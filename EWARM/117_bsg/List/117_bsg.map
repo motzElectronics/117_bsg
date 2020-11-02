@@ -1,0 +1,1388 @@
+###############################################################################
+#
+# IAR ELF Linker V8.30.1.114/W32 for ARM                  02/Nov/2020  15:51:19
+# Copyright 2007-2018 IAR Systems AB.
+#
+#    Output file  =  
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Exe\117_bsg.out
+#    Map file     =  
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\List\117_bsg.map
+#    Command line =  
+#        -f C:\Users\annsi\AppData\Local\Temp\EWE0F7.tmp
+#        (C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\circularBuffer.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\cmsis_os.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\croutine.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\dma.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\event_groups.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\freertos.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\gpio.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\heap_4.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\iwdg.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\list.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\m_utils_bsg.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\m_utils_json.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\main.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\port.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\portasm.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\queue.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\rtc.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\simcom.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\spi.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\spiflash.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\startup_stm32f401xe.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\stm32f4xx_hal.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\stm32f4xx_hal_cortex.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\stm32f4xx_hal_dma.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\stm32f4xx_hal_dma_ex.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\stm32f4xx_hal_exti.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\stm32f4xx_hal_flash.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\stm32f4xx_hal_flash_ex.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\stm32f4xx_hal_flash_ramfunc.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\stm32f4xx_hal_gpio.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\stm32f4xx_hal_iwdg.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\stm32f4xx_hal_msp.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\stm32f4xx_hal_pwr.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\stm32f4xx_hal_pwr_ex.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\stm32f4xx_hal_rcc.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\stm32f4xx_hal_rcc_ex.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\stm32f4xx_hal_rtc.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\stm32f4xx_hal_rtc_ex.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\stm32f4xx_hal_spi.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\stm32f4xx_hal_tim.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\stm32f4xx_hal_tim_ex.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\stm32f4xx_hal_timebase_tim.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\stm32f4xx_hal_uart.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\stm32f4xx_it.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\stream_buffer.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\system_stm32f4xx.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\task_get_gps.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\task_get_new_bin.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\task_http.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\task_iwdg.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\task_keep_alive.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\tasks.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\timers.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\usart.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\utils_crc.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\utils_flash.o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj\utils_gps.o
+#        --redirect _Printf=_PrintfFull --redirect _Scanf=_ScanfFull
+#        --no_out_extension -o
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Exe\117_bsg.out
+#        --map
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\List\117_bsg.map
+#        --config
+#        C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM/stm32f401xe_flash.icf
+#        --semihosting --entry __iar_program_start --redirect
+#        __iar_sh_stdout=__iar_sh_stdout_swo --vfe --text_out locale)
+#
+###############################################################################
+
+*******************************************************************************
+*** RUNTIME MODEL ATTRIBUTES
+***
+
+CppFlavor       = *
+__Heap_Handler  = Basic
+__SystemLibrary = DLib
+__dlib_version  = 6
+
+
+*******************************************************************************
+*** HEAP SELECTION
+***
+
+The basic heap was selected because no calls to memory allocation
+functions were found in the application outside of system library
+functions, and there are calls to deallocation functions in the
+application.
+
+
+*******************************************************************************
+*** PLACEMENT SUMMARY
+***
+
+"A0":  place at 0x800'8000 { ro section .intvec };
+"P1":  place in [from 0x800'8000 to 0x807'ffff] { ro };
+define block CSTACK with size = 1K, alignment = 8 { };
+define block HEAP with size = 512, alignment = 8 { };
+"P2":  place in [from 0x2000'0000 to 0x2001'7fff] {
+          rw, block CSTACK, block HEAP };
+initialize by copy { rw };
+
+  Section            Kind         Address    Size  Object
+  -------            ----         -------    ----  ------
+"A0":                                       0x194
+  .intvec            ro code   0x800'8000   0x194  startup_stm32f401xe.o [1]
+                             - 0x800'8194   0x194
+
+"P1":                                      0xbfab
+  .text              ro code   0x800'8194   0xf7a  xprintffull.o [2]
+  .text              ro code   0x800'910e    0x7a  lz77_init_single.o [4]
+  .text              ro code   0x800'9188    0xb4  xlocale_c.o [2]
+  .text              ro code   0x800'923c    0x16  strchr.o [4]
+  .text              ro code   0x800'9252    0x3a  zero_init3.o [4]
+  .text              ro code   0x800'928c    0x40  xfail_s.o [2]
+  .text              ro code   0x800'92cc    0x36  strlen.o [4]
+  .text              ro code   0x800'9302    0x1e  xencoding_8859_1.o [2]
+  .text              ro code   0x800'9320    0x58  memchr.o [4]
+  .text              ro code   0x800'9378     0xa  xmbcurmax.o [2]
+  .text              ro code   0x800'9382     0xa  xsprout.o [2]
+  .text              ro code   0x800'938c    0xa6  ABImemcpy.o [4]
+  .rodata            const     0x800'9432     0x2  spiflash.o [1]
+  .text              ro code   0x800'9434   0x230  I64DivMod.o [4]
+  .text              ro code   0x800'9664   0x1a2  DblMul.o [3]
+  .text              ro code   0x800'9808    0x70  frexp.o [3]
+  .text              ro code   0x800'9878    0x2e  DblCmpLe.o [3]
+  .text              ro code   0x800'98a8    0x2e  DblCmpGe.o [3]
+  .text              ro code   0x800'98d8   0x13a  ldexp.o [3]
+  .text              ro code   0x800'9a14    0x3a  DblToS32.o [3]
+  .text              ro code   0x800'9a50    0x22  S32ToDbl.o [3]
+  .text              ro code   0x800'9a74    0xe2  DblSub.o [3]
+  .text              ro code   0x800'9b58   0x246  DblDiv.o [3]
+  .text              ro code   0x800'9da0    0x28  DblToU32.o [3]
+  .text              ro code   0x800'9dc8    0x1a  U32ToDbl.o [3]
+  .text              ro code   0x800'9de2     0x6  abort.o [2]
+  .text              ro code   0x800'9de8     0x2  I64DivZer.o [4]
+  .text              ro code   0x800'9dec   0x17a  DblAdd.o [3]
+  .text              ro code   0x800'9f68    0x14  exit.o [5]
+  .text              ro code   0x800'9f7c   0xd98  tasks.o [1]
+  .text              ro code   0x800'ad14   0x274  heap_4.o [1]
+  .text              ro code   0x800'af88    0x9a  list.o [1]
+  .text              ro code   0x800'b024   0x204  port.o [1]
+  .text              ro code   0x800'b228   0x108  freertos.o [1]
+  CODE               ro code   0x800'b330    0xb0  portasm.o [1]
+  .text              ro code   0x800'b3e0    0xb8  cmsis_os.o [1]
+  .text              ro code   0x800'b498   0x6fa  queue.o [1]
+  .text              ro code   0x800'bb94   0xcbc  stm32f4xx_hal_uart.o [1]
+  .text              ro code   0x800'c850   0x3b0  usart.o [1]
+  .text              ro code   0x800'cc00     0xc  stm32f4xx_hal.o [1]
+  .text              ro code   0x800'cc0c   0x4a8  stm32f4xx_hal_dma.o [1]
+  .text              ro code   0x800'd0b4     0x2  stm32f4xx_hal_uart.o [1]
+  .text              ro code   0x800'd0b6     0x2  stm32f4xx_hal_uart.o [1]
+  .text              ro code   0x800'd0b8   0x25c  stm32f4xx_hal_rcc.o [1]
+  .text              ro code   0x800'd314   0x2a2  main.o [1]
+  .text              ro code   0x800'd5b8     0x6  ABImemclr4.o [4]
+  .text              ro code   0x800'd5c0   0x238  stm32f4xx_hal_gpio.o [1]
+  .text              ro code   0x800'd7f8   0x138  stm32f4xx_hal_cortex.o [1]
+  .text              ro code   0x800'd930    0x66  ABImemset.o [4]
+  .text              ro code   0x800'd998    0x98  stm32f4xx_hal_timebase_tim.o [1]
+  .text              ro code   0x800'da30    0x34  stm32f4xx_hal.o [1]
+  .text              ro code   0x800'da64    0xf0  gpio.o [1]
+  .text              ro code   0x800'db54    0x88  dma.o [1]
+  .text              ro code   0x800'dbdc   0x19c  spi.o [1]
+  .text              ro code   0x800'dd78    0x28  iwdg.o [1]
+  .text              ro code   0x800'dda0    0x4c  rtc.o [1]
+  .text              ro code   0x800'ddec    0x28  printf.o [2]
+  .text              ro code   0x800'de14   0x30a  m_utils_bsg.o [1]
+  .text              ro code   0x800'e120   0x390  circularBuffer.o [1]
+  .text              ro code   0x800'e4b0   0x3dc  stm32f4xx_hal_rcc.o [1]
+  .text              ro code   0x800'e88c   0x174  stm32f4xx_hal_rcc_ex.o [1]
+  .text              ro code   0x800'ea00    0x40  sprintf.o [2]
+  .text              ro code   0x800'ea40    0x18  stm32f4xx_hal.o [1]
+  .text              ro code   0x800'ea58    0x32  ABImemset48.o [4]
+  .text              ro code   0x800'ea8c   0x27a  stm32f4xx_hal_tim.o [1]
+  .text              ro code   0x800'ed08    0x48  stm32f4xx_hal_msp.o [1]
+  .text              ro code   0x800'ed50   0x898  stm32f4xx_hal_spi.o [1]
+  .text              ro code   0x800'f5e8    0x5e  stm32f4xx_hal_iwdg.o [1]
+  .text              ro code   0x800'f648   0x442  stm32f4xx_hal_rtc.o [1]
+  .text              ro code   0x800'fa8c    0x6e  utils_crc.o [1]
+  .text              ro code   0x800'fafc   0x4d4  spiflash.o [1]
+  .text              ro code   0x800'ffd0   0x8fc  simcom.o [1]
+  .text              ro code   0x801'08cc   0x1bc  iar_Stoullx.o [2]
+  .text              ro code   0x801'0a88     0xa  gmtime.o [2]
+  .text              ro code   0x801'0a94    0xd0  mktime.o [2]
+  .text              ro code   0x801'0b64   0x342  utils_gps.o [1]
+  .text              ro code   0x801'0ea8   0x17c  iar_Stoulx.o [2]
+  .text              ro code   0x801'1024     0x2  stm32f4xx_hal_tim.o [1]
+  .text              ro code   0x801'1026     0x2  stm32f4xx_hal_tim.o [1]
+  .text              ro code   0x801'1028     0x2  stm32f4xx_hal_tim.o [1]
+  .text              ro code   0x801'102a     0x2  stm32f4xx_hal_tim_ex.o [1]
+  .text              ro code   0x801'102c     0x2  stm32f4xx_hal_tim.o [1]
+  .text              ro code   0x801'102e     0x2  stm32f4xx_hal_tim_ex.o [1]
+  .text              ro code   0x801'1030     0x2  stm32f4xx_hal_spi.o [1]
+  .text              ro code   0x801'1032     0x2  stm32f4xx_hal_spi.o [1]
+  .text              ro code   0x801'1034     0x2  stm32f4xx_hal_spi.o [1]
+  .text              ro code   0x801'1036     0x2  stm32f4xx_hal_spi.o [1]
+  .text              ro code   0x801'1038    0x4c  strtok.o [2]
+  .text              ro code   0x801'1084    0x4a  strcmp.o [4]
+  .text              ro code   0x801'10ce    0x14  isspace.o [2]
+  .text              ro code   0x801'10e2    0x14  tolower.o [2]
+  .text              ro code   0x801'10f8   0x104  xttotm.o [2]
+  .text              ro code   0x801'11fc    0x6c  xDaysTo.o [2]
+  .text              ro code   0x801'1268     0x4  xTzoff_nop.o [2]
+  .text              ro code   0x801'126c     0xe  math_wrappers64.o [3]
+  .text              ro code   0x801'127a    0x28  strpbrk.o [2]
+  .text              ro code   0x801'12a4    0x39  strtok_r.o [2]
+  .text              ro code   0x801'12de    0x22  strspn.o [2]
+  .text              ro code   0x801'1300    0x22  strcspn.o [2]
+  .text              ro code   0x801'1322     0x6  xisdst_nop.o [2]
+  .rodata            const     0x801'1328    0x44  m_utils_json.o [1]
+  .text              ro code   0x801'1370   0x580  strto64.o [3]
+  .text              ro code   0x801'18f0   0x122  iar_Stopfx.o [2]
+  .text              ro code   0x801'1a14   0x1c4  iar_Stoflt.o [2]
+  .text              ro code   0x801'1bd8   0x21c  iar_Stoxflt.o [2]
+  .text              ro code   0x801'1df4    0x14  isalpha.o [2]
+  .text              ro code   0x801'1e08   0x324  task_http.o [1]
+  .text              ro code   0x801'212c   0x1bc  m_utils_json.o [1]
+  .text              ro code   0x801'22e8    0x1e  strcat.o [2]
+  .text              ro code   0x801'2308   0x254  task_get_new_bin.o [1]
+  .text              ro code   0x801'255c   0x188  utils_flash.o [1]
+  .text              ro code   0x801'26e4   0x22c  stm32f4xx_hal_flash.o [1]
+  .text              ro code   0x801'2910    0x64  stm32f4xx_hal_flash_ex.o [1]
+  .text              ro code   0x801'2974    0x28  stm32f4xx_hal.o [1]
+  .text              ro code   0x801'299c   0x140  heap0.o [2]
+  .text              ro code   0x801'2adc    0x2c  xgetmemchunk.o [2]
+  .text              ro code   0x801'2b08   0x114  task_get_gps.o [1]
+  .text              ro code   0x801'2c1c    0xd8  xfspos.o [2]
+  .text              ro code   0x801'2cf4    0xac  fflush.o [2]
+  .text              ro code   0x801'2da0     0xc  xfgpos.o [2]
+  .text              ro code   0x801'2dac    0x4a  lseek.o [5]
+  .text              ro code   0x801'2df6    0x10  write.o [5]
+  .text              ro code   0x801'2e08    0xcc  XShHandles.o [2]
+  .text              ro code   0x801'2ed4    0x1e  dwrite.o [5]
+  .text              ro code   0x801'2ef4    0x50  iarwstdswo.o [5]
+  .text              ro code   0x801'2f44    0x22  iarwrite.o [5]
+  .text              ro code   0x801'2f68    0xbc  stm32f4xx_it.o [1]
+  .text              ro code   0x801'3024    0xb4  xfwprep.o [2]
+  .text              ro code   0x801'30d8    0x24  fseek.o [2]
+  .text              ro code   0x801'30fc    0x8c  xfofind.o [2]
+  .text              ro code   0x801'3188     0x4  heaptramp0.o [2]
+  .text              ro code   0x801'318c    0x7e  fclose.o [2]
+  .text              ro code   0x801'320a    0x18  close.o [5]
+  .text              ro code   0x801'3222    0x14  remove.o [5]
+  .text              ro code   0x801'3236    0x54  fputc.o [2]
+  .text              ro code   0x801'328c    0x3c  xcloseall.o [2]
+  .rodata            const     0x801'32c8    0x38  task_get_new_bin.o [1]
+  .rodata            const     0x801'3300    0x38  task_get_new_bin.o [1]
+  .rodata            const     0x801'3338    0x34  m_utils_json.o [1]
+  .rodata            const     0x801'336c    0x30  m_utils_json.o [1]
+  .rodata            const     0x801'339c    0x30  main.o [1]
+  .rodata            const     0x801'33cc    0x30  task_get_new_bin.o [1]
+  .rodata            const     0x801'33fc    0x2c  m_utils_json.o [1]
+  .rodata            const     0x801'3428    0x2c  main.o [1]
+  .rodata            const     0x801'3454    0x2c  simcom.o [1]
+  .rodata            const     0x801'3480    0x28  main.o [1]
+  .rodata            const     0x801'34a8    0x28  simcom.o [1]
+  .text              ro code   0x801'34d0    0x28  data_init.o [4]
+  .rodata            const     0x801'34f8    0x24  main.o [1]
+  .rodata            const     0x801'351c    0x24  simcom.o [1]
+  .text              ro code   0x801'3540    0x22  fpinit_M.o [3]
+  .iar.init_table    const     0x801'3564    0x20  - Linker created -
+  .rodata            const     0x801'3584    0x20  circularBuffer.o [1]
+  .rodata            const     0x801'35a4    0x20  simcom.o [1]
+  .rodata            const     0x801'35c4    0x20  simcom.o [1]
+  .rodata            const     0x801'35e4    0x20  simcom.o [1]
+  .rodata            const     0x801'3604    0x20  simcom.o [1]
+  .rodata            const     0x801'3624    0x20  task_get_new_bin.o [1]
+  .text              ro code   0x801'3644    0x20  system_stm32f4xx.o [1]
+  .text              ro code   0x801'3664    0x1e  cmain.o [4]
+  .text              ro code   0x801'3682     0x4  low_level_init.o [2]
+  .text              ro code   0x801'3686     0x4  exit.o [2]
+  .text              ro code   0x801'368c     0xe  cexit.o [4]
+  .rodata            const     0x801'369c    0x1c  freertos.o [1]
+  .rodata            const     0x801'36b8    0x1c  freertos.o [1]
+  .rodata            const     0x801'36d4    0x1c  freertos.o [1]
+  .rodata            const     0x801'36f0    0x1c  freertos.o [1]
+  .rodata            const     0x801'370c    0x1c  freertos.o [1]
+  .rodata            const     0x801'3728    0x1c  simcom.o [1]
+  .rodata            const     0x801'3744    0x1c  simcom.o [1]
+  .rodata            const     0x801'3760    0x1c  simcom.o [1]
+  .rodata            const     0x801'377c    0x1c  simcom.o [1]
+  .rodata            const     0x801'3798    0x1c  simcom.o [1]
+  .rodata            const     0x801'37b4    0x1c  spiflash.o [1]
+  .rodata            const     0x801'37d0    0x1c  task_get_gps.o [1]
+  .rodata            const     0x801'37ec    0x1c  task_get_new_bin.o [1]
+  .rodata            const     0x801'3808    0x1c  task_get_new_bin.o [1]
+  .rodata            const     0x801'3824    0x1c  utils_flash.o [1]
+  .rodata            const     0x801'3840    0x1c  utils_flash.o [1]
+  .rodata            const     0x801'385c    0x18  circularBuffer.o [1]
+  .rodata            const     0x801'3874    0x18  main.o [1]
+  .rodata            const     0x801'388c    0x18  simcom.o [1]
+  .rodata            const     0x801'38a4    0x18  simcom.o [1]
+  .rodata            const     0x801'38bc    0x18  simcom.o [1]
+  .rodata            const     0x801'38d4    0x18  simcom.o [1]
+  .rodata            const     0x801'38ec    0x18  simcom.o [1]
+  .rodata            const     0x801'3904    0x18  spiflash.o [1]
+  .rodata            const     0x801'391c    0x18  task_get_new_bin.o [1]
+  .rodata            const     0x801'3934    0x18  task_get_new_bin.o [1]
+  .rodata            const     0x801'394c    0x18  task_get_new_bin.o [1]
+  .rodata            const     0x801'3964    0x18  task_http.o [1]
+  .rodata            const     0x801'397c    0x18  task_http.o [1]
+  .rodata            const     0x801'3994    0x18  utils_flash.o [1]
+  .rodata            const     0x801'39ac    0x18  utils_flash.o [1]
+  .text              ro code   0x801'39c4    0x18  task_iwdg.o [1]
+  .text              ro code   0x801'39dc    0x16  xprout.o [2]
+  .text              ro code   0x801'39f4     0xc  putchar.o [2]
+  .rodata            const     0x801'3a00    0x14  m_utils_bsg.o [1]
+  .rodata            const     0x801'3a14    0x14  m_utils_bsg.o [1]
+  .rodata            const     0x801'3a28    0x14  main.o [1]
+  .rodata            const     0x801'3a3c    0x14  simcom.o [1]
+  .rodata            const     0x801'3a50    0x14  simcom.o [1]
+  .rodata            const     0x801'3a64    0x14  simcom.o [1]
+  .rodata            const     0x801'3a78    0x14  simcom.o [1]
+  .rodata            const     0x801'3a8c    0x14  simcom.o [1]
+  .rodata            const     0x801'3aa0    0x14  simcom.o [1]
+  .rodata            const     0x801'3ab4    0x14  simcom.o [1]
+  .rodata            const     0x801'3ac8    0x14  spiflash.o [1]
+  .rodata            const     0x801'3adc    0x14  spiflash.o [1]
+  .rodata            const     0x801'3af0    0x14  task_get_gps.o [1]
+  .rodata            const     0x801'3b04    0x14  task_get_gps.o [1]
+  .rodata            const     0x801'3b18    0x14  task_get_new_bin.o [1]
+  .rodata            const     0x801'3b2c    0x14  task_http.o [1]
+  .rodata            const     0x801'3b40    0x14  task_http.o [1]
+  .rodata            const     0x801'3b54    0x10  circularBuffer.o [1]
+  .rodata            const     0x801'3b64    0x10  circularBuffer.o [1]
+  .rodata            const     0x801'3b74    0x10  m_utils_bsg.o [1]
+  .rodata            const     0x801'3b84    0x10  main.o [1]
+  .rodata            const     0x801'3b94     0xc  freertos.o [1]
+  .rodata            const     0x801'3ba0    0x10  main.o [1]
+  .rodata            const     0x801'3bb0    0x10  simcom.o [1]
+  .rodata            const     0x801'3bc0    0x10  simcom.o [1]
+  .rodata            const     0x801'3bd0    0x10  simcom.o [1]
+  .rodata            const     0x801'3be0    0x10  spiflash.o [1]
+  .rodata            const     0x801'3bf0    0x10  spiflash.o [1]
+  .rodata            const     0x801'3c00    0x10  spiflash.o [1]
+  .rodata            const     0x801'3c10    0x10  system_stm32f4xx.o [1]
+  .rodata            const     0x801'3c20    0x10  task_get_new_bin.o [1]
+  .rodata            const     0x801'3c30    0x10  utils_flash.o [1]
+  .text              ro code   0x801'3c40    0x10  startup_stm32f401xe.o [1]
+  .rodata            const     0x801'3c50     0xc  freertos.o [1]
+  .rodata            const     0x801'3c5c     0xc  freertos.o [1]
+  .rodata            const     0x801'3c68     0xc  simcom.o [1]
+  .rodata            const     0x801'3c74     0xc  simcom.o [1]
+  .rodata            const     0x801'3c80     0xc  simcom.o [1]
+  .rodata            const     0x801'3c8c     0xc  simcom.o [1]
+  .rodata            const     0x801'3c98     0xc  simcom.o [1]
+  .rodata            const     0x801'3ca4     0xc  simcom.o [1]
+  .rodata            const     0x801'3cb0     0xc  simcom.o [1]
+  .rodata            const     0x801'3cbc     0xc  simcom.o [1]
+  .rodata            const     0x801'3cc8     0xc  simcom.o [1]
+  .rodata            const     0x801'3cd4     0xc  simcom.o [1]
+  .rodata            const     0x801'3ce0     0xc  simcom.o [1]
+  .rodata            const     0x801'3cec     0xc  simcom.o [1]
+  .rodata            const     0x801'3cf8     0xc  spiflash.o [1]
+  .rodata            const     0x801'3d04     0xc  spiflash.o [1]
+  .rodata            const     0x801'3d10     0xc  task_http.o [1]
+  .text              ro code   0x801'3d1c     0xc  freertos.o [1]
+  .text              ro code   0x801'3d28     0xc  cstartup_M.o [4]
+  .rodata            const     0x801'3d34     0x8  freertos.o [1]
+  .rodata            const     0x801'3d3c     0x8  freertos.o [1]
+  .rodata            const     0x801'3d44     0x8  freertos.o [1]
+  .rodata            const     0x801'3d4c     0x8  freertos.o [1]
+  .rodata            const     0x801'3d54     0x8  freertos.o [1]
+  .rodata            const     0x801'3d5c     0x8  m_utils_json.o [1]
+  .rodata            const     0x801'3d64     0x8  simcom.o [1]
+  .rodata            const     0x801'3d6c     0x8  simcom.o [1]
+  .rodata            const     0x801'3d74     0x8  simcom.o [1]
+  .rodata            const     0x801'3d7c     0x8  simcom.o [1]
+  .rodata            const     0x801'3d84     0x8  simcom.o [1]
+  .rodata            const     0x801'3d8c     0x8  simcom.o [1]
+  .rodata            const     0x801'3d94     0x8  simcom.o [1]
+  .rodata            const     0x801'3d9c     0x8  spiflash.o [1]
+  .rodata            const     0x801'3da4     0x8  stm32f4xx_hal_dma.o [1]
+  .rodata            const     0x801'3dac     0x8  system_stm32f4xx.o [1]
+  .rodata            const     0x801'3db4     0x8  task_get_gps.o [1]
+  .rodata            const     0x801'3dbc     0x8  tasks.o [1]
+  .rodata            const     0x801'3dc4     0x6  xlocale_c.o [2]
+  .rodata            const     0x801'3dcc     0x4  heap_4.o [1]
+  .rodata            const     0x801'3dd0     0x4  spiflash.o [1]
+  .rodata            const     0x801'3dd4     0x4  spiflash.o [1]
+  .rodata            const     0x801'3dd8     0x4  spiflash.o [1]
+  .text              ro code   0x801'3ddc     0x4  startup_stm32f401xe.o [1]
+  .text              ro code   0x801'3de0     0x4  startup_stm32f401xe.o [1]
+  .text              ro code   0x801'3de4     0x4  startup_stm32f401xe.o [1]
+  .text              ro code   0x801'3de8     0x4  startup_stm32f401xe.o [1]
+  .text              ro code   0x801'3dec     0x4  startup_stm32f401xe.o [1]
+  .text              ro code   0x801'3df0     0x4  startup_stm32f401xe.o [1]
+  .text              ro code   0x801'3df4     0x4  startup_stm32f401xe.o [1]
+  .text              ro code   0x801'3df8     0x4  startup_stm32f401xe.o [1]
+  .text              ro code   0x801'3dfc     0x4  startup_stm32f401xe.o [1]
+  .text              ro code   0x801'3e00     0x4  startup_stm32f401xe.o [1]
+  .text              ro code   0x801'3e04     0x4  startup_stm32f401xe.o [1]
+  .text              ro code   0x801'3e08     0x4  startup_stm32f401xe.o [1]
+  .text              ro code   0x801'3e0c     0x4  startup_stm32f401xe.o [1]
+  .text              ro code   0x801'3e10     0x4  startup_stm32f401xe.o [1]
+  .text              ro code   0x801'3e14     0x4  startup_stm32f401xe.o [1]
+  .text              ro code   0x801'3e18     0x4  startup_stm32f401xe.o [1]
+  .text              ro code   0x801'3e1c     0x4  startup_stm32f401xe.o [1]
+  .text              ro code   0x801'3e20     0x4  startup_stm32f401xe.o [1]
+  .text              ro code   0x801'3e24     0x4  startup_stm32f401xe.o [1]
+  .text              ro code   0x801'3e28     0x4  startup_stm32f401xe.o [1]
+  .text              ro code   0x801'3e2c     0x4  startup_stm32f401xe.o [1]
+  .text              ro code   0x801'3e30     0x4  startup_stm32f401xe.o [1]
+  .text              ro code   0x801'3e34     0x4  startup_stm32f401xe.o [1]
+  .text              ro code   0x801'3e38     0x4  startup_stm32f401xe.o [1]
+  .text              ro code   0x801'3e3c     0x4  startup_stm32f401xe.o [1]
+  .text              ro code   0x801'3e40     0x4  startup_stm32f401xe.o [1]
+  .text              ro code   0x801'3e44     0x4  startup_stm32f401xe.o [1]
+  .text              ro code   0x801'3e48     0x4  startup_stm32f401xe.o [1]
+  .text              ro code   0x801'3e4c     0x4  startup_stm32f401xe.o [1]
+  .text              ro code   0x801'3e50     0x4  startup_stm32f401xe.o [1]
+  .text              ro code   0x801'3e54     0x4  startup_stm32f401xe.o [1]
+  .text              ro code   0x801'3e58     0x4  startup_stm32f401xe.o [1]
+  .text              ro code   0x801'3e5c     0x4  startup_stm32f401xe.o [1]
+  .text              ro code   0x801'3e60     0x4  startup_stm32f401xe.o [1]
+  .text              ro code   0x801'3e64     0x4  startup_stm32f401xe.o [1]
+  .text              ro code   0x801'3e68     0x4  startup_stm32f401xe.o [1]
+  .text              ro code   0x801'3e6c     0x4  startup_stm32f401xe.o [1]
+  .text              ro code   0x801'3e70     0x4  startup_stm32f401xe.o [1]
+  .text              ro code   0x801'3e74     0x4  startup_stm32f401xe.o [1]
+  .text              ro code   0x801'3e78     0x4  startup_stm32f401xe.o [1]
+  .text              ro code   0x801'3e7c     0x4  startup_stm32f401xe.o [1]
+  .text              ro code   0x801'3e80     0x4  startup_stm32f401xe.o [1]
+  .text              ro code   0x801'3e84     0x4  startup_stm32f401xe.o [1]
+  .text              ro code   0x801'3e88     0x4  startup_stm32f401xe.o [1]
+  .text              ro code   0x801'3e8c     0x4  startup_stm32f401xe.o [1]
+  .text              ro code   0x801'3e90     0x4  startup_stm32f401xe.o [1]
+  .text              ro code   0x801'3e94     0x4  startup_stm32f401xe.o [1]
+  .text              ro code   0x801'3e98     0x0  cstart_closeall.o [4]
+  .rodata            const     0x801'3e98     0x0  zero_init3.o [4]
+  .rodata            const     0x801'3e98     0x0  lz77_init_single.o [4]
+  Initializer bytes  const     0x801'3e98   0x2a7  <for P2-1>
+                             - 0x801'413f  0xbfab
+
+"P2", part 1 of 3:                          0x38a
+  P2-1                        0x2000'0000   0x38a  <Init block>
+    .data            inited   0x2000'0000     0x4  m_utils_bsg.o [1]
+    .data            inited   0x2000'0004     0x4  port.o [1]
+    .data            inited   0x2000'0008     0x4  stm32f4xx_hal.o [1]
+    .data            inited   0x2000'000c     0x4  system_stm32f4xx.o [1]
+    .data            inited   0x2000'0010   0x200  utils_crc.o [1]
+    .data            inited   0x2000'0210    0x38  xlocale_c.o [2]
+    .data            inited   0x2000'0248    0x48  xlocale_c.o [2]
+    .data            inited   0x2000'0290    0x48  xfiles.o [2]
+    .data            inited   0x2000'02d8    0x48  xfiles.o [2]
+    .data            inited   0x2000'0320    0x48  xfiles.o [2]
+    .data            inited   0x2000'0368    0x20  xfiles.o [2]
+    .data            inited   0x2000'0388     0x1  simcom.o [1]
+    .data            inited   0x2000'0389     0x1  stm32f4xx_hal.o [1]
+                            - 0x2000'038a   0x38a
+
+"P2", part 2 of 3:                         0x544c
+  .bss               zero     0x2000'038c  0x2710  heap_4.o [1]
+  .bss               zero     0x2000'2a9c  0x1004  m_utils_json.o [1]
+  .bss               zero     0x2000'3aa0   0x400  usart.o [1]
+  .bss               zero     0x2000'3ea0   0x400  usart.o [1]
+  .bss               zero     0x2000'42a0   0x3e8  utils_flash.o [1]
+  .bss               zero     0x2000'4688   0x200  freertos.o [1]
+  .bss               zero     0x2000'4888   0x1f4  usart.o [1]
+  .bss               zero     0x2000'4a7c   0x100  main.o [1]
+  .bss               zero     0x2000'4b7c   0x100  task_get_new_bin.o [1]
+  .bss               zero     0x2000'4c7c   0x100  task_http.o [1]
+  .bss               zero     0x2000'4d7c    0xc8  task_get_gps.o [1]
+  .bss               zero     0x2000'4e44    0x8c  tasks.o [1]
+  .bss               zero     0x2000'4ed0    0x80  XShHandles.o [2]
+  .bss               zero     0x2000'4f50    0x64  m_utils_json.o [1]
+  .bss               zero     0x2000'4fb4    0x64  simcom.o [1]
+  .bss               zero     0x2000'5018    0x64  simcom.o [1]
+  .bss               zero     0x2000'507c    0x64  simcom.o [1]
+  .bss               zero     0x2000'50e0    0x60  spi.o [1]
+  .bss               zero     0x2000'5140    0x60  spi.o [1]
+  .bss               zero     0x2000'51a0    0x60  usart.o [1]
+  .bss               zero     0x2000'5200    0x60  usart.o [1]
+  .bss               zero     0x2000'5260    0x60  usart.o [1]
+  .bss               zero     0x2000'52c0    0x58  spi.o [1]
+  .bss               zero     0x2000'5318    0x54  freertos.o [1]
+  .bss               zero     0x2000'536c    0x50  xfiles.o [2]
+  .bss               zero     0x2000'53bc    0x50  xfiles.o [2]
+  .bss               zero     0x2000'540c    0x48  main.o [1]
+  .bss               zero     0x2000'5454    0x40  stm32f4xx_hal_timebase_tim.o [1]
+  .bss               zero     0x2000'5494    0x40  usart.o [1]
+  .bss               zero     0x2000'54d4    0x40  usart.o [1]
+  .bss               zero     0x2000'5514    0x30  spiflash.o [1]
+  .bss               zero     0x2000'5544    0x2c  m_utils_bsg.o [1]
+  .bss               zero     0x2000'5570    0x2c  xttotm.o [2]
+  .bss               zero     0x2000'559c    0x20  rtc.o [1]
+  .bss               zero     0x2000'55bc    0x20  stm32f4xx_hal_flash.o [1]
+  .bss               zero     0x2000'55dc    0x1c  task_get_gps.o [1]
+  .bss               zero     0x2000'55f8    0x1c  task_http.o [1]
+  .bss               zero     0x2000'5614    0x18  main.o [1]
+  .bss               zero     0x2000'562c    0x18  main.o [1]
+  .bss               zero     0x2000'5644    0x18  task_get_gps.o [1]
+  .bss               zero     0x2000'565c    0x18  task_get_gps.o [1]
+  .bss               zero     0x2000'5674    0x14  m_utils_bsg.o [1]
+  .bss               zero     0x2000'5688    0x14  tasks.o [1]
+  .bss               zero     0x2000'569c    0x14  tasks.o [1]
+  .bss               zero     0x2000'56b0    0x14  tasks.o [1]
+  .bss               zero     0x2000'56c4    0x14  tasks.o [1]
+  .bss               zero     0x2000'56d8    0x14  tasks.o [1]
+  .bss               zero     0x2000'56ec    0x14  usart.o [1]
+  .bss               zero     0x2000'5700    0x14  usart.o [1]
+  .bss               zero     0x2000'5714    0x10  main.o [1]
+  .bss               zero     0x2000'5724     0xc  iwdg.o [1]
+  .bss               zero     0x2000'5730     0x8  heap_4.o [1]
+  .bss               zero     0x2000'5738     0x8  spi.o [1]
+  .bss               zero     0x2000'5740     0x8  heap0.o [2]
+  .bss               zero     0x2000'5748     0x4  freertos.o [1]
+  .bss               zero     0x2000'574c     0x4  freertos.o [1]
+  .bss               zero     0x2000'5750     0x4  freertos.o [1]
+  .bss               zero     0x2000'5754     0x4  freertos.o [1]
+  .bss               zero     0x2000'5758     0x4  freertos.o [1]
+  .bss               zero     0x2000'575c     0x4  freertos.o [1]
+  .bss               zero     0x2000'5760     0x4  freertos.o [1]
+  .bss               zero     0x2000'5764     0x4  freertos.o [1]
+  .bss               zero     0x2000'5768     0x4  heap_4.o [1]
+  .bss               zero     0x2000'576c     0x4  heap_4.o [1]
+  .bss               zero     0x2000'5770     0x4  heap_4.o [1]
+  .bss               zero     0x2000'5774     0x4  heap_4.o [1]
+  .bss               zero     0x2000'5778     0x4  m_utils_bsg.o [1]
+  .bss               zero     0x2000'577c     0x4  m_utils_json.o [1]
+  .bss               zero     0x2000'5780     0x4  port.o [1]
+  .bss               zero     0x2000'5784     0x4  stm32f4xx_hal.o [1]
+  .bss               zero     0x2000'5788     0x4  tasks.o [1]
+  .bss               zero     0x2000'578c     0x4  tasks.o [1]
+  .bss               zero     0x2000'5790     0x4  tasks.o [1]
+  .bss               zero     0x2000'5794     0x4  tasks.o [1]
+  .bss               zero     0x2000'5798     0x4  tasks.o [1]
+  .bss               zero     0x2000'579c     0x4  tasks.o [1]
+  .bss               zero     0x2000'57a0     0x4  tasks.o [1]
+  .bss               zero     0x2000'57a4     0x4  tasks.o [1]
+  .bss               zero     0x2000'57a8     0x4  tasks.o [1]
+  .bss               zero     0x2000'57ac     0x4  tasks.o [1]
+  .bss               zero     0x2000'57b0     0x4  tasks.o [1]
+  .bss               zero     0x2000'57b4     0x4  tasks.o [1]
+  .bss               zero     0x2000'57b8     0x4  tasks.o [1]
+  .bss               zero     0x2000'57bc     0x4  tasks.o [1]
+  .bss               zero     0x2000'57c0     0x4  tasks.o [1]
+  .bss               zero     0x2000'57c4     0x4  strtok.o [2]
+  .bss               zero     0x2000'57c8     0x4  xfail_s.o [2]
+  .bss               zero     0x2000'57cc     0x4  xgetmemchunk.o [2]
+  .bss               zero     0x2000'57d0     0x2  m_utils_json.o [1]
+  .bss               zero     0x2000'57d2     0x2  m_utils_json.o [1]
+  .bss               zero     0x2000'57d4     0x1  port.o [1]
+  .bss               zero     0x2000'57d5     0x1  task_get_new_bin.o [1]
+  .bss               zero     0x2000'57d6     0x1  task_http.o [1]
+                            - 0x2000'57d7  0x544b
+
+"P2", part 3 of 3:                          0x600
+  CSTACK                      0x2000'57d8   0x400  <Block>
+    CSTACK           uninit   0x2000'57d8   0x400  <Block tail>
+  HEAP                        0x2000'5bd8   0x200  <Block>
+    HEAP             uninit   0x2000'5bd8   0x200  <Block tail>
+                            - 0x2000'5dd8   0x600
+
+Unused ranges:
+
+         From           To      Size
+         ----           --      ----
+   0x801'413f   0x807'ffff  0x6'bec1
+  0x2000'038a  0x2000'038b       0x2
+  0x2000'5dd8  0x2001'7fff  0x1'2228
+
+
+*******************************************************************************
+*** INIT TABLE
+***
+
+          Address      Size
+          -------      ----
+Zero (__iar_zero_init3)
+    1 destination range, total size 0x544b:
+          0x2000'038c  0x544b
+
+Copy/lz77 (__iar_lz77_init_single3)
+    1 source range, total size 0x2a7 (74% of destination):
+           0x801'3e98   0x2a7
+    1 destination range, total size 0x38a:
+          0x2000'0000   0x38a
+
+
+
+*******************************************************************************
+*** MODULE SUMMARY
+***
+
+    Module                        ro code  ro data  rw data
+    ------                        -------  -------  -------
+command line/config:
+    -------------------------------------------------------
+    Total:
+
+C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj: [1]
+    circularBuffer.o                  912       88
+    cmsis_os.o                        184
+    dma.o                             136
+    freertos.o                        276      216      628
+    gpio.o                            240
+    heap_4.o                          628        4   10 024
+    iwdg.o                             40                12
+    list.o                            154
+    m_utils_bsg.o                     778       58       72
+    m_utils_json.o                    444      220    4 208
+    main.o                            674      244      392
+    port.o                            516        3        9
+    portasm.o                         176
+    queue.o                         1 786
+    rtc.o                              76                32
+    simcom.o                        2 300      897      301
+    spi.o                             412               288
+    spiflash.o                      1 236      186       48
+    startup_stm32f401xe.o             608
+    stm32f4xx_hal.o                   128        4        9
+    stm32f4xx_hal_cortex.o            312
+    stm32f4xx_hal_dma.o             1 192        8
+    stm32f4xx_hal_flash.o             556                32
+    stm32f4xx_hal_flash_ex.o          100
+    stm32f4xx_hal_gpio.o              568
+    stm32f4xx_hal_iwdg.o               94
+    stm32f4xx_hal_msp.o                72
+    stm32f4xx_hal_rcc.o             1 592
+    stm32f4xx_hal_rcc_ex.o            372
+    stm32f4xx_hal_rtc.o             1 090
+    stm32f4xx_hal_spi.o             2 208
+    stm32f4xx_hal_tim.o               642
+    stm32f4xx_hal_tim_ex.o              4
+    stm32f4xx_hal_timebase_tim.o      152                64
+    stm32f4xx_hal_uart.o            3 264
+    stm32f4xx_it.o                    188
+    system_stm32f4xx.o                 32       27        4
+    task_get_gps.o                    276       76      276
+    task_get_new_bin.o                596      356      257
+    task_http.o                       804      100      285
+    task_iwdg.o                        24
+    tasks.o                         3 480        8      300
+    usart.o                           944             3 004
+    utils_crc.o                       110      384      512
+    utils_flash.o                     392      120    1 000
+    utils_gps.o                       834
+    -------------------------------------------------------
+    Total:                         31 602    2 999   21 757
+
+dl7M_tlf.a: [2]
+    XShHandles.o                      204               128
+    abort.o                             6
+    exit.o                              4
+    fclose.o                          126
+    fflush.o                          172
+    fputc.o                            84
+    fseek.o                            36
+    gmtime.o                           10
+    heap0.o                           320                 8
+    heaptramp0.o                        4
+    iar_Stoflt.o                      452
+    iar_Stopfx.o                      290
+    iar_Stoullx.o                     444
+    iar_Stoulx.o                      380
+    iar_Stoxflt.o                     540
+    isalpha.o                          20
+    isspace.o                          20
+    low_level_init.o                    4
+    mktime.o                          208
+    printf.o                           40
+    putchar.o                          12
+    sprintf.o                          64
+    strcat.o                           30
+    strcspn.o                          34
+    strpbrk.o                          40
+    strspn.o                           34
+    strtok.o                           76                 4
+    strtok_r.o                         57
+    tolower.o                          20
+    xDaysTo.o                         108
+    xTzoff_nop.o                        4
+    xcloseall.o                        60
+    xencoding_8859_1.o                 30
+    xfail_s.o                          64                 4
+    xfgpos.o                           12
+    xfiles.o                                   186      408
+    xfofind.o                         140
+    xfspos.o                          216
+    xfwprep.o                         180
+    xgetmemchunk.o                     44                 4
+    xisdst_nop.o                        6
+    xlocale_c.o                       180      102      128
+    xmbcurmax.o                        10
+    xprintffull.o                   3 962
+    xprout.o                           22
+    xsprout.o                          10
+    xttotm.o                          260                44
+    -------------------------------------------------------
+    Total:                          9 039      288      728
+
+m7M_tls.a: [3]
+    DblAdd.o                          378
+    DblCmpGe.o                         46
+    DblCmpLe.o                         46
+    DblDiv.o                          582
+    DblMul.o                          418
+    DblSub.o                          226
+    DblToS32.o                         58
+    DblToU32.o                         40
+    S32ToDbl.o                         34
+    U32ToDbl.o                         26
+    fpinit_M.o                         34
+    frexp.o                           112
+    ldexp.o                           314
+    math_wrappers64.o                  14
+    strto64.o                       1 408
+    -------------------------------------------------------
+    Total:                          3 736
+
+rt7M_tl.a: [4]
+    ABImemclr4.o                        6
+    ABImemcpy.o                       166
+    ABImemset.o                       102
+    ABImemset48.o                      50
+    I64DivMod.o                       560
+    I64DivZer.o                         2
+    cexit.o                            14
+    cmain.o                            30
+    cstart_closeall.o
+    cstartup_M.o                       12
+    data_init.o                        40
+    lz77_init_single.o                122
+    memchr.o                           88
+    strchr.o                           22
+    strcmp.o                           74
+    strlen.o                           54
+    zero_init3.o                       58
+    -------------------------------------------------------
+    Total:                          1 400
+
+shb_l.a: [5]
+    close.o                            24
+    dwrite.o                           30
+    exit.o                             20
+    iarwrite.o                         34
+    iarwstdswo.o                       80
+    lseek.o                            74
+    remove.o                           20
+    write.o                            16
+    -------------------------------------------------------
+    Total:                            298
+
+    Gaps                               71        6
+    Linker created                              32    1 536
+-----------------------------------------------------------
+    Grand Total:                   46 146    3 325   24 021
+
+
+*******************************************************************************
+*** ENTRY LIST
+***
+
+Entry                       Address    Size  Type      Object
+-----                       -------    ----  ----      ------
+.iar.init_table$$Base    0x801'3564           --   Gb  - Linker created -
+.iar.init_table$$Limit   0x801'3584           --   Gb  - Linker created -
+?main                    0x801'3665          Code  Gb  cmain.o [4]
+AHBPrescTable            0x801'3c10    0x10  Data  Gb  system_stm32f4xx.o [1]
+APBPrescTable            0x801'3dac     0x8  Data  Gb  system_stm32f4xx.o [1]
+Aldata                  0x2000'5740     0x8  Data  Lc  heap0.o [2]
+BusFault_Handler         0x801'2f6f     0x2  Code  Gb  stm32f4xx_it.o [1]
+CNT_MAX_PAGES_TX        0x2000'57d6     0x1  Data  Lc  task_http.o [1]
+CSTACK$$Base            0x2000'57d8           --   Gb  - Linker created -
+CSTACK$$Limit           0x2000'5bd8           --   Gb  - Linker created -
+CacheMore                0x800'91c9    0x24  Code  Lc  xlocale_c.o [2]
+Crc16Table              0x2000'0010   0x200  Data  Lc  utils_crc.o [1]
+DMA1_Stream3_IRQHandler
+                         0x801'2f75     0xa  Code  Gb  stm32f4xx_it.o [1]
+DMA1_Stream4_IRQHandler
+                         0x801'2f7f     0xa  Code  Gb  stm32f4xx_it.o [1]
+DMA1_Stream5_IRQHandler
+                         0x801'2f89     0xa  Code  Gb  stm32f4xx_it.o [1]
+DMA2_Stream2_IRQHandler
+                         0x801'2fe9     0xa  Code  Gb  stm32f4xx_it.o [1]
+DMA2_Stream7_IRQHandler
+                         0x801'2ff3     0xa  Code  Gb  stm32f4xx_it.o [1]
+DMA_CalcBaseAndBitshift
+                         0x800'cfd9    0x30  Code  Lc  stm32f4xx_hal_dma.o [1]
+DMA_CalcBaseAndBitshift::flagBitshiftOffset
+                         0x801'3da4     0x8  Data  Lc  stm32f4xx_hal_dma.o [1]
+DMA_CheckFifoParam       0x800'd019    0x9c  Code  Lc  stm32f4xx_hal_dma.o [1]
+DMA_SetConfig            0x800'cfab    0x2e  Code  Lc  stm32f4xx_hal_dma.o [1]
+DebugMon_Handler         0x801'2f73     0x2  Code  Gb  stm32f4xx_it.o [1]
+Dtentox                  0x801'1515   0x192  Code  Lc  strto64.o [3]
+Error_Handler            0x800'd5b5     0x2  Code  Gb  main.o [1]
+FLASH_Erase_Sector       0x801'2911    0x60  Code  Gb  stm32f4xx_hal_flash_ex.o [1]
+FLASH_Program_Byte       0x801'285f    0x1a  Code  Lc  stm32f4xx_hal_flash.o [1]
+FLASH_Program_DoubleWord
+                         0x801'27f9    0x2a  Code  Lc  stm32f4xx_hal_flash.o [1]
+FLASH_Program_HalfWord   0x801'2841    0x1e  Code  Lc  stm32f4xx_hal_flash.o [1]
+FLASH_Program_Word       0x801'2823    0x1e  Code  Lc  stm32f4xx_hal_flash.o [1]
+FLASH_SetErrorCode       0x801'2879    0x7e  Code  Lc  stm32f4xx_hal_flash.o [1]
+FLASH_WaitForLastOperation
+                         0x801'27a9    0x50  Code  Gb  stm32f4xx_hal_flash.o [1]
+HAL_DMA_Abort_IT         0x800'cd7b    0x28  Code  Gb  stm32f4xx_hal_dma.o [1]
+HAL_DMA_IRQHandler       0x800'cda3   0x208  Code  Gb  stm32f4xx_hal_dma.o [1]
+HAL_DMA_Init             0x800'cc0d    0xe2  Code  Gb  stm32f4xx_hal_dma.o [1]
+HAL_DMA_Start_IT         0x800'ccef    0x8c  Code  Gb  stm32f4xx_hal_dma.o [1]
+HAL_Delay                0x801'2975    0x28  Code  Wk  stm32f4xx_hal.o [1]
+HAL_FLASH_Lock           0x801'279b     0xe  Code  Gb  stm32f4xx_hal_flash.o [1]
+HAL_FLASH_Program        0x801'26e5    0x94  Code  Gb  stm32f4xx_hal_flash.o [1]
+HAL_FLASH_Unlock         0x801'2779    0x22  Code  Gb  stm32f4xx_hal_flash.o [1]
+HAL_GPIO_Init            0x800'd5c1   0x1f2  Code  Gb  stm32f4xx_hal_gpio.o [1]
+HAL_GPIO_WritePin        0x800'd7b3    0x1a  Code  Gb  stm32f4xx_hal_gpio.o [1]
+HAL_GetTick              0x800'cc01     0xc  Code  Wk  stm32f4xx_hal.o [1]
+HAL_IWDG_Init            0x800'f5e9    0x50  Code  Gb  stm32f4xx_hal_iwdg.o [1]
+HAL_IWDG_Refresh         0x800'f639     0xe  Code  Gb  stm32f4xx_hal_iwdg.o [1]
+HAL_IncTick              0x800'ea41    0x18  Code  Wk  stm32f4xx_hal.o [1]
+HAL_Init                 0x800'da31    0x30  Code  Gb  stm32f4xx_hal.o [1]
+HAL_InitTick             0x800'd999    0x88  Code  Gb  stm32f4xx_hal_timebase_tim.o [1]
+HAL_MspInit              0x800'ed09    0x48  Code  Gb  stm32f4xx_hal_msp.o [1]
+HAL_NVIC_EnableIRQ       0x800'd901     0xe  Code  Gb  stm32f4xx_hal_cortex.o [1]
+HAL_NVIC_SetPriority     0x800'd8d7    0x2a  Code  Gb  stm32f4xx_hal_cortex.o [1]
+HAL_NVIC_SetPriorityGrouping
+                         0x800'd8cb     0xc  Code  Gb  stm32f4xx_hal_cortex.o [1]
+HAL_NVIC_SystemReset     0x800'd90f     0x8  Code  Gb  stm32f4xx_hal_cortex.o [1]
+HAL_RCCEx_PeriphCLKConfig
+                         0x800'e88d   0x14a  Code  Gb  stm32f4xx_hal_rcc_ex.o [1]
+HAL_RCC_ClockConfig      0x800'd0b9   0x140  Code  Gb  stm32f4xx_hal_rcc.o [1]
+HAL_RCC_GetClockConfig   0x800'd22b    0x34  Code  Gb  stm32f4xx_hal_rcc.o [1]
+HAL_RCC_GetHCLKFreq      0x800'd1f9     0x6  Code  Gb  stm32f4xx_hal_rcc.o [1]
+HAL_RCC_GetPCLK1Freq     0x800'd1ff    0x16  Code  Gb  stm32f4xx_hal_rcc.o [1]
+HAL_RCC_GetPCLK2Freq     0x800'd215    0x16  Code  Gb  stm32f4xx_hal_rcc.o [1]
+HAL_RCC_OscConfig        0x800'e4b1   0x3dc  Code  Wk  stm32f4xx_hal_rcc.o [1]
+HAL_RTC_GetDate          0x800'f989    0x54  Code  Gb  stm32f4xx_hal_rtc.o [1]
+HAL_RTC_GetTime          0x800'f825    0x68  Code  Gb  stm32f4xx_hal_rtc.o [1]
+HAL_RTC_Init             0x800'f649    0xcc  Code  Gb  stm32f4xx_hal_rtc.o [1]
+HAL_RTC_MspInit          0x800'ddcf    0x10  Code  Gb  rtc.o [1]
+HAL_RTC_SetDate          0x800'f88d    0xfc  Code  Gb  stm32f4xx_hal_rtc.o [1]
+HAL_RTC_SetTime          0x800'f715   0x110  Code  Gb  stm32f4xx_hal_rtc.o [1]
+HAL_RTC_WaitForSynchro   0x800'f9e9    0x36  Code  Gb  stm32f4xx_hal_rtc.o [1]
+HAL_SPI_IRQHandler       0x800'f151   0x128  Code  Gb  stm32f4xx_hal_spi.o [1]
+HAL_SPI_Init             0x800'ed51    0x8e  Code  Gb  stm32f4xx_hal_spi.o [1]
+HAL_SPI_MspInit          0x800'dc23    0xf0  Code  Gb  spi.o [1]
+HAL_SPI_Receive_DMA      0x800'eed1   0x112  Code  Gb  stm32f4xx_hal_spi.o [1]
+HAL_SPI_RxCpltCallback   0x800'dd13    0x14  Code  Gb  spi.o [1]
+HAL_SPI_TransmitReceive_DMA
+                         0x800'efe3   0x16e  Code  Gb  stm32f4xx_hal_spi.o [1]
+HAL_SPI_Transmit_DMA     0x800'eddf    0xf2  Code  Gb  stm32f4xx_hal_spi.o [1]
+HAL_SPI_TxCpltCallback   0x800'dd3b    0x14  Code  Gb  spi.o [1]
+HAL_SPI_TxRxCpltCallback
+                         0x800'dd27    0x14  Code  Gb  spi.o [1]
+HAL_TIMEx_BreakCallback
+                         0x801'102b     0x2  Code  Wk  stm32f4xx_hal_tim_ex.o [1]
+HAL_TIMEx_CommutCallback
+                         0x801'102f     0x2  Code  Wk  stm32f4xx_hal_tim_ex.o [1]
+HAL_TIM_Base_Init        0x800'ea8d    0x38  Code  Gb  stm32f4xx_hal_tim.o [1]
+HAL_TIM_Base_Start_IT    0x800'eac5    0x2a  Code  Gb  stm32f4xx_hal_tim.o [1]
+HAL_TIM_IRQHandler       0x800'eaef   0x176  Code  Gb  stm32f4xx_hal_tim.o [1]
+HAL_TIM_PeriodElapsedCallback
+                         0x800'd563    0x12  Code  Gb  main.o [1]
+HAL_UART_IRQHandler      0x800'be37   0x150  Code  Gb  stm32f4xx_hal_uart.o [1]
+HAL_UART_Init            0x800'bb95    0x76  Code  Gb  stm32f4xx_hal_uart.o [1]
+HAL_UART_MspInit         0x800'c8c1   0x19a  Code  Gb  usart.o [1]
+HAL_UART_Receive_DMA     0x800'bd81    0xb6  Code  Gb  stm32f4xx_hal_uart.o [1]
+HAL_UART_RxCpltCallback
+                         0x800'cb45    0x34  Code  Gb  usart.o [1]
+HAL_UART_RxHalfCpltCallback
+                         0x800'cb79    0x14  Code  Gb  usart.o [1]
+HAL_UART_Transmit        0x800'bc0b    0xe0  Code  Gb  stm32f4xx_hal_uart.o [1]
+HAL_UART_Transmit_DMA    0x800'bceb    0x96  Code  Gb  stm32f4xx_hal_uart.o [1]
+HAL_UART_TxCpltCallback
+                         0x800'cb8d    0x22  Code  Gb  usart.o [1]
+HEAP$$Base              0x2000'5bd8           --   Gb  - Linker created -
+HEAP$$Limit             0x2000'5dd8           --   Gb  - Linker created -
+HardFault_Handler        0x801'2f6b     0x2  Code  Gb  stm32f4xx_it.o [1]
+LoadInt                  0x800'8357    0x7a  Code  Lc  xprintffull.o [2]
+MX_DMA_Init              0x800'db55    0x88  Code  Gb  dma.o [1]
+MX_FREERTOS_Init         0x800'b237    0xb2  Code  Gb  freertos.o [1]
+MX_GPIO_Init             0x800'da65    0xf0  Code  Gb  gpio.o [1]
+MX_IWDG_Init             0x800'dd79    0x28  Code  Gb  iwdg.o [1]
+MX_RTC_Init              0x800'dda1    0x2e  Code  Gb  rtc.o [1]
+MX_SPI2_Init             0x800'dbdd    0x46  Code  Gb  spi.o [1]
+MX_USART1_UART_Init      0x800'c851    0x38  Code  Gb  usart.o [1]
+MX_USART2_UART_Init      0x800'c889    0x38  Code  Gb  usart.o [1]
+MemManage_Handler        0x801'2f6d     0x2  Code  Gb  stm32f4xx_it.o [1]
+NMI_Handler              0x801'2f69     0x2  Code  Gb  stm32f4xx_it.o [1]
+NVIC_EncodePriority      0x800'd871    0x40  Code  Lc  stm32f4xx_hal_cortex.o [1]
+PendSV_Handler           0x800'b331          Code  Gb  portasm.o [1]
+RTC_Bcd2ToByte           0x800'fa71    0x1a  Code  Gb  stm32f4xx_hal_rtc.o [1]
+RTC_ByteToBcd2           0x800'fa59    0x18  Code  Gb  stm32f4xx_hal_rtc.o [1]
+RTC_EnterInitMode        0x800'fa1f    0x3a  Code  Gb  stm32f4xx_hal_rtc.o [1]
+Region$$Table$$Base      0x801'3564           --   Gb  - Linker created -
+Region$$Table$$Limit     0x801'3584           --   Gb  - Linker created -
+SPI2_IRQHandler          0x801'2f9d     0xa  Code  Gb  stm32f4xx_it.o [1]
+SPI_DMAAbortOnError      0x800'f431    0x16  Code  Lc  stm32f4xx_hal_spi.o [1]
+SPI_DMAError             0x800'f409    0x28  Code  Lc  stm32f4xx_hal_spi.o [1]
+SPI_DMAHalfReceiveCplt   0x800'f3e9     0xe  Code  Lc  stm32f4xx_hal_spi.o [1]
+SPI_DMAHalfTransmitCplt
+                         0x800'f3d9     0xe  Code  Lc  stm32f4xx_hal_spi.o [1]
+SPI_DMAHalfTransmitReceiveCplt
+                         0x800'f3f9     0xe  Code  Lc  stm32f4xx_hal_spi.o [1]
+SPI_DMAReceiveCplt       0x800'f2f5    0x7a  Code  Lc  stm32f4xx_hal_spi.o [1]
+SPI_DMATransmitCplt      0x800'f279    0x7a  Code  Lc  stm32f4xx_hal_spi.o [1]
+SPI_DMATransmitReceiveCplt
+                         0x800'f371    0x66  Code  Lc  stm32f4xx_hal_spi.o [1]
+SPI_EndRxTransaction     0x800'f4e9    0x9a  Code  Lc  stm32f4xx_hal_spi.o [1]
+SPI_EndRxTxTransaction   0x800'f583    0x5e  Code  Lc  stm32f4xx_hal_spi.o [1]
+SPI_WaitFlagStateUntilTimeout
+                         0x800'f449    0xa0  Code  Lc  stm32f4xx_hal_spi.o [1]
+SVC_Handler              0x800'b389          Code  Gb  portasm.o [1]
+SysTick_Handler          0x800'b1a5    0x28  Code  Gb  port.o [1]
+SystemClock_Config       0x800'd36f    0xcc  Code  Gb  main.o [1]
+SystemCoreClock         0x2000'000c     0x4  Data  Gb  system_stm32f4xx.o [1]
+SystemInit               0x801'3645    0x12  Code  Gb  system_stm32f4xx.o [1]
+TIM1_UP_TIM10_IRQHandler
+                         0x801'2f93     0xa  Code  Gb  stm32f4xx_it.o [1]
+TIM_Base_SetConfig       0x800'ec65    0x82  Code  Gb  stm32f4xx_hal_tim.o [1]
+UART_DMAAbortOnError     0x800'c11d    0x16  Code  Lc  stm32f4xx_hal_uart.o [1]
+UART_DMAError            0x800'c021    0x58  Code  Lc  stm32f4xx_hal_uart.o [1]
+UART_DMAReceiveCplt      0x800'bfcd    0x44  Code  Lc  stm32f4xx_hal_uart.o [1]
+UART_DMARxHalfCplt       0x800'c011     0xe  Code  Lc  stm32f4xx_hal_uart.o [1]
+UART_DMATransmitCplt     0x800'bf89    0x34  Code  Lc  stm32f4xx_hal_uart.o [1]
+UART_DMATxHalfCplt       0x800'bfbd     0xe  Code  Lc  stm32f4xx_hal_uart.o [1]
+UART_EndRxTransfer       0x800'c0fb    0x20  Code  Lc  stm32f4xx_hal_uart.o [1]
+UART_EndTransmit_IT      0x800'c1a3    0x20  Code  Lc  stm32f4xx_hal_uart.o [1]
+UART_EndTxTransfer       0x800'c0e7    0x14  Code  Lc  stm32f4xx_hal_uart.o [1]
+UART_Receive_IT          0x800'c1c3    0xae  Code  Lc  stm32f4xx_hal_uart.o [1]
+UART_SetConfig           0x800'c271   0x5d4  Code  Lc  stm32f4xx_hal_uart.o [1]
+UART_Transmit_IT         0x800'c135    0x6e  Code  Lc  stm32f4xx_hal_uart.o [1]
+UART_WaitOnFlagUntilTimeout
+                         0x800'c079    0x6e  Code  Lc  stm32f4xx_hal_uart.o [1]
+USART1_IRQHandler        0x801'2fa7    0x38  Code  Gb  stm32f4xx_it.o [1]
+USART2_IRQHandler        0x801'2fdf     0xa  Code  Gb  stm32f4xx_it.o [1]
+UsageFault_Handler       0x801'2f71     0x2  Code  Gb  stm32f4xx_it.o [1]
+_Close_all               0x801'328d    0x3c  Code  Gb  xcloseall.o [2]
+_Encoding_8859_1_Mbrlen
+                         0x800'9315     0x2  Code  Gb  xencoding_8859_1.o [2]
+_Encoding_8859_1_Wctomb
+                         0x800'9303    0x12  Code  Gb  xencoding_8859_1.o [2]
+_Files                  0x2000'0368    0x20  Data  Gb  xfiles.o [2]
+_Fofree                  0x801'30fd    0x86  Code  Gb  xfofind.o [2]
+_Fspos                   0x801'2c1d    0xd8  Code  Gb  xfspos.o [2]
+_Fwprep                  0x801'3025    0xb4  Code  Gb  xfwprep.o [2]
+_GenldFull               0x800'8de9   0x274  Code  Lc  xprintffull.o [2]
+_LdtobFull               0x800'89bd   0x400  Code  Lc  xprintffull.o [2]
+_LitobFull               0x800'8865   0x112  Code  Lc  xprintffull.o [2]
+_LocaleC_isalpha         0x800'918f     0xc  Code  Gb  xlocale_c.o [2]
+_LocaleC_islower         0x800'9189     0x4  Code  Gb  xlocale_c.o [2]
+_LocaleC_isspace         0x800'91a5    0x14  Code  Gb  xlocale_c.o [2]
+_LocaleC_isupper         0x800'918d     0x2  Code  Gb  xlocale_c.o [2]
+_LocaleC_tolower         0x800'91b9     0xc  Code  Gb  xlocale_c.o [2]
+_Locale_lconv           0x2000'0210    0x38  Data  Lc  xlocale_c.o [2]
+_Nnl                     0x801'2da1     0xc  Code  Gb  xfgpos.o [2]
+_PrintfFull              0x800'8195   0x1aa  Code  Gb  xprintffull.o [2]
+_Prout                   0x801'39dd    0x16  Code  Gb  xprout.o [2]
+_PutcharsFull            0x800'905d    0x2e  Code  Lc  xprintffull.o [2]
+_PutfldFull              0x800'83d1   0x2d8  Code  Lc  xprintffull.o [2]
+_PutstrFull              0x800'879f    0xc6  Code  Lc  xprintffull.o [2]
+_PuttxtFull              0x800'86a9    0xf6  Code  Lc  xprintffull.o [2]
+_SProut                  0x800'9383     0xa  Code  Gb  xsprout.o [2]
+_Strtok_ssave           0x2000'57c4     0x4  Data  Lc  strtok.o [2]
+_Ttotm_ts               0x2000'5570    0x2c  Data  Lc  xttotm.o [2]
+_Tzoff                   0x801'1269     0x4  Code  Gb  xTzoff_nop.o [2]
+__NVIC_EnableIRQ         0x800'd827    0x1e  Code  Lc  stm32f4xx_hal_cortex.o [1]
+__NVIC_GetPriorityGrouping
+                         0x800'd81b     0xc  Code  Lc  stm32f4xx_hal_cortex.o [1]
+__NVIC_SetPriority       0x800'd845    0x2c  Code  Lc  stm32f4xx_hal_cortex.o [1]
+__NVIC_SetPriorityGrouping
+                         0x800'd7f9    0x22  Code  Lc  stm32f4xx_hal_cortex.o [1]
+__NVIC_SystemReset       0x800'd8b1    0x1a  Code  Lc  stm32f4xx_hal_cortex.o [1]
+__NVIC_SystemReset       0x801'2309    0x1a  Code  Lc  task_get_new_bin.o [1]
+__aeabi_cdcmple          0x800'9879          Code  Gb  DblCmpLe.o [3]
+__aeabi_cdrcmple         0x800'98a9          Code  Gb  DblCmpGe.o [3]
+__aeabi_d2iz             0x800'9a15          Code  Gb  DblToS32.o [3]
+__aeabi_d2uiz            0x800'9da1          Code  Gb  DblToU32.o [3]
+__aeabi_dadd             0x800'9ded          Code  Gb  DblAdd.o [3]
+__aeabi_ddiv             0x800'9b59          Code  Gb  DblDiv.o [3]
+__aeabi_dmul             0x800'9665          Code  Gb  DblMul.o [3]
+__aeabi_dsub             0x800'9a75          Code  Gb  DblSub.o [3]
+__aeabi_i2d              0x800'9a51          Code  Gb  S32ToDbl.o [3]
+__aeabi_ldiv0            0x800'9de9          Code  Gb  I64DivZer.o [4]
+__aeabi_memclr4          0x800'd5b9          Code  Gb  ABImemclr4.o [4]
+__aeabi_memcpy           0x800'938d          Code  Gb  ABImemcpy.o [4]
+__aeabi_memcpy4          0x800'93ad          Code  Gb  ABImemcpy.o [4]
+__aeabi_memcpy8          0x800'93ad          Code  Gb  ABImemcpy.o [4]
+__aeabi_memset           0x800'd931          Code  Gb  ABImemset.o [4]
+__aeabi_ui2d             0x800'9dc9          Code  Gb  U32ToDbl.o [3]
+__aeabi_uldivmod         0x800'9435          Code  Gb  I64DivMod.o [4]
+__basic_free             0x801'2a49    0x16  Code  Gb  heap0.o [2]
+__basic_free_intern      0x801'2a5f    0x7a  Code  Lc  heap0.o [2]
+__basic_malloc           0x801'299d    0x18  Code  Gb  heap0.o [2]
+__basic_malloc_intern    0x801'29b5    0x94  Code  Lc  heap0.o [2]
+__cexit_closeall         0x801'368f          Code  Gb  cexit.o [4]
+__close                  0x801'320b    0x18  Code  Gb  close.o [5]
+__cmain                  0x801'3665          Code  Gb  cmain.o [4]
+__cstart_closeall        0x801'3e98          Data  Gb  cstart_closeall.o [4]
+__data_GetMemChunk       0x801'2add    0x2c  Code  Gb  xgetmemchunk.o [2]
+__data_GetMemChunk::start
+                        0x2000'57cc     0x4  Data  Lc  xgetmemchunk.o [2]
+__dwrite                 0x801'2ed5    0x1e  Code  Gb  dwrite.o [5]
+__exit                   0x800'9f69    0x14  Code  Gb  exit.o [5]
+__gmtime32               0x801'0a89     0xa  Code  Gb  gmtime.o [2]
+__iar_Daysto32           0x801'11fd    0x3a  Code  Gb  xDaysTo.o [2]
+__iar_Fail_s             0x800'928d    0x1c  Code  Gb  xfail_s.o [2]
+__iar_Isdst32            0x801'1323     0x6  Code  Gb  xisdst_nop.o [2]
+__iar_Mbcurmax           0x800'9379     0xa  Code  Gb  xmbcurmax.o [2]
+__iar_Memchr             0x800'9321          Code  Gb  memchr.o [4]
+__iar_Memset             0x800'd931          Code  Gb  ABImemset.o [4]
+__iar_Memset4_word       0x800'ea59          Code  Gb  ABImemset48.o [4]
+__iar_Memset8_word       0x800'ea59          Code  Gb  ABImemset48.o [4]
+__iar_Memset_word        0x800'd939          Code  Gb  ABImemset.o [4]
+__iar_Stderr            0x2000'0320    0x48  Data  Gb  xfiles.o [2]
+__iar_Stdin             0x2000'0290    0x48  Data  Gb  xfiles.o [2]
+__iar_Stdout            0x2000'02d8    0x48  Data  Gb  xfiles.o [2]
+__iar_Sto64              0x801'16b9   0x19e  Code  Gb  strto64.o [3]
+__iar_Stoflt             0x801'1a15   0x1c4  Code  Gb  iar_Stoflt.o [2]
+__iar_Stopfx             0x801'18f1   0x122  Code  Gb  iar_Stopfx.o [2]
+__iar_Stoullx            0x801'08cd   0x15c  Code  Gb  iar_Stoullx.o [2]
+__iar_Stoulx             0x801'0ea9   0x112  Code  Gb  iar_Stoulx.o [2]
+__iar_Stoxflt            0x801'1bd9   0x1e6  Code  Gb  iar_Stoxflt.o [2]
+__iar_Stoxflt::digits    0x801'1dc4    0x18  Data  Lc  iar_Stoxflt.o [2]
+__iar_Stoxflt::vals      0x801'1ddc    0x18  Data  Lc  iar_Stoxflt.o [2]
+__iar_Strchr             0x800'923d          Code  Gb  strchr.o [4]
+__iar_Ttotm32            0x801'10f9    0xc6  Code  Gb  xttotm.o [2]
+__iar_dadd               0x800'9a85          Code  Gb  DblSub.o [3]
+__iar_data_init3         0x801'34d1    0x28  Code  Gb  data_init.o [4]
+__iar_dsub               0x800'9dfd          Code  Gb  DblAdd.o [3]
+__iar_dsubStart          0x800'9e0f          Code  Gb  DblAdd.o [3]
+__iar_frexp              0x800'9815          Code  Gb  frexp.o [3]
+__iar_frexpl             0x800'9815          Code  Gb  frexp.o [3]
+__iar_globLocale        0x2000'0248    0x48  Data  Lc  xlocale_c.o [2]
+__iar_global_Locale      0x800'91c5     0x4  Code  Gb  xlocale_c.o [2]
+__iar_init_vfp           0x801'3541          Code  Gb  fpinit_M.o [3]
+__iar_ldexp64            0x800'98d9          Code  Gb  ldexp.o [3]
+__iar_lz77_init_single3
+                         0x800'910f    0x7a  Code  Gb  lz77_init_single.o [4]
+__iar_program_start      0x801'3d29          Code  Gb  cstartup_M.o [4]
+__iar_scalbln64          0x800'98d9          Code  Gb  ldexp.o [3]
+__iar_scalbn64           0x800'98d9          Code  Gb  ldexp.o [3]
+__iar_sh_Discard         0x801'2e09    0x42  Code  Gb  XShHandles.o [2]
+__iar_sh_Move            0x801'2e4b    0x46  Code  Gb  XShHandles.o [2]
+__iar_sh_Pos             0x801'2e91    0x3e  Code  Gb  XShHandles.o [2]
+__iar_sh_stdout_swo      0x801'2ef5    0x50  Code  Gb  iarwstdswo.o [5]
+__iar_sh_write           0x801'2f45    0x22  Code  Gb  iarwrite.o [5]
+__iar_softfp___iar_frexp64
+                         0x800'9809          Code  Gb  frexp.o [3]
+__iar_softfp_frexp       0x800'9809          Code  Gb  frexp.o [3]
+__iar_softfp_frexpl      0x800'9809          Code  Gb  frexp.o [3]
+__iar_vfp_atof           0x801'1273     0x8  Code  Gb  math_wrappers64.o [3]
+__iar_zero_init3         0x800'9253    0x3a  Code  Gb  zero_init3.o [4]
+__low_level_init         0x801'3683     0x4  Code  Gb  low_level_init.o [2]
+__lseek                  0x801'2dad    0x4a  Code  Gb  lseek.o [5]
+__mktime32               0x801'0a95    0xd0  Code  Gb  mktime.o [2]
+__vector_table           0x800'8000          Data  Gb  startup_stm32f401xe.o [1]
+__write                  0x801'2df7    0x10  Code  Gb  write.o [5]
+_call_main               0x801'3671          Code  Gb  cmain.o [4]
+_exit                    0x801'368d          Code  Gb  cexit.o [4]
+_gLocale_mblen           0x800'9229     0x4  Code  Gb  xlocale_c.o [2]
+_gLocale_mblenInt        0x800'91ed    0x2c  Code  Gb  xlocale_c.o [2]
+_gLocale_wctomb          0x800'922d     0x4  Code  Gb  xlocale_c.o [2]
+_gLocale_wctombInt       0x800'9225     0x4  Code  Gb  xlocale_c.o [2]
+_main                    0x801'367f          Code  Gb  cmain.o [4]
+abort                    0x800'9de3     0x6  Code  Gb  abort.o [2]
+addGnssPckgToJson        0x801'212d   0x106  Code  Gb  m_utils_json.o [1]
+addGnssPckgToJson::cnt  0x2000'57d0     0x2  Data  Lc  m_utils_json.o [1]
+arrUrlFileSz            0x2000'540c    0x48  Data  Lc  main.o [1]
+atof                     0x801'189d     0x8  Code  Gb  strto64.o [3]
+atoi                     0x801'0fc1     0x2  Code  Gb  iar_Stoulx.o [2]
+bsg                     0x2000'5614    0x18  Data  Gb  main.o [1]
+bsgInit                  0x800'de15    0x52  Code  Gb  m_utils_bsg.o [1]
+bufEnd                  0x2000'0000     0x4  Data  Lc  m_utils_bsg.o [1]
+bufGnss                 0x2000'4d7c    0xc8  Data  Lc  task_get_gps.o [1]
+bufPckgGPS              0x2000'4a7c   0x100  Data  Gb  main.o [1]
+bufPckgGnss             0x2000'5644    0x18  Data  Lc  task_get_gps.o [1]
+cBufInit                 0x800'e121    0x20  Code  Gb  circularBuffer.o [1]
+cBufRead                 0x800'e235    0x5e  Code  Gb  circularBuffer.o [1]
+cBufReset                0x800'e141    0x2e  Code  Gb  circularBuffer.o [1]
+cBufWriteToBuf           0x800'e16f    0xc6  Code  Gb  circularBuffer.o [1]
+calcCrc16                0x800'fa8d    0x32  Code  Gb  utils_crc.o [1]
+charToHex                0x801'261f    0xae  Code  Gb  utils_flash.o [1]
+checkBufForWritingToFlash
+                         0x800'de6b    0x3e  Code  Gb  m_utils_bsg.o [1]
+circBufGnss             0x2000'565c    0x18  Data  Gb  task_get_gps.o [1]
+circBufPckgGPS          0x2000'562c    0x18  Data  Gb  main.o [1]
+closeGnssJson            0x801'2233    0x20  Code  Gb  m_utils_json.o [1]
+copyGetDatafromBuf       0x800'e293   0x112  Code  Gb  circularBuffer.o [1]
+copyStr                  0x801'020d    0x2c  Code  Gb  simcom.o [1]
+crc8                     0x800'fac5    0x36  Code  Gb  utils_crc.o [1]
+ddiv                     0x801'143d    0xc8  Code  Lc  strto64.o [3]
+deserializePckgGnss      0x801'0e2b    0x7c  Code  Gb  utils_gps.o [1]
+digits                   0x801'0fd4    0x28  Data  Lc  iar_Stoulx.o [2]
+digits                   0x801'0a38    0x28  Data  Lc  iar_Stoullx.o [2]
+dmul                     0x801'1371    0xca  Code  Lc  strto64.o [3]
+ebuf                    0x2000'536c    0x50  Data  Lc  xfiles.o [2]
+exit                     0x801'3687     0x4  Code  Gb  exit.o [2]
+fclose                   0x801'318d    0x7e  Code  Gb  fclose.o [2]
+fflush                   0x801'2d69    0x34  Code  Gb  fflush.o [2]
+fflushOne                0x801'2cf5    0x74  Code  Lc  fflush.o [2]
+fillGprmc                0x801'0be9   0x106  Code  Gb  utils_gps.o [1]
+fillTelemetry            0x800'e049    0x50  Code  Gb  m_utils_bsg.o [1]
+flashClearPage           0x801'255d    0x34  Code  Gb  utils_flash.o [1]
+flashWrite               0x801'2591    0x8e  Code  Gb  utils_flash.o [1]
+fputc                    0x801'3237    0x54  Code  Gb  fputc.o [2]
+free                     0x801'3189     0x4  Code  Gb  heaptramp0.o [2]
+fseek                    0x801'30d9    0x24  Code  Gb  fseek.o [2]
+getFlashData             0x800'de67     0x4  Code  Gb  m_utils_bsg.o [1]
+getGPSHandle            0x2000'5748     0x4  Data  Gb  freertos.o [1]
+getLenMsgSimUart         0x800'e3a5    0x78  Code  Gb  circularBuffer.o [1]
+getLenMsgUblox           0x800'e41d    0x82  Code  Gb  circularBuffer.o [1]
+getNewBinHandle         0x2000'5754     0x4  Data  Gb  freertos.o [1]
+getReadyTxPages          0x801'203b    0x34  Code  Gb  task_http.o [1]
+getServerTime            0x800'dee1    0xde  Code  Gb  m_utils_bsg.o [1]
+gmtime                   0x801'0a89     0xa  Code  Gb  gmtime.o [2]
+gnssInit                 0x801'07b1    0x32  Code  Gb  simcom.o [1]
+hdma_spi2_rx            0x2000'50e0    0x60  Data  Gb  spi.o [1]
+hdma_spi2_tx            0x2000'5140    0x60  Data  Gb  spi.o [1]
+hdma_usart1_rx          0x2000'51a0    0x60  Data  Gb  usart.o [1]
+hdma_usart1_tx          0x2000'5200    0x60  Data  Gb  usart.o [1]
+hdma_usart2_rx          0x2000'5260    0x60  Data  Gb  usart.o [1]
+hexFirmware             0x2000'42a0   0x3e8  Data  Gb  utils_flash.o [1]
+hiwdg                   0x2000'5724     0xc  Data  Gb  iwdg.o [1]
+hrtc                    0x2000'559c    0x20  Data  Gb  rtc.o [1]
+hspi2                   0x2000'52c0    0x58  Data  Gb  spi.o [1]
+htim1                   0x2000'5454    0x40  Data  Gb  stm32f4xx_hal_timebase_tim.o [1]
+httpDeInit               0x801'03ff    0x18  Code  Gb  simcom.o [1]
+httpGet                  0x801'0451    0x78  Code  Gb  simcom.o [1]
+httpHandle              0x2000'574c     0x4  Data  Gb  freertos.o [1]
+httpInit                 0x801'02d1   0x12e  Code  Gb  simcom.o [1]
+httpPost                 0x801'05ab    0xf4  Code  Gb  simcom.o [1]
+httpRead                 0x801'04d1    0xbe  Code  Gb  simcom.o [1]
+httpWriteCommand         0x801'013f    0xce  Code  Gb  simcom.o [1]
+httpWriteData            0x801'0599    0x12  Code  Gb  simcom.o [1]
+huart1                  0x2000'5494    0x40  Data  Gb  usart.o [1]
+huart2                  0x2000'54d4    0x40  Data  Gb  usart.o [1]
+isCrcOk                  0x800'e0d1    0x4e  Code  Gb  m_utils_bsg.o [1]
+isDataFromFlashOk        0x801'20b5    0x66  Code  Gb  task_http.o [1]
+isJson                  0x2000'0388     0x1  Data  Gb  simcom.o [1]
+isRxNewFirmware         0x2000'57d5     0x1  Data  Gb  task_get_new_bin.o [1]
+isalpha                  0x801'1df5    0x14  Code  Gb  isalpha.o [2]
+isspace                  0x801'10cf    0x14  Code  Gb  isspace.o [2]
+keepAliveHandle         0x2000'5750     0x4  Data  Gb  freertos.o [1]
+ldexp                    0x800'98d9          Code  Gb  ldexp.o [3]
+ldexpl                   0x800'98d9          Code  Gb  ldexp.o [3]
+lmos                     0x801'11cc    0x18  Data  Lc  xttotm.o [2]
+lmos                     0x801'1238    0x18  Data  Lc  xDaysTo.o [2]
+localeconv               0x800'9231     0x4  Code  Gb  xlocale_c.o [2]
+main                     0x800'd315    0x5a  Code  Gb  main.o [1]
+makeFreeRtosPriority     0x800'b3e1    0x16  Code  Lc  cmsis_os.o [1]
+manageIWDGHandle        0x2000'5758     0x4  Data  Gb  freertos.o [1]
+memchr                   0x800'9321          Code  Gb  memchr.o [4]
+mktime                   0x801'0a95    0xd0  Code  Gb  mktime.o [2]
+mos                      0x801'11e4    0x18  Data  Lc  xttotm.o [2]
+mos                      0x801'1250    0x18  Data  Lc  xDaysTo.o [2]
+mutexGPSBufHandle       0x2000'575c     0x4  Data  Gb  freertos.o [1]
+mutexRTCHandle          0x2000'5764     0x4  Data  Gb  freertos.o [1]
+mutexWebHandle          0x2000'5760     0x4  Data  Gb  freertos.o [1]
+ndigs                    0x801'0ffc    0x28  Data  Lc  iar_Stoulx.o [2]
+ndigs                    0x801'0a60    0x28  Data  Lc  iar_Stoullx.o [2]
+obuf                    0x2000'53bc    0x50  Data  Lc  xfiles.o [2]
+osDelay                  0x800'b461    0x1c  Code  Gb  cmsis_os.o [1]
+osKernelStart            0x800'b3f7     0xa  Code  Gb  cmsis_os.o [1]
+osMutexCreate            0x800'b47d    0x1c  Code  Gb  cmsis_os.o [1]
+osThreadCreate           0x800'b401    0x60  Code  Gb  cmsis_os.o [1]
+pFlash                  0x2000'55bc    0x20  Data  Gb  stm32f4xx_hal_flash.o [1]
+pckgGnss                0x2000'55dc    0x1c  Data  Lc  task_get_gps.o [1]
+pckgGnss                0x2000'55f8    0x1c  Data  Lc  task_http.o [1]
+pckgJsonGnss            0x2000'2a9c  0x1004  Data  Gb  m_utils_json.o [1]
+pckgUpdFirmwareToJson    0x801'2253    0x64  Code  Gb  m_utils_json.o [1]
+pckgUpdFirmwareToJson::cnt
+                        0x2000'57d2     0x2  Data  Lc  m_utils_json.o [1]
+pows                     0x801'18a8    0x48  Data  Lc  strto64.o [3]
+printf                   0x800'dded    0x28  Code  Gb  printf.o [2]
+prvAddCurrentTaskToDelayedList
+                         0x800'ac55    0x82  Code  Lc  tasks.o [1]
+prvAddNewTaskToReadyList
+                         0x800'a167    0x9a  Code  Lc  tasks.o [1]
+prvCheckTasksWaitingTermination
+                         0x800'a8d9    0x3e  Code  Lc  tasks.o [1]
+prvCopyDataToQueue       0x800'ba4f    0x9c  Code  Lc  queue.o [1]
+prvDeleteTCB             0x800'a91d    0x44  Code  Lc  tasks.o [1]
+prvGetDisinheritPriorityAfterTimeout
+                         0x800'ba39    0x16  Code  Lc  queue.o [1]
+prvHeapInit              0x800'aea9    0x62  Code  Lc  heap_4.o [1]
+prvIdleTask              0x800'a85d    0x24  Code  Lc  tasks.o [1]
+prvInitialiseMutex       0x800'b67d    0x22  Code  Lc  queue.o [1]
+prvInitialiseNewQueue    0x800'b64b    0x32  Code  Lc  queue.o [1]
+prvInitialiseNewTask     0x800'a095    0xd2  Code  Lc  tasks.o [1]
+prvInitialiseTaskLists   0x800'a881    0x52  Code  Lc  tasks.o [1]
+prvInsertBlockIntoFreeList
+                         0x800'af0b    0x5e  Code  Lc  heap_4.o [1]
+prvIsQueueEmpty          0x800'bb59    0x1c  Code  Lc  queue.o [1]
+prvIsQueueFull           0x800'bb75    0x1e  Code  Lc  queue.o [1]
+prvResetNextTaskUnblockTime
+                         0x800'a961    0x2a  Code  Lc  tasks.o [1]
+prvTaskExitError         0x800'b04d    0x2a  Code  Lc  port.o [1]
+prvTaskIsTaskSuspended   0x800'a327    0x3e  Code  Lc  tasks.o [1]
+prvUnlockQueue           0x800'baeb    0x6e  Code  Lc  queue.o [1]
+putchar                  0x801'39f5     0xc  Code  Gb  putchar.o [2]
+pvPortMalloc             0x800'ad15   0x120  Code  Gb  heap_4.o [1]
+pvTaskIncrementMutexHeldCount
+                         0x800'ac13    0x16  Code  Gb  tasks.o [1]
+pxCurrentTCB            0x2000'5788     0x4  Data  Gb  tasks.o [1]
+pxDelayedTaskList       0x2000'578c     0x4  Data  Lc  tasks.o [1]
+pxEnd                   0x2000'5768     0x4  Data  Lc  heap_4.o [1]
+pxOverflowDelayedTaskList
+                        0x2000'5790     0x4  Data  Lc  tasks.o [1]
+pxPortInitialiseStack    0x800'b025    0x28  Code  Gb  port.o [1]
+pxReadyTasksLists       0x2000'4e44    0x8c  Data  Lc  tasks.o [1]
+remove                   0x801'3223    0x14  Code  Gb  remove.o [5]
+sFileInfo               0x2000'4ed0    0x80  Data  Lc  XShHandles.o [2]
+saveCsq                  0x801'211b    0x12  Code  Gb  task_http.o [1]
+scalbln                  0x800'98d9          Code  Gb  ldexp.o [3]
+scalblnl                 0x800'98d9          Code  Gb  ldexp.o [3]
+scalbn                   0x800'98d9          Code  Gb  ldexp.o [3]
+scalbnl                  0x800'98d9          Code  Gb  ldexp.o [3]
+scale                    0x800'8977    0x46  Code  Lc  xprintffull.o [2]
+sec_hand                0x2000'57c8     0x4  Data  Lc  xfail_s.o [2]
+sendDataToServer         0x801'1f43    0xf8  Code  Gb  task_http.o [1]
+serializePckgGnss        0x801'0dad    0x7e  Code  Gb  utils_gps.o [1]
+setCoords                0x801'0d1f    0x7e  Code  Gb  utils_gps.o [1]
+setDate                  0x801'0ba5    0x42  Code  Gb  utils_gps.o [1]
+setDateTime              0x800'dfbf    0x5c  Code  Gb  m_utils_bsg.o [1]
+setTM                    0x800'e01b    0x2e  Code  Gb  m_utils_bsg.o [1]
+setTM::curTime          0x2000'5544    0x2c  Data  Lc  m_utils_bsg.o [1]
+setTime                  0x801'0b65    0x40  Code  Gb  utils_gps.o [1]
+simBufCommand           0x2000'4fb4    0x64  Data  Lc  simcom.o [1]
+simBufError             0x2000'5018    0x64  Data  Lc  simcom.o [1]
+simCheckCSQ              0x801'06a5    0x32  Code  Gb  simcom.o [1]
+simExecCommand           0x801'0417    0x3a  Code  Gb  simcom.o [1]
+simGetDateTime           0x801'0239    0x44  Code  Gb  simcom.o [1]
+simGetStatusAnsw         0x801'00b5    0x34  Code  Gb  simcom.o [1]
+simGetSzSoft             0x801'06d7    0x46  Code  Gb  simcom.o [1]
+simHardwareReset         0x801'0791    0x12  Code  Gb  simcom.o [1]
+simHttpInit              0x801'027d    0x48  Code  Gb  simcom.o [1]
+simInit                  0x800'ffd1    0xe4  Code  Gb  simcom.o [1]
+simOff                   0x801'0779    0x18  Code  Gb  simcom.o [1]
+simOn                    0x801'071d    0x56  Code  Gb  simcom.o [1]
+simReset                 0x801'07a3     0x8  Code  Gb  simcom.o [1]
+simTxATCommand           0x801'0125    0x1a  Code  Gb  simcom.o [1]
+simWriteCommand          0x801'00e9    0x3c  Code  Gb  simcom.o [1]
+spiFlash64              0x2000'5514    0x30  Data  Gb  spiflash.o [1]
+spiFlashES               0x800'fc7f    0x7c  Code  Gb  spiflash.o [1]
+spiFlashInit             0x800'fafd    0xc2  Code  Gb  spiflash.o [1]
+spiFlashRdPg             0x800'fed3    0xb4  Code  Gb  spiflash.o [1]
+spiFlashReadID           0x800'fbbf    0x46  Code  Gb  spiflash.o [1]
+spiFlashRxData           0x800'fc57    0x28  Code  Gb  spiflash.o [1]
+spiFlashTxData           0x800'fc2f    0x28  Code  Gb  spiflash.o [1]
+spiFlashTxRxCmd          0x800'fc05    0x2a  Code  Gb  spiflash.o [1]
+spiFlashWaitReady        0x800'fcfb    0x5c  Code  Gb  spiflash.o [1]
+spiFlashWrEn             0x800'fd57    0x32  Code  Gb  spiflash.o [1]
+spiFlashWrPg             0x800'fd89   0x14a  Code  Gb  spiflash.o [1]
+spiMemInfo              0x2000'5738     0x8  Data  Gb  spi.o [1]
+sprintf                  0x800'ea01    0x40  Code  Gb  sprintf.o [2]
+strcat                   0x801'22e9    0x1e  Code  Gb  strcat.o [2]
+strchr                   0x800'923d          Code  Gb  strchr.o [4]
+strcmp                   0x801'1085          Code  Gb  strcmp.o [4]
+strcspn                  0x801'1301    0x22  Code  Gb  strcspn.o [2]
+strlen                   0x800'92cd          Code  Gb  strlen.o [4]
+strpbrk                  0x801'127b    0x22  Code  Gb  strpbrk.o [2]
+strsep                   0x801'0cef    0x30  Code  Gb  utils_gps.o [1]
+strspn                   0x801'12df    0x22  Code  Gb  strspn.o [2]
+strtok                   0x801'1039    0x4c  Code  Gb  strtok.o [2]
+strtok_r                 0x801'12a5    0x38  Code  Gb  strtok_r.o [2]
+strtoul                  0x801'0fcd     0x2  Code  Gb  iar_Stoulx.o [2]
+strtoull                 0x801'0a31     0x2  Code  Gb  iar_Stoullx.o [2]
+taskGetGPS               0x801'2b09   0x114  Code  Gb  task_get_gps.o [1]
+taskGetNewBin            0x801'2323   0x1d6  Code  Gb  task_get_new_bin.o [1]
+taskHttp                 0x801'1e09   0x13a  Code  Gb  task_http.o [1]
+taskManageIWDG           0x801'39c5    0x18  Code  Gb  task_iwdg.o [1]
+timestamp               0x2000'577c     0x4  Data  Lc  m_utils_json.o [1]
+tmpBufPage              0x2000'4b7c   0x100  Data  Lc  task_get_new_bin.o [1]
+tmpBufPage              0x2000'4c7c   0x100  Data  Gb  task_http.o [1]
+tmpDate                 0x2000'5778     0x4  Data  Lc  m_utils_bsg.o [1]
+tmpJsonGnss             0x2000'4f50    0x64  Data  Gb  m_utils_json.o [1]
+tmpSimBuf               0x2000'507c    0x64  Data  Lc  simcom.o [1]
+tmpTime                 0x2000'5674    0x14  Data  Lc  m_utils_bsg.o [1]
+tolower                  0x801'10e3    0x14  Code  Gb  tolower.o [2]
+uInfoGnss               0x2000'56ec    0x14  Data  Gb  usart.o [1]
+uInfoSim                0x2000'5700    0x14  Data  Gb  usart.o [1]
+uartClearInfo            0x800'caa1    0x1a  Code  Gb  usart.o [1]
+uartInitInfo             0x800'ca5b    0x36  Code  Gb  usart.o [1]
+uartRxDma                0x800'ca91    0x10  Code  Gb  usart.o [1]
+uartTx                   0x800'cabb    0x8a  Code  Gb  usart.o [1]
+ucHeap                  0x2000'038c  0x2710  Data  Lc  heap_4.o [1]
+ucMaxSysCallPriority    0x2000'57d4     0x1  Data  Lc  port.o [1]
+ulMaxPRIGROUPValue      0x2000'5780     0x4  Data  Lc  port.o [1]
+urls                    0x2000'5714    0x10  Data  Gb  main.o [1]
+urlsInit                 0x800'd537    0x2c  Code  Gb  main.o [1]
+usart2BufRx             0x2000'4888   0x1f4  Data  Lc  usart.o [1]
+usartSimBufRx           0x2000'3aa0   0x400  Data  Lc  usart.o [1]
+usartSimBufTx           0x2000'3ea0   0x400  Data  Lc  usart.o [1]
+uwTick                  0x2000'5784     0x4  Data  Gb  stm32f4xx_hal.o [1]
+uwTickFreq              0x2000'0389     0x1  Data  Gb  stm32f4xx_hal.o [1]
+uwTickPrio              0x2000'0008     0x4  Data  Gb  stm32f4xx_hal.o [1]
+uxCriticalNesting       0x2000'0004     0x4  Data  Lc  port.o [1]
+uxCurrentNumberOfTasks  0x2000'5798     0x4  Data  Lc  tasks.o [1]
+uxDeletedTasksWaitingCleanUp
+                        0x2000'5794     0x4  Data  Lc  tasks.o [1]
+uxListRemove             0x800'affb    0x28  Code  Gb  list.o [1]
+uxPendedTicks           0x2000'57a8     0x4  Data  Lc  tasks.o [1]
+uxSchedulerSuspended    0x2000'57c0     0x4  Data  Lc  tasks.o [1]
+uxTaskNumber            0x2000'57b4     0x4  Data  Lc  tasks.o [1]
+uxTopReadyPriority      0x2000'57a0     0x4  Data  Lc  tasks.o [1]
+vApplicationGetIdleTaskMemory
+                         0x800'b229     0xe  Code  Gb  freertos.o [1]
+vListInitialise          0x800'af89    0x1e  Code  Gb  list.o [1]
+vListInitialiseItem      0x800'afa7     0x6  Code  Gb  list.o [1]
+vListInsert              0x800'afc5    0x36  Code  Gb  list.o [1]
+vListInsertEnd           0x800'afad    0x18  Code  Gb  list.o [1]
+vPortEnableVFP           0x800'b3c5          Code  Gb  portasm.o [1]
+vPortEnterCritical       0x800'b145    0x34  Code  Gb  port.o [1]
+vPortExitCritical        0x800'b179    0x2c  Code  Gb  port.o [1]
+vPortFree                0x800'ae35    0x74  Code  Gb  heap_4.o [1]
+vPortStartFirstTask      0x800'b3a5          Code  Gb  portasm.o [1]
+vTaskDelay               0x800'a201    0x4e  Code  Gb  tasks.o [1]
+vTaskInternalSetTimeOutState
+                         0x800'a795    0x12  Code  Gb  tasks.o [1]
+vTaskMissedYield         0x800'a851     0xa  Code  Gb  tasks.o [1]
+vTaskPlaceOnEventList    0x800'a6e5    0x34  Code  Gb  tasks.o [1]
+vTaskPriorityDisinheritAfterTimeout
+                         0x800'ab25    0xee  Code  Gb  tasks.o [1]
+vTaskResume              0x800'a365    0x82  Code  Gb  tasks.o [1]
+vTaskStartScheduler      0x800'a3e7    0x90  Code  Gb  tasks.o [1]
+vTaskSuspend             0x800'a24f    0xd8  Code  Gb  tasks.o [1]
+vTaskSuspendAll          0x800'a477     0xc  Code  Gb  tasks.o [1]
+vTaskSwitchContext       0x800'a677    0x6e  Code  Gb  tasks.o [1]
+waitIdle                 0x800'd4e3    0x54  Code  Gb  main.o [1]
+waitRx                   0x800'd48f    0x54  Code  Gb  main.o [1]
+waitTx                   0x800'd43b    0x54  Code  Gb  main.o [1]
+writeSafeToCBuf          0x800'dea9    0x38  Code  Gb  m_utils_bsg.o [1]
+xBlockAllocatedBit      0x2000'5774     0x4  Data  Lc  heap_4.o [1]
+xDelayedTaskList1       0x2000'5688    0x14  Data  Lc  tasks.o [1]
+xDelayedTaskList2       0x2000'569c    0x14  Data  Lc  tasks.o [1]
+xFreeBytesRemaining     0x2000'576c     0x4  Data  Lc  heap_4.o [1]
+xHeapStructSize          0x801'3dcc     0x4  Data  Lc  heap_4.o [1]
+xIdleStack              0x2000'4688   0x200  Data  Lc  freertos.o [1]
+xIdleTaskHandle         0x2000'57bc     0x4  Data  Lc  tasks.o [1]
+xIdleTaskTCBBuffer      0x2000'5318    0x54  Data  Lc  freertos.o [1]
+xMinimumEverFreeBytesRemaining
+                        0x2000'5770     0x4  Data  Lc  heap_4.o [1]
+xNextTaskUnblockTime    0x2000'57b8     0x4  Data  Lc  tasks.o [1]
+xNumOfOverflows         0x2000'57b0     0x4  Data  Lc  tasks.o [1]
+xPendingReadyList       0x2000'56b0    0x14  Data  Lc  tasks.o [1]
+xPortStartScheduler      0x800'b077    0xce  Code  Gb  port.o [1]
+xQueueCreateMutex        0x800'b69f    0x20  Code  Gb  queue.o [1]
+xQueueCreateMutexStatic
+                         0x800'b6bf    0x2e  Code  Gb  queue.o [1]
+xQueueGenericCreate      0x800'b5ef    0x5c  Code  Gb  queue.o [1]
+xQueueGenericCreateStatic
+                         0x800'b52d    0xc2  Code  Gb  queue.o [1]
+xQueueGenericReset       0x800'b499    0x94  Code  Gb  queue.o [1]
+xQueueGenericSend        0x800'b6ed   0x1a6  Code  Gb  queue.o [1]
+xQueueSemaphoreTake      0x800'b893   0x1a2  Code  Gb  queue.o [1]
+xSchedulerRunning       0x2000'57a4     0x4  Data  Lc  tasks.o [1]
+xStart                  0x2000'5730     0x8  Data  Lc  heap_4.o [1]
+xSuspendedTaskList      0x2000'56d8    0x14  Data  Lc  tasks.o [1]
+xTaskCheckForTimeOut     0x800'a7bd    0x8e  Code  Gb  tasks.o [1]
+xTaskCreate              0x800'a01b    0x7a  Code  Gb  tasks.o [1]
+xTaskCreateStatic        0x800'9f7d    0x9e  Code  Gb  tasks.o [1]
+xTaskGetSchedulerState   0x800'a98b    0x20  Code  Gb  tasks.o [1]
+xTaskIncrementTick       0x800'a56b   0x10c  Code  Gb  tasks.o [1]
+xTaskPriorityDisinherit
+                         0x800'aa6b    0xb2  Code  Gb  tasks.o [1]
+xTaskPriorityInherit     0x800'a9b1    0xba  Code  Gb  tasks.o [1]
+xTaskRemoveFromEventList
+                         0x800'a719    0x7c  Code  Gb  tasks.o [1]
+xTaskResumeAll           0x800'a483    0xe8  Code  Gb  tasks.o [1]
+xTasksWaitingTermination
+                        0x2000'56c4    0x14  Data  Lc  tasks.o [1]
+xTickCount              0x2000'579c     0x4  Data  Lc  tasks.o [1]
+xYieldPending           0x2000'57ac     0x4  Data  Lc  tasks.o [1]
+
+
+[1] = C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\117_bsg\Obj
+[2] = dl7M_tlf.a
+[3] = m7M_tls.a
+[4] = rt7M_tl.a
+[5] = shb_l.a
+
+  46 146 bytes of readonly  code memory
+   3 325 bytes of readonly  data memory
+  24 021 bytes of readwrite data memory
+
+Errors: none
+Warnings: none
