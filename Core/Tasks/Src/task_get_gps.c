@@ -1,4 +1,5 @@
 #include "../Tasks/Inc/task_get_gps.h"
+#include "tim.h"
 extern osMutexId mutexGPSBufHandle;
 extern CircularBuffer circBufPckgGPS;
 extern osThreadId httpHandle;
@@ -25,7 +26,8 @@ void taskGetGPS(void const * argument)
 			uInfoGnss.irqFlags.isIrqRx = 0;
 			while(cBufRead(&circBufGnss, (u8*)bufGnss, CIRC_TYPE_GNSS, 0)){
 				D(printf("GPS: %s", bufGnss));
-				if(fillGprmc(bufGnss, &pckgGnss) == GPS_OK){
+				if(!bsg.sleepTimer.flagOn && fillGprmc(bufGnss, &pckgGnss) == GPS_OK){
+					checkStopTrain(&pckgGnss);
 					serializePckgGnss(bufPckgGnss, &pckgGnss);
 					writeSafeToCBuf(&circBufPckgGPS, bufPckgGnss, GPS_SZ_GRMC, mutexGPSBufHandle);
 				}
@@ -38,3 +40,19 @@ void taskGetGPS(void const * argument)
 	}
   /* USER CODE END taskGetGPS */
 }
+
+void checkStopTrain(PckgGnss* pckg){
+	static u8 cntr = 0;
+	if(pckg->speed / 10 < 5){
+		cntr++;
+		if(cntr == 5){
+			cntr = 0;
+			bsg.sleepTimer.flagOn = 1;
+			HAL_TIM_Base_Start_IT(&htim10);
+		}
+	} else {
+		cntr = 0;
+		bsg.sleepTimer.flagOn = 0;
+	}
+}
+

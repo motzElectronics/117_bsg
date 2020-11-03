@@ -318,6 +318,18 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart){
 	}
 }
 
+void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart){
+  u32 error = HAL_UART_GetError(huart);
+	if(huart->Instance == USART1){
+		
+		D(printf("HAL_UART_ErrorCallback() sim800 ERROR_CODE: %d\r\n", (int)error));//		createLog(logError, LOG_SZ_ERROR, bufResponse);
+		uartRxDma(&uInfoSim);
+	} else if(huart->Instance == USART2){
+		D(printf("ErrorCallback() gnss ERROR_CODE: %d\r\n", (int)error));
+		uartRxDma(&uInfoGnss);
+	}
+}
+
 /* USER CODE END 1 */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

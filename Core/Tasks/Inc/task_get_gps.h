@@ -5,5 +5,5 @@
 #include "cmsis_os.h"
 #include "../Utils/Inc/circularBuffer.h"
 #include "../Utils/Inc/utils_gps.h"
-
+void checkStopTrain(PckgGnss* pckg);
 #endif

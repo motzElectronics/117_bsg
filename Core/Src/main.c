@@ -24,6 +24,7 @@
 #include "iwdg.h"
 #include "rtc.h"
 #include "spi.h"
+#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
@@ -71,7 +72,9 @@ void MX_FREERTOS_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+void absurdeFun(FIRMWARE_INFO* info){
+  info->numFirmware++;
+}
 /* USER CODE END 0 */
 
 /**
@@ -108,11 +111,14 @@ int main(void)
   MX_USART2_UART_Init();
   MX_IWDG_Init();
   MX_RTC_Init();
+  MX_TIM10_Init();
   /* USER CODE BEGIN 2 */
-  D(printf("OK: start main prog\r\n"));
+  // D(printf("OK: start main prog\r\n"));
   FIRMWARE_INFO info = {.header = 0x1122334455667788,
 		  .numFirmware = BSG_ID_FIRMWARE, .verFirmware = BSG_VER_BETA_FIRMWARE, .numTrainCar = BSG_ID_TRAINCAR
   };
+  absurdeFun(&info);
+  D(printf("firmware: %d\r\n", info.numFirmware));
   uartInitInfo();
   bsgInit();
   urlsInit();
@@ -248,6 +254,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   /* USER CODE END Callback 0 */
   if (htim->Instance == TIM1) {
     HAL_IncTick();
+  } else if(htim->Instance == TIM10){
+    HAL_TIM_Base_Stop_IT(&htim10);
+    bsg.sleepTimer.flagOn = 0;
   }
   /* USER CODE BEGIN Callback 1 */
 

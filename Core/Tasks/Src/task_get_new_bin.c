@@ -28,6 +28,7 @@ void taskGetNewBin(void const * argument){
 		D(printf("ERROR: simGetSzSoft"));
 		osDelay(1000);
 	}
+	flashClearPage(FLASH_SECTOR_6);
 	flashClearPage(FLASH_SECTOR_7);
 	simHttpInit(urls.getPartFirmware);
 
@@ -55,7 +56,7 @@ void taskGetNewBin(void const * argument){
 					}
 				} else{ 
 					while(HAL_FLASH_Unlock() != HAL_OK) D(printf("ERROR: HAL_FLASH_Unlock()\r\n"));
-					FLASH_Erase_Sector(FLASH_SECTOR_3, VOLTAGE_RANGE_3);
+					FLASH_Erase_Sector(FLASH_SECTOR_1, VOLTAGE_RANGE_3);
 					D(printf("FLASH_Erase_Sector\r\n"));
 					while(HAL_FLASH_Program(TYPEPROGRAM_WORD, FLASH_ADDR_ID_BOOT, (u32)bsg.idBoot))
 						D(printf("ERROR: HAL_FLASH_Program(BOOT_ADDR_ID_LOADER)\r\n"));

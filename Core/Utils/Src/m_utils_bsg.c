@@ -22,6 +22,7 @@ void bsgInit(){
 	bsg.idDev = BSG_ID_DEV_BSG;
 	bsg.idFirmware = BSG_ID_FIRMWARE;
 	bsg.idBoot = BSG_ID_BOOT;
+	bsg.sleepTimer.flagOn = 0;
 }
 
 

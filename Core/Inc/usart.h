@@ -44,7 +44,7 @@ void MX_USART2_UART_Init(void);
 #include "cmsis_os.h"
 
 #define USART_SZ_BUF_RX_USART2    500
-#define USART_SZ_BUF_RX_USART1    1024
+#define USART_SZ_BUF_RX_USART1    1524
 #define USART_SZ_BUF_TX_USART1    1024
 
 #define USART_TIMEOUT             15000

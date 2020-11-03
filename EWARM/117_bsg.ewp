@@ -286,7 +286,7 @@
         <option>
           <name>CCAllowList</name>
           <version>1</version>
-          <state>00000000</state>
+          <state>11111110</state>
         </option>
         <option>
           <name>CCDebugInfo</name>
@@ -373,7 +373,7 @@
         </option>
         <option>
           <name>CCOptLevel</name>
-          <state>0</state>
+          <state>3</state>
         </option>
         <option>
           <name>CCOptStrategy</name>
@@ -382,7 +382,7 @@
         </option>
         <option>
           <name>CCOptLevelSlave</name>
-          <state>0</state>
+          <state>3</state>
         </option>
         <option>
           <name>CompilerMisraRules98</name>
@@ -645,7 +645,7 @@
         <option>
           <name>OOCOutputFormat</name>
           <version>3</version>
-          <state>1</state>
+          <state>3</state>
         </option>
         <option>
           <name>OCOutputOverride</name>
@@ -653,7 +653,7 @@
         </option>
         <option>
           <name>OOCOutputFile</name>
-          <state>117_bsg.hex</state>
+          <state>117_bsg.bin</state>
         </option>
         <option>
           <name>OOCCommandLineProducer</name>
@@ -1068,6 +1068,9 @@
         </file>
         <file>
           <name>$PROJ_DIR$\..\Core\Src\spi.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$/../Core/Src/tim.c</name>
         </file>
         <file>
           <name>$PROJ_DIR$\..\Core\Src\usart.c</name>
