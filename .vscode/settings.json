@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "utils_gps.h": "c",
+        "spiflash.h": "c"
+    }
+}

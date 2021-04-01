@@ -11,7 +11,7 @@
             <name>C-SPY</name>
             <archiveVersion>2</archiveVersion>
             <data>
-                <version>30</version>
+                <version>31</version>
                 <wantNonLocal>1</wantNonLocal>
                 <debug>1</debug>
                 <option>
@@ -36,7 +36,7 @@
                 </option>
                 <option>
                     <name>MacFile</name>
-                    <state />
+                    <state></state>
                 </option>
                 <option>
                     <name>MemOverride</name>
@@ -60,7 +60,7 @@
                 </option>
                 <option>
                     <name>CExtraOptions</name>
-                    <state />
+                    <state></state>
                 </option>
                 <option>
                     <name>CFpuProcessor</name>
@@ -68,7 +68,7 @@
                 </option>
                 <option>
                     <name>OCDDFArgumentProducer</name>
-                    <state />
+                    <state></state>
                 </option>
                 <option>
                     <name>OCDownloadSuppressDownload</name>
@@ -88,7 +88,7 @@
                 </option>
                 <option>
                     <name>OCLastSavedByProductVersion</name>
-                    <state>8.30.1.17146</state>
+                    <state>8.40.1.21529</state>
                 </option>
                 <option>
                     <name>UseFlashLoader</name>
@@ -104,7 +104,7 @@
                 </option>
                 <option>
                     <name>MacFile2</name>
-                    <state />
+                    <state></state>
                 </option>
                 <option>
                     <name>CDevice</name>
@@ -120,7 +120,7 @@
                 </option>
                 <option>
                     <name>OCImagesPath1</name>
-                    <state />
+                    <state></state>
                 </option>
                 <option>
                     <name>OCImagesSuppressCheck2</name>
@@ -128,7 +128,7 @@
                 </option>
                 <option>
                     <name>OCImagesPath2</name>
-                    <state />
+                    <state></state>
                 </option>
                 <option>
                     <name>OCImagesSuppressCheck3</name>
@@ -136,7 +136,7 @@
                 </option>
                 <option>
                     <name>OCImagesPath3</name>
-                    <state />
+                    <state></state>
                 </option>
                 <option>
                     <name>OverrideDefFlashBoard</name>
@@ -144,15 +144,15 @@
                 </option>
                 <option>
                     <name>OCImagesOffset1</name>
-                    <state />
+                    <state></state>
                 </option>
                 <option>
                     <name>OCImagesOffset2</name>
-                    <state />
+                    <state></state>
                 </option>
                 <option>
                     <name>OCImagesOffset3</name>
-                    <state />
+                    <state></state>
                 </option>
                 <option>
                     <name>OCImagesUse1</name>
@@ -183,24 +183,16 @@
                     <state>1</state>
                 </option>
                 <option>
-                    <name>OCMulticoreMaster</name>
-                    <state>0</state>
-                </option>
-                <option>
-                    <name>OCMulticorePort</name>
-                    <state>53461</state>
-                </option>
-                <option>
                     <name>OCMulticoreWorkspace</name>
-                    <state />
+                    <state></state>
                 </option>
                 <option>
                     <name>OCMulticoreSlaveProject</name>
-                    <state />
+                    <state></state>
                 </option>
                 <option>
                     <name>OCMulticoreSlaveConfiguration</name>
-                    <state />
+                    <state></state>
                 </option>
                 <option>
                     <name>OCDownloadExtraImage</name>
@@ -217,6 +209,14 @@
                 <option>
                     <name>OCMulticoreNrOfCoresSlave</name>
                     <state>1</state>
+                </option>
+                <option>
+                    <name>OCMulticoreAMPConfigType</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>OCMulticoreSessionFile</name>
+                    <state></state>
                 </option>
             </data>
         </settings>
@@ -241,7 +241,7 @@
                 </option>
                 <option>
                     <name>OCSimPspConfigFile</name>
-                    <state />
+                    <state></state>
                 </option>
             </data>
         </settings>
@@ -258,7 +258,7 @@
                 </option>
                 <option>
                     <name>Fast Model</name>
-                    <state />
+                    <state></state>
                 </option>
                 <option>
                     <name>CCADILogFileCheck</name>
@@ -425,7 +425,7 @@
                 </option>
                 <option>
                     <name>OCProbeConfig</name>
-                    <state />
+                    <state></state>
                 </option>
                 <option>
                     <name>CMSISDAPProbeConfigRadio</name>
@@ -437,7 +437,7 @@
                 </option>
                 <option>
                     <name>ICpuName</name>
-                    <state />
+                    <state></state>
                 </option>
                 <option>
                     <name>OCJetEmuParams</name>
@@ -445,7 +445,7 @@
                 </option>
                 <option>
                     <name>CCCMSISDAPUsbSerialNo</name>
-                    <state />
+                    <state></state>
                 </option>
                 <option>
                     <name>CCCMSISDAPUsbSerialNoSelect</name>
@@ -666,7 +666,7 @@
                 </option>
                 <option>
                     <name>OCProbeConfig</name>
-                    <state />
+                    <state></state>
                 </option>
                 <option>
                     <name>IjetProbeConfigRadio</name>
@@ -686,7 +686,7 @@
                 </option>
                 <option>
                     <name>ICpuName</name>
-                    <state />
+                    <state></state>
                 </option>
                 <option>
                     <name>OCJetEmuParams</name>
@@ -712,7 +712,7 @@
                 </option>
                 <option>
                     <name>CCIjetUsbSerialNo</name>
-                    <state />
+                    <state></state>
                 </option>
                 <option>
                     <name>CCIjetUsbSerialNoSelect</name>
@@ -883,7 +883,7 @@
                 </option>
                 <option>
                     <name>CCJLinkUsbSerialNo</name>
-                    <state />
+                    <state></state>
                 </option>
                 <option>
                     <name>CCTcpIpAlt</name>
@@ -892,7 +892,7 @@
                 </option>
                 <option>
                     <name>CCJLinkTcpIpSerialNo</name>
-                    <state />
+                    <state></state>
                 </option>
                 <option>
                     <name>CCCpuClockEdit</name>
@@ -1003,7 +1003,7 @@
             <name>STLINK_ID</name>
             <archiveVersion>2</archiveVersion>
             <data>
-                <version>5</version>
+                <version>6</version>
                 <wantNonLocal>1</wantNonLocal>
                 <debug>1</debug>
                 <option>
@@ -1093,7 +1093,7 @@
                 </option>
                 <option>
                     <name>CCSTLinkUsbSerialNo</name>
-                    <state />
+                    <state></state>
                 </option>
                 <option>
                     <name>CCSTLinkUsbSerialNoSelect</name>
@@ -1101,12 +1101,12 @@
                 </option>
                 <option>
                     <name>CCSTLinkJtagSpeedList</name>
-                    <version>1</version>
+                    <version>2</version>
                     <state>0</state>
                 </option>
                 <option>
                     <name>CCSTLinkDAPNumber</name>
-                    <state />
+                    <state></state>
                 </option>
                 <option>
                     <name>CCSTLinkDebugAccessPortRadio</name>
@@ -1115,6 +1115,11 @@
                 <option>
                     <name>CCSTLinkUseServerSelect</name>
                     <state>0</state>
+                </option>
+                <option>
+                    <name>CCSTLinkProbeList</name>
+                    <version>0</version>
+                    <state>1</state>
                 </option>
             </data>
         </settings>
@@ -1231,11 +1236,11 @@
                 </option>
                 <option>
                     <name>TIPackage</name>
-                    <state />
+                    <state></state>
                 </option>
                 <option>
                     <name>BoardFile</name>
-                    <state />
+                    <state></state>
                 </option>
                 <option>
                     <name>DoLogfile</name>
@@ -1327,7 +1332,7 @@
                 </option>
                 <option>
                     <name>CCXds100CpuClockEdit</name>
-                    <state />
+                    <state></state>
                 </option>
                 <option>
                     <name>CCXds100SwoClockAuto</name>
@@ -1348,7 +1353,7 @@
                 </option>
                 <option>
                     <name>CCXds100UsbSerialNo</name>
-                    <state />
+                    <state></state>
                 </option>
                 <option>
                     <name>CCXds100UsbSerialNoSelect</name>
@@ -1412,6 +1417,10 @@
                 <loadFlag>0</loadFlag>
             </plugin>
             <plugin>
+                <file>$TOOLKIT_DIR$\plugins\rtos\HWRTOSplugin\HWRTOSplugin.ewplugin</file>
+                <loadFlag>0</loadFlag>
+            </plugin>
+            <plugin>
                 <file>$TOOLKIT_DIR$\plugins\rtos\Mbed\MbedArmPlugin.ENU.ewplugin</file>
                 <loadFlag>0</loadFlag>
             </plugin>
@@ -1421,6 +1430,10 @@
             </plugin>
             <plugin>
                 <file>$TOOLKIT_DIR$\plugins\rtos\OpenRTOS\OpenRTOSPlugin.ewplugin</file>
+                <loadFlag>0</loadFlag>
+            </plugin>
+            <plugin>
+                <file>$TOOLKIT_DIR$\plugins\rtos\RemedyRtosViewer\RemedyRtosViewer.ewplugin</file>
                 <loadFlag>0</loadFlag>
             </plugin>
             <plugin>
@@ -1454,10 +1467,6 @@
             <plugin>
                 <file>$TOOLKIT_DIR$\plugins\rtos\uCOS-III\uCOS-III-KA-CSpy.ewplugin</file>
                 <loadFlag>0</loadFlag>
-            </plugin>
-            <plugin>
-                <file>$EW_DIR$\common\plugins\CodeCoverage\CodeCoverage.ENU.ewplugin</file>
-                <loadFlag>1</loadFlag>
             </plugin>
             <plugin>
                 <file>$EW_DIR$\common\plugins\Orti\Orti.ENU.ewplugin</file>

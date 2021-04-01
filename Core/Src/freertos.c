@@ -46,16 +46,21 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
+#include "usart.h"
+#include "../Utils/Inc/utils_pckgs_manager.h"
 
 /* USER CODE END Variables */
 osThreadId getGPSHandle;
-osThreadId httpHandle;
 osThreadId keepAliveHandle;
 osThreadId getNewBinHandle;
 osThreadId manageIWDGHandle;
+osThreadId createWebPckgHandle;
+osThreadId webExchangeHandle;
+osMessageQId queueWebPckgHandle;
 osMutexId mutexGPSBufHandle;
 osMutexId mutexWebHandle;
 osMutexId mutexRTCHandle;
+osSemaphoreId semCreateWebPckgHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -63,10 +68,11 @@ osMutexId mutexRTCHandle;
 /* USER CODE END FunctionPrototypes */
 
 void taskGetGPS(void const * argument);
-void taskHttp(void const * argument);
 void taskAlive(void const * argument);
 void taskGetNewBin(void const * argument);
 void taskManageIWDG(void const * argument);
+void taskCreateWebPckg(void const * argument);
+void taskWebExchange(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -112,6 +118,11 @@ void MX_FREERTOS_Init(void) {
   /* add mutexes, ... */
   /* USER CODE END RTOS_MUTEX */
 
+  /* Create the semaphores(s) */
+  /* definition and creation of semCreateWebPckg */
+  osSemaphoreDef(semCreateWebPckg);
+  semCreateWebPckgHandle = osSemaphoreCreate(osSemaphore(semCreateWebPckg), 1);
+
   /* USER CODE BEGIN RTOS_SEMAPHORES */
   /* add semaphores, ... */
   /* USER CODE END RTOS_SEMAPHORES */
@@ -119,6 +130,11 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN RTOS_TIMERS */
   /* start timers, add new ones, ... */
   /* USER CODE END RTOS_TIMERS */
+
+  /* Create the queue(s) */
+  /* definition and creation of queueWebPckg */
+  osMessageQDef(queueWebPckg, 8, WebPckg*);
+  queueWebPckgHandle = osMessageCreate(osMessageQ(queueWebPckg), NULL);
 
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
@@ -128,10 +144,6 @@ void MX_FREERTOS_Init(void) {
   /* definition and creation of getGPS */
   osThreadDef(getGPS, taskGetGPS, osPriorityNormal, 0, 256);
   getGPSHandle = osThreadCreate(osThread(getGPS), NULL);
-
-  /* definition and creation of http */
-  osThreadDef(http, taskHttp, osPriorityNormal, 0, 256);
-  httpHandle = osThreadCreate(osThread(http), NULL);
 
   /* definition and creation of keepAlive */
   osThreadDef(keepAlive, taskAlive, osPriorityNormal, 0, 256);
@@ -144,6 +156,14 @@ void MX_FREERTOS_Init(void) {
   /* definition and creation of manageIWDG */
   osThreadDef(manageIWDG, taskManageIWDG, osPriorityNormal, 0, 128);
   manageIWDGHandle = osThreadCreate(osThread(manageIWDG), NULL);
+
+  /* definition and creation of createWebPckg */
+  osThreadDef(createWebPckg, taskCreateWebPckg, osPriorityNormal, 0, 256);
+  createWebPckgHandle = osThreadCreate(osThread(createWebPckg), NULL);
+
+  /* definition and creation of webExchange */
+  osThreadDef(webExchange, taskWebExchange, osPriorityNormal, 0, 256);
+  webExchangeHandle = osThreadCreate(osThread(webExchange), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -167,24 +187,6 @@ __weak void taskGetGPS(void const * argument)
     osDelay(1);
   }
   /* USER CODE END taskGetGPS */
-}
-
-/* USER CODE BEGIN Header_taskHttp */
-/**
-* @brief Function implementing the http thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_taskHttp */
-__weak void taskHttp(void const * argument)
-{
-  /* USER CODE BEGIN taskHttp */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
-  /* USER CODE END taskHttp */
 }
 
 /* USER CODE BEGIN Header_taskAlive */
@@ -239,6 +241,42 @@ __weak void taskManageIWDG(void const * argument)
     osDelay(1);
   }
   /* USER CODE END taskManageIWDG */
+}
+
+/* USER CODE BEGIN Header_taskCreateWebPckg */
+/**
+* @brief Function implementing the createWebPckg thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_taskCreateWebPckg */
+__weak void taskCreateWebPckg(void const * argument)
+{
+  /* USER CODE BEGIN taskCreateWebPckg */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END taskCreateWebPckg */
+}
+
+/* USER CODE BEGIN Header_taskWebExchange */
+/**
+* @brief Function implementing the webExchange thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_taskWebExchange */
+__weak void taskWebExchange(void const * argument)
+{
+  /* USER CODE BEGIN taskWebExchange */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END taskWebExchange */
 }
 
 /* Private application code --------------------------------------------------*/

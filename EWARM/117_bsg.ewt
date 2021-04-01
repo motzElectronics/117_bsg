@@ -1198,6 +1198,9 @@
             <group>
                 <name>Core</name>
                 <file>
+                    <name>$PROJ_DIR$\..\Core\Src\crc.c</name>
+                </file>
+                <file>
                     <name>$PROJ_DIR$\..\Core\Src\dma.c</name>
                 </file>
                 <file>
@@ -1228,6 +1231,9 @@
                     <name>$PROJ_DIR$\..\Core\Src\stm32f4xx_it.c</name>
                 </file>
                 <file>
+                    <name>$PROJ_DIR$\..\Core\Src\tim.c</name>
+                </file>
+                <file>
                     <name>$PROJ_DIR$\..\Core\Src\usart.c</name>
                 </file>
             </group>
@@ -1243,19 +1249,22 @@
             <group>
                 <name>Tasks</name>
                 <file>
+                    <name>$PROJ_DIR$\..\Core\Tasks\Src\task_create_webpckg.c</name>
+                </file>
+                <file>
                     <name>$PROJ_DIR$\..\Core\Tasks\Src\task_get_gps.c</name>
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\Core\Tasks\Src\task_get_new_bin.c</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\Core\Tasks\Src\task_http.c</name>
-                </file>
-                <file>
                     <name>$PROJ_DIR$\..\Core\Tasks\Src\task_iwdg.c</name>
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\Core\Tasks\Src\task_keep_alive.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\Core\Tasks\Src\task_web_excahnge.c</name>
                 </file>
             </group>
             <group>
@@ -1267,9 +1276,6 @@
                     <name>$PROJ_DIR$\..\Core\Utils\Src\m_utils_bsg.c</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\Core\Utils\Src\m_utils_json.c</name>
-                </file>
-                <file>
                     <name>$PROJ_DIR$\..\Core\Utils\Src\utils_crc.c</name>
                 </file>
                 <file>
@@ -1277,6 +1283,9 @@
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\Core\Utils\Src\utils_gps.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\Core\Utils\Src\utils_pckgs_manager.c</name>
                 </file>
             </group>
         </group>
@@ -1296,6 +1305,9 @@
             </file>
             <file>
                 <name>$PROJ_DIR$\..\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_cortex.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_crc.c</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\..\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_dma.c</name>

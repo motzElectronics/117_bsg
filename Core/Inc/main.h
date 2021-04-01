@@ -79,70 +79,85 @@ void Error_Handler(void);
 #define DEBUG 1
 
 #if DEBUG
-  #define D(x)  x
+#define D(x) x
 #else
-  #define D(x)
+#define D(x)
 #endif
 
-#define LOG_SZ_ERROR	100
-#define WAIT_TIMEOUT 	15000
-#define DUMMY_BYTE		0xFF
+#define LOG_SZ_ERROR 100
+#define WAIT_TIMEOUT 15000
+#define DUMMY_BYTE 0xFF
 
-#define URL_FILE_SZ							(char*)"http://188.242.176.25:8080/api/filesize?uid="
-#define URL_TIME							(char*)"http://188.242.176.25:8080/api/time"
-#define URL_GET_NEW_FIRMWARE				(char*)"http://188.242.176.25:8080/api/getFile"
-#define URL_MEASURE							(char*)"http://188.242.176.25:8080/api/add/measures"
+#define URL_TCP_ADDR (char*)"188.242.176.25"
+#define URL_TCP_PORT 8086
 
-extern char logError[LOG_SZ_ERROR]; 
-typedef uint8_t			u8;
-typedef uint16_t		u16;
-typedef uint32_t		u32;
-typedef uint64_t		u64;
-typedef unsigned int 	uint;
+#define BSG_SZ_UART_MSG 132
+#define BSG_SZ_TEMP_MSG 4
 
-typedef int8_t		s8;
-typedef int16_t		s16;
-typedef int32_t		s32;
+#define SZ_CMD_ENERGY 12
+#define SZ_CMD_VOLTAMPER 8
+#define SZ_CMD_TEMP 8
+#define SZ_CMD_GRMC 20
+#define SZ_CMD_TELEMETRY 10
+#define SZ_CMD_TELEMETRY_PHONE_NUM 14
 
+#define SZ_PAGE 255
+#define SZ_BUF_ENERGY_FROM_UART1 500
+#define AMOUNT_MAX_PAGES 5
+#define SZ_PAGES 1275  // SZ_PAGE * AMOUNT_MAX_PAGES
 
-typedef union{
-	struct{
-		u8 isIrqTx:		1;
-		u8 isIrqRx: 	1;
-		u8 isIrqIdle:	1;
-	};
-	u8 regIrq;
-}IrqFlags;
+#define BSG_PREAMBLE 0xABCD
+#define BSG_PREAMBLE_LSB 0xAB
+#define BSG_PREAMBLE_MSB 0xCD
 
-typedef struct{
-	u8 hour;
-	u8 min;
-	u8 sec;
-	u8 year;
-	u8 month;
-	u8 day;
-}DateTime;
+#define SZ_WEB_PCKG 1400
 
-typedef struct{
-	char* addMeasure;
-	char* getTime;
-	char* getSzSoft;
-	char* getPartFirmware;
-}HttpUrl;
+extern char logError[LOG_SZ_ERROR];
+typedef uint8_t u8;
+typedef uint16_t u16;
+typedef uint32_t u32;
+typedef uint64_t u64;
+typedef unsigned int uint;
 
-typedef struct{
-	u64		header;
-	u8		numFirmware;
-	char	verFirmware;
-  u8    numTrainCar;
-}FIRMWARE_INFO;
+typedef int8_t s8;
+typedef int16_t s16;
+typedef int32_t s32;
 
-extern HttpUrl urls;
+typedef union {
+    struct {
+        u8 isIrqTx : 1;
+        u8 isIrqRx : 1;
+        u8 isIrqIdle : 3;
+    };
+    u8 regIrq;
+} IrqFlags;
 
-u8 waitRx(char* waitStr, IrqFlags* pFlags, u16 pause, u16 timeout);
-u8 waitTx(char* waitStr, IrqFlags* pFlags, u16 pause, u16 timeout);
-u8 waitIdle(char* waitStr, IrqFlags* pFlags, u16 pause, u16 timeout);
+typedef struct {
+    u8 hour;
+    u8 min;
+    u8 sec;
+    u8 year;
+    u8 month;
+    u8 day;
+} DateTime;
 
+typedef struct {
+    u64 header;
+    u8 numFirmware;
+    char verFirmware;
+    u8 numTrainCar;
+} FIRMWARE_INFO;
+
+typedef struct {
+    char* tcpAddr;
+    u32 tcpPort;
+} Urls;
+
+extern Urls urls;
+u8 waitRx(char* waitStr, IrqFlags* pFlags, u16 pause, u32 timeout);
+u8 waitTx(char* waitStr, IrqFlags* pFlags, u16 pause, u32 timeout);
+u8 waitIdle(char* waitStr, IrqFlags* pFlags, u16 pause, u32 timeout);
+u8 waitIdleCnt(char* waitStr, IrqFlags* pFlags, u8 cnt, u16 pause, u32 timeout);
 void urlsInit();
 /* USER CODE END Private defines */
 
