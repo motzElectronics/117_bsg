@@ -36,7 +36,7 @@ void taskGetGPS(void const *argument) {
         if (uInfoGnss.irqFlags.isIrqRx) {
             uInfoGnss.irqFlags.isIrqRx = 0;
             while (cBufRead(&circBufGnss, (u8 *)bufGnss, CIRC_TYPE_GNSS, 0)) {
-                // D(printf("GPS: %s", bufGnss));
+                // D(printf("GPS : %s", bufGnss));
                 if (!bsg.sleepTimer.flagOn &&
                     fillGprmc(bufGnss, &pckgGnss) == GPS_OK) {
                     // checkStopTrain(&pckgGnss);
@@ -106,5 +106,5 @@ void generateInitTelemetry() {
     saveTelemetry(&pckgTel, &circBufAllPckgs);
 
     updSpiFlash(&circBufAllPckgs);
-    xSemaphoreGive(semCreateWebPckgHandle);
+	xSemaphoreGive(semCreateWebPckgHandle);
 }

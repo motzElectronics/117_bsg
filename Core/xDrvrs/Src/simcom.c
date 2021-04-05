@@ -281,8 +281,8 @@ u8 procReturnStatus(u8 ret) {
     }
 
     if (notSend == 1) {
-        simReset();
         D(printf("DANGER DANGER HIGH VOLTAGE\r\n"));
+        simReset();
         ret = TCP_SEND_ER_LOST_PCKG;
         notSend = 0;
     }
@@ -312,9 +312,9 @@ u8 openTcp() {
 
 u8 sendTcp(u8* data, u16 sz) {
     u8 ret = TCP_OK;
-    if (!bsg.isTCPOpen) {
-        return TCP_SEND_ER;
-    }
+    // if (!bsg.isTCPOpen) {
+    //     return TCP_SEND_ER;
+    // }
     if (!waitGoodCsq(120)) {
         D(printf("ER: waitGoodCsq\r\n"));
         ret = TCP_CSQ_ER;

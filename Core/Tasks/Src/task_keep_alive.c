@@ -7,17 +7,20 @@ extern CircularBuffer circBufAllPckgs;
 
 void taskKeepAlive(void const * argument){
     u16 timeout = 1;
-    // vTaskSuspend(keepAliveHandle);
+    vTaskSuspend(keepAliveHandle);
     
     for(;;)
     {
-        if(!(timeout % 30) && !isRxNewFirmware){
+        if(!(timeout % 60) && !isRxNewFirmware){
+            D(printf("\r\ngetNumFirmware\r\n\r\n"));
             getNumFirmware();
         }
         if(!(timeout % 600) && !isRxNewFirmware){
+            D(printf("\r\ngenerateMsgKeepAlive\r\n\r\n"));
             generateMsgKeepAlive();
         }
         if(!(timeout % 5400) && !isRxNewFirmware){
+            D(printf("\r\nupdRTC\r\n\r\n"));
             updRTC();
         }
         

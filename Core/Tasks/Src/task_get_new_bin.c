@@ -23,7 +23,7 @@ void taskGetNewBin(void const* argument) {
     u32 szPartSoft;
     u8 cntFailTCPReq = 0;
 
-    FLASH_Erase_Sector(FLASH_SECTOR_3, VOLTAGE_RANGE_3);
+    FLASH_Erase_Sector(FLASH_SECTOR_1, VOLTAGE_RANGE_3);
 
     vTaskSuspend(getNewBinHandle);
     D(printf("taskCreateWebPckg\r\n"));
@@ -36,6 +36,7 @@ void taskGetNewBin(void const* argument) {
     }
 
     while (!(szSoft = getSzFirmware()));
+    flashClearPage(FLASH_SECTOR_6);
     flashClearPage(FLASH_SECTOR_7);
     clearAllWebPckgs();
 
@@ -53,10 +54,11 @@ void taskGetNewBin(void const* argument) {
             memset(partFirmware, 0xFF, SZ_PART_FIRMW + 1);
 
             if (!bsg.isTCPOpen) {
-                while (openTcp() != TCP_OK)
-                    ;
+                while (openTcp() != TCP_OK);
+                cntFailTCPReq = 0;
             }
 
+            osDelay(100);
             if (getPartFirmware(bufNumBytesFirmware, partFirmware, szPartSoft + 4, 8) == SUCCESS &&
                 isCrcOk(partFirmware, szPartSoft)) {
                 curSzSoft += szPartSoft;
@@ -68,11 +70,14 @@ void taskGetNewBin(void const* argument) {
                 D(printf("ERROR: httpPost() DOWNLOAD\r\n"));
                 cntFailTCPReq++;
                 if (cntFailTCPReq > 10) {
+                    cntFailTCPReq = 0;
                     simReset();
                 }
             }
         } else {
+            D(printf("DOWNLOAD COMPLETE\r\n"));
             updBootInfo();
+            osDelay(100);
             NVIC_SystemReset();
         }
     }
@@ -82,8 +87,8 @@ void taskGetNewBin(void const* argument) {
 void updBootInfo() {
     szSoft = szSoft % 4 == 0 ? szSoft : ((szSoft / 4) + 1) * 4;
     while (HAL_FLASH_Unlock() != HAL_OK) D(printf("ERROR: HAL_FLASH_Unlock()\r\n"));
-    FLASH_Erase_Sector(FLASH_SECTOR_3, VOLTAGE_RANGE_3);
-    D(printf("FLASH_Erase_Sector\r\n"));
+    FLASH_Erase_Sector(FLASH_SECTOR_1, VOLTAGE_RANGE_3);
+    // D(printf("FLASH_Erase_Sector\r\n"));
     while (HAL_FLASH_Program(TYPEPROGRAM_WORD, FLASH_ADDR_ID_BOOT, BSG_ID_BOOT))
         D(printf("ERROR: HAL_FLASH_Program(BOOT_ADDR_ID_LOADER)\r\n"));
     while (HAL_FLASH_Program(TYPEPROGRAM_WORD, FLASH_ADDR_IS_NEW_FIRWARE, (u32)1))
@@ -127,7 +132,7 @@ ErrorStatus getPartFirmware(u8* reqData, u8* answBuf, u16 szAnsw, u8 szReq) {
         D(printf("ERROR: part Firmware\r\n"));
         ret = ERROR;
     } else {
-        waitIdleCnt("wait IDLE part firmware", &(uInfoSim.irqFlags), szAnsw / SZ_TCP_PCKG + 1, 100, 6000);
+        waitIdleCnt("wait IDLE part firmware", &(uInfoSim.irqFlags), szAnsw / SZ_TCP_PCKG, 100, 10000);
         osDelay(100);
         memcpy(answBuf, &uInfoSim.pRxBuf[11], szAnsw);
     }

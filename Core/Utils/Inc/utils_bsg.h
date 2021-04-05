@@ -7,6 +7,7 @@
 
 #ifndef INC_UTILS_BSG_H_
 #define INC_UTILS_BSG_H_
+
 #include "../Utils/Inc/circularBuffer.h"
 #include "../Utils/Inc/utils_crc.h"
 #include "../xDrvrs/Inc/simcom.h"
@@ -15,7 +16,7 @@
 #include "time.h"
 #include "usart.h"
 
-#define BSG_THRESHOLD_CNT_PAGES 1
+#define BSG_THRESHOLD_CNT_PAGES 2
 #define BSG_ID_DEV_BSG 0x12
 #define BSG_ADDR_ID_MCU 0x1FFF7A10
 
@@ -24,8 +25,8 @@
 
 #define BSG_MSG_NO_GPS (char*)"0000.000000,N,00000.000000,E,+0000,000,000"
 
-#define BSG_ID_FIRMWARE 4
-#define BSG_ID_BOOT 1
+#define BSG_ID_FIRMWARE 5
+#define BSG_ID_BOOT 2
 #define BSG_ID_TRAINCAR 0
 #define BSG_ID_TRAIN 1706
 #define BSG_VER_BETA_FIRMWARE (char)'B'

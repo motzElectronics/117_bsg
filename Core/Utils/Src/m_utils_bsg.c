@@ -2,10 +2,13 @@
 #include "../Utils/Inc/utils_gps.h"
 #include "../Utils/Inc/utils_pckgs_manager.h"
 #include "rtc.h"
+#include "cmsis_os.h"
+
 extern BSG bsg;
 extern osMutexId mutexGPSBufHandle;
 extern osMutexId mutexRTCHandle;
 extern osMutexId mutexWebHandle;
+extern osMutexId mutexFlashWriteHandle;
 extern osThreadId getNewBinHandle;
 extern osSemaphoreId semCreateWebPckgHandle;
 extern CircularBuffer circBufTTLVtoFlash;
@@ -85,6 +88,7 @@ void getNumFirmware() {
         D(printf("ERROR: getNumFirmware()\r\n"));
     } else {
         u32 numFirmware = bufFirmware[0] << 24 | bufFirmware[1] << 16 | bufFirmware[2] << 8 | bufFirmware[3];
+            D(printf("FIRMWARE v.:%d\r\n", (int)numFirmware));
         if (numFirmware != BSG_ID_FIRMWARE && numFirmware > 0) {
             D(printf("New FIRMWARE v.:%d\r\n", (int)numFirmware));
             vTaskResume(getNewBinHandle);
@@ -96,8 +100,7 @@ u32 getFlashData(u32 ADDR) { return (*(__IO u32*)ADDR); }
 
 u8 isCrcOk(char* pData, int len) {
     u32 crcCalc = crc32_byte(pData, len);
-    u32 crcRecv = pData[len] << 24 | pData[len + 1] << 16 |
-                  pData[len + 2] << 8 | pData[len + 3];
+    u32 crcRecv = pData[len] << 24 | pData[len + 1] << 16 | pData[len + 2] << 8 | pData[len + 3];
     if (crcCalc != crcRecv) {
         D(printf("ERROR: crc \r\n"));
     }
@@ -110,16 +113,19 @@ u8 isCrcOk(char* pData, int len) {
 
 void updSpiFlash(CircularBuffer* cbuf) {
     u16 bufEnd[2] = {0, BSG_PREAMBLE};
-    // xSemaphoreTake(mutexWriteToEnergyBufHandle, portMAX_DELAY);
+
+    // osMutexWait(mutexFlashWriteHandle, osWaitForever);
 
     bufEnd[0] = calcCrc16(cbuf->buf, cbuf->readAvailable);
     cBufWriteToBuf(cbuf, (u8*)bufEnd, 4);
     spiFlash64.lock = 0;
     spiFlashWrPg(cbuf->buf, cbuf->readAvailable, 0, spiFlash64.headNumPg);
     cBufReset(cbuf);
-
-    // xSemaphoreGive(mutexWriteToEnergyBufHandle);
+    
     D(printf("updSpiFlash()\r\n"));
+
+    // osSemaphoreRelease(semCreateWebPckgHandle);
+    // osMutexRelease(mutexFlashWriteHandle);
 }
 
 u8 waitGoodCsq(u32 timeout) {
@@ -127,8 +133,7 @@ u8 waitGoodCsq(u32 timeout) {
     u16 cntNOCsq = 0;
     u16 cntNOCsqMax = timeout / 3;
 
-    csq = simCheckCSQ();
-    while (csq < 5 || csq > 99) {
+    while ((csq = simCheckCSQ()) < 5 || csq > 99) {
         osDelay(3000);
         cntNOCsq++;
         if (cntNOCsq == cntNOCsqMax) {
@@ -143,17 +148,21 @@ u8 waitGoodCsq(u32 timeout) {
 
 void saveData(u8* data, u8 sz, u8 cmdData, CircularBuffer* cbuf) {
     u16 bufEnd[2] = {0, BSG_PREAMBLE};
-    // xSemaphoreTake(mutexWriteToEnergyBufHandle, portMAX_DELAY);
+
+    // osMutexWait(mutexFlashWriteHandle, osWaitForever);
+
     if (cbuf->writeAvailable < sz + 2 + 4) {
         bufEnd[0] = calcCrc16(cbuf->buf, cbuf->readAvailable);
         cBufWriteToBuf(cbuf, (u8*)bufEnd, 4);
         spiFlashWrPg(cbuf->buf, cbuf->readAvailable, 0, spiFlash64.headNumPg);
         cBufReset(cbuf);
+
+        // osSemaphoreRelease(semCreateWebPckgHandle);
     } else {
         cBufWriteToBuf(cbuf, &cmdData, 1);
         cBufWriteToBuf(cbuf, data, sz);
     }
-    // xSemaphoreGive(mutexWriteToEnergyBufHandle);
+    // osMutexRelease(mutexFlashWriteHandle);
 }
 
 u8 isDataFromFlashOk(char* pData, u8 len) {

@@ -152,8 +152,8 @@ ErrorStatus generateWebPckgReq(u8 CMD_REQ, u8* data, u8 sz, u8 szReq, u8* answ, 
         } else {
             memcpy(answ, &uInfoSim.pRxBuf[11], szAnsw);
         }
-        osMutexRelease(mutexWebHandle);
         clearWebPckg(curPckg);
+        osMutexRelease(mutexWebHandle);
     } else {
         ret = ERROR;
         D(printf("ERROR: NO FREE PCKG\r\n"));

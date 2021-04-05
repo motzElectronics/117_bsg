@@ -60,6 +60,7 @@ osMessageQId queueWebPckgHandle;
 osMutexId mutexGPSBufHandle;
 osMutexId mutexWebHandle;
 osMutexId mutexRTCHandle;
+osMutexId mutexFlashWriteHandle;
 osSemaphoreId semCreateWebPckgHandle;
 
 /* Private function prototypes -----------------------------------------------*/
@@ -68,7 +69,7 @@ osSemaphoreId semCreateWebPckgHandle;
 /* USER CODE END FunctionPrototypes */
 
 void taskGetGPS(void const * argument);
-void taskAlive(void const * argument);
+void taskKeepAlive(void const * argument);
 void taskGetNewBin(void const * argument);
 void taskManageIWDG(void const * argument);
 void taskCreateWebPckg(void const * argument);
@@ -114,6 +115,10 @@ void MX_FREERTOS_Init(void) {
   osMutexDef(mutexRTC);
   mutexRTCHandle = osMutexCreate(osMutex(mutexRTC));
 
+  /* definition and creation of mutexFlashWrite */
+  osMutexDef(mutexFlashWrite);
+  mutexFlashWriteHandle = osMutexCreate(osMutex(mutexFlashWrite));
+
   /* USER CODE BEGIN RTOS_MUTEX */
   /* add mutexes, ... */
   /* USER CODE END RTOS_MUTEX */
@@ -142,15 +147,15 @@ void MX_FREERTOS_Init(void) {
 
   /* Create the thread(s) */
   /* definition and creation of getGPS */
-  osThreadDef(getGPS, taskGetGPS, osPriorityNormal, 0, 256);
+  osThreadDef(getGPS, taskGetGPS, osPriorityNormal, 0, 300);
   getGPSHandle = osThreadCreate(osThread(getGPS), NULL);
 
   /* definition and creation of keepAlive */
-  osThreadDef(keepAlive, taskAlive, osPriorityNormal, 0, 256);
+  osThreadDef(keepAlive, taskKeepAlive, osPriorityNormal, 0, 300);
   keepAliveHandle = osThreadCreate(osThread(keepAlive), NULL);
 
   /* definition and creation of getNewBin */
-  osThreadDef(getNewBin, taskGetNewBin, osPriorityNormal, 0, 256);
+  osThreadDef(getNewBin, taskGetNewBin, osPriorityNormal, 0, 300);
   getNewBinHandle = osThreadCreate(osThread(getNewBin), NULL);
 
   /* definition and creation of manageIWDG */
@@ -158,11 +163,11 @@ void MX_FREERTOS_Init(void) {
   manageIWDGHandle = osThreadCreate(osThread(manageIWDG), NULL);
 
   /* definition and creation of createWebPckg */
-  osThreadDef(createWebPckg, taskCreateWebPckg, osPriorityNormal, 0, 256);
+  osThreadDef(createWebPckg, taskCreateWebPckg, osPriorityNormal, 0, 300);
   createWebPckgHandle = osThreadCreate(osThread(createWebPckg), NULL);
 
   /* definition and creation of webExchange */
-  osThreadDef(webExchange, taskWebExchange, osPriorityNormal, 0, 256);
+  osThreadDef(webExchange, taskWebExchange, osPriorityNormal, 0, 300);
   webExchangeHandle = osThreadCreate(osThread(webExchange), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
@@ -189,22 +194,22 @@ __weak void taskGetGPS(void const * argument)
   /* USER CODE END taskGetGPS */
 }
 
-/* USER CODE BEGIN Header_taskAlive */
+/* USER CODE BEGIN Header_taskKeepAlive */
 /**
-* @brief Function implementing the alive thread.
+* @brief Function implementing the keepAlive thread.
 * @param argument: Not used
 * @retval None
 */
-/* USER CODE END Header_taskAlive */
-__weak void taskAlive(void const * argument)
+/* USER CODE END Header_taskKeepAlive */
+__weak void taskKeepAlive(void const * argument)
 {
-  /* USER CODE BEGIN taskAlive */
+  /* USER CODE BEGIN taskKeepAlive */
   /* Infinite loop */
   for(;;)
   {
     osDelay(1);
   }
-  /* USER CODE END taskAlive */
+  /* USER CODE END taskKeepAlive */
 }
 
 /* USER CODE BEGIN Header_taskGetNewBin */
