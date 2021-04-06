@@ -1,6 +1,8 @@
 {
     "files.associations": {
         "utils_gps.h": "c",
-        "spiflash.h": "c"
+        "spiflash.h": "c",
+        "utils_bsg.h": "c",
+        "utils_pckgs_manager.h": "c"
     }
 }

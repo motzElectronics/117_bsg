@@ -281,7 +281,7 @@ u8 procReturnStatus(u8 ret) {
     }
 
     if (notSend == 1) {
-        D(printf("DANGER DANGER HIGH VOLTAGE\r\n"));
+        D(printf("ERROR: TCP SEND FAILED\r\n"));
         simReset();
         ret = TCP_SEND_ER_LOST_PCKG;
         notSend = 0;

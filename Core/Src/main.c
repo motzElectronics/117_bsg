@@ -72,7 +72,7 @@ void MX_FREERTOS_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-void absurdeFun(FIRMWARE_INFO* info) { info->numFirmware++; }
+
 /* USER CODE END 0 */
 
 /**
@@ -113,12 +113,12 @@ int main(void)
   MX_CRC_Init();
   /* USER CODE BEGIN 2 */
     // D(printf("OK: start main prog\r\n"));
-    FIRMWARE_INFO info = {.header = 0x1122334455667788,
+    volatile FIRMWARE_INFO info = {.header = 0x1122334455667788,
                           .numFirmware = BSG_ID_FIRMWARE,
                           .verFirmware = BSG_VER_BETA_FIRMWARE,
                           .numTrainCar = BSG_ID_TRAINCAR};
-    absurdeFun(&info);
-    D(printf("\r\n firmware: %d\r\n", info.numFirmware));
+    
+    D(printf("\r\nfirmware: %d\r\n", info.numFirmware));
     uartInitInfo();
     bsgInit();
     urlsInit();

@@ -1,5 +1,5 @@
 #include "../Tasks/Inc/task_get_new_bin.h"
-
+#include "../Tasks/Inc/task_keep_alive.h"
 #include "../Utils/Inc/utils_pckgs_manager.h"
 
 extern osThreadId webExchangeHandle;
@@ -75,6 +75,12 @@ void taskGetNewBin(void const* argument) {
                 }
             }
         } else {
+            if (!bsg.isTCPOpen) {
+                while (openTcp() != TCP_OK);
+            }
+            if (sendMsgFWUpdated() != SUCCESS) {
+                D(printf("ERROR: Send FW UPDATED\r\n"));
+            }
             D(printf("DOWNLOAD COMPLETE\r\n"));
             updBootInfo();
             osDelay(100);

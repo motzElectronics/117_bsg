@@ -1,4 +1,5 @@
 #include "../Tasks/Inc/task_get_gps.h"
+#include "../Tasks/Inc/task_keep_alive.h"
 
 #include "tim.h"
 extern osMutexId mutexGPSBufHandle;
@@ -27,6 +28,10 @@ void taskGetGPS(void const *argument) {
     simInit();
     while (openTcp() != TCP_OK);
     getServerTime();
+
+    if (sendMsgFWUpdated() != SUCCESS) {
+        D(printf("ERROR: Send FW UPDATED\r\n"));
+    }
 
     generateInitTelemetry();
     unLockTasks();
