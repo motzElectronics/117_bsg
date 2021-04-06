@@ -15,7 +15,7 @@ extern u8 isRxNewFirmware;
 
 extern CircularBuffer circBufAllPckgs;
 
-u8 bufTxData[32];
+u8 bufTxData[20];
 
 void taskKeepAlive(void const * argument){
     u16 timeout = 1;
@@ -76,7 +76,7 @@ ErrorStatus sendMsgFWUpdated() {
 
     D(printf("sendMsgFWUpdated\r\n"));
 
-    memset(bufTxData, 0, 32);
+    memset(bufTxData, 0, 20);
     pckgTel.group = TEL_GR_HARDWARE_STATUS;
 	pckgTel.code = TEL_CD_HW_UPDATED;
 	pckgTel.data = 1;
@@ -97,7 +97,7 @@ ErrorStatus sendMsgDevOff() {
     ErrorStatus ret = SUCCESS;
     PckgTelemetry pckgTel;
 
-    memset(bufTxData, 0, 32);
+    memset(bufTxData, 0, 20);
     pckgTel.group = TEL_GR_HARDWARE_STATUS;
 	pckgTel.code = TEL_CD_HW_BSG;
 	pckgTel.data = 0;

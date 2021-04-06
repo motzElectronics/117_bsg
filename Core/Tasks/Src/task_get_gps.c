@@ -29,10 +29,6 @@ void taskGetGPS(void const *argument) {
     while (openTcp() != TCP_OK);
     getServerTime();
 
-    if (sendMsgFWUpdated() != SUCCESS) {
-        D(printf("ERROR: Send FW UPDATED\r\n"));
-    }
-
     generateInitTelemetry();
     unLockTasks();
 
