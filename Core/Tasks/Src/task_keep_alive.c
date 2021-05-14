@@ -27,6 +27,10 @@ void taskKeepAlive(void const * argument){
             D(printf("\r\ngetNumFirmware\r\n\r\n"));
             getNumFirmware();
         }
+        if (!(timeout % 30) && !isRxNewFirmware) {
+            D(printf("sendMsgGpsInvalidCount\r\n"));
+            sendMsgGpsInvalidCount();
+        }
         if(!(timeout % 600) && !isRxNewFirmware){
             D(printf("\r\ngenerateMsgKeepAlive\r\n\r\n"));
             generateMsgKeepAlive();
@@ -82,10 +86,9 @@ ErrorStatus sendMsgFWUpdated() {
 	pckgTel.data = 1;
     pckgTel.unixTimeStamp = getUnixTimeStamp();
     copyTelemetry(bufTxData, &pckgTel);
-    pckgTel.group = TEL_GR_HARDWARE_STATUS;
+    
 	pckgTel.code = TEL_CD_HW_BSG;
 	pckgTel.data = 0;
-    pckgTel.unixTimeStamp = getUnixTimeStamp();
     copyTelemetry(&bufTxData[SZ_CMD_TELEMETRY], &pckgTel);
 
     ret = sendWebPckgData(CMD_DATA_TELEMETRY, bufTxData, SZ_CMD_TELEMETRY * 2, 2);
@@ -105,6 +108,26 @@ ErrorStatus sendMsgDevOff() {
     copyTelemetry(bufTxData, &pckgTel);
 
     ret = sendWebPckgData(CMD_DATA_TELEMETRY, bufTxData, SZ_CMD_TELEMETRY, 1);
+    
+    return ret;
+}
+
+ErrorStatus sendMsgGpsInvalidCount() {
+    ErrorStatus ret = SUCCESS;
+    PckgTelemetry pckgTel;
+
+    memset(bufTxData, 0, 20);
+    pckgTel.group = TEL_GR_GENINF;
+	pckgTel.code = TEL_CD_GENINF_GPS_INV_CNT;
+	pckgTel.data = bsg.gpsInvaligCount;
+    pckgTel.unixTimeStamp = getUnixTimeStamp();
+    copyTelemetry(bufTxData, &pckgTel);
+
+	pckgTel.code = TEL_CD_GENINF_GPS_PARSE_ER_CNT;
+	pckgTel.data = bsg.gpsParseFailCount;
+    copyTelemetry(&bufTxData[SZ_CMD_TELEMETRY], &pckgTel);
+
+    ret = sendWebPckgData(CMD_DATA_TELEMETRY, bufTxData, SZ_CMD_TELEMETRY * 2, 2);
     
     return ret;
 }

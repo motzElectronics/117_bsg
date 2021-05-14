@@ -60,7 +60,7 @@ osMessageQId queueWebPckgHandle;
 osMutexId mutexGPSBufHandle;
 osMutexId mutexWebHandle;
 osMutexId mutexRTCHandle;
-osMutexId mutexFlashWriteHandle;
+osMutexId mutexSpiFlashHandle;
 osSemaphoreId semCreateWebPckgHandle;
 
 /* Private function prototypes -----------------------------------------------*/
@@ -115,9 +115,9 @@ void MX_FREERTOS_Init(void) {
   osMutexDef(mutexRTC);
   mutexRTCHandle = osMutexCreate(osMutex(mutexRTC));
 
-  /* definition and creation of mutexFlashWrite */
-  osMutexDef(mutexFlashWrite);
-  mutexFlashWriteHandle = osMutexCreate(osMutex(mutexFlashWrite));
+  /* definition and creation of mutexSpiFlash */
+  osMutexDef(mutexSpiFlash);
+  mutexSpiFlashHandle = osMutexCreate(osMutex(mutexSpiFlash));
 
   /* USER CODE BEGIN RTOS_MUTEX */
   /* add mutexes, ... */

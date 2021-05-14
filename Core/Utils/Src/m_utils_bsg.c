@@ -8,12 +8,10 @@ extern BSG bsg;
 extern osMutexId mutexGPSBufHandle;
 extern osMutexId mutexRTCHandle;
 extern osMutexId mutexWebHandle;
-extern osMutexId mutexFlashWriteHandle;
 extern osThreadId getNewBinHandle;
 extern osSemaphoreId semCreateWebPckgHandle;
 extern CircularBuffer circBufTTLVtoFlash;
 extern CircularBuffer circBufAllPckgs;
-extern osMutexId mutexRTCHandle;
 
 static RTC_TimeTypeDef tmpTime;
 static RTC_DateTypeDef tmpDate;
@@ -31,13 +29,15 @@ void bsgInit() {
     bsg.idFirmware = BSG_ID_FIRMWARE;
     bsg.idBoot = BSG_ID_BOOT;
     bsg.sleepTimer.flagOn = 0;
+    bsg.gpsInvaligCount = 0;
+    bsg.gpsParseFailCount = 0;
 }
 
 u32 getUnixTimeStamp() {
     time_t t;
     static struct tm curTime;
 
-    xSemaphoreTake(mutexRTCHandle, portMAX_DELAY);
+    osMutexWait(mutexRTCHandle, osWaitForever);
     HAL_RTC_GetTime(&hrtc, &tmpTime, RTC_FORMAT_BIN);
     HAL_RTC_GetDate(&hrtc, &tmpDate, RTC_FORMAT_BIN);
     curTime.tm_year = tmpDate.Year + 100;
@@ -47,7 +47,7 @@ u32 getUnixTimeStamp() {
     curTime.tm_hour = tmpTime.Hours;
     curTime.tm_min = tmpTime.Minutes;
     curTime.tm_sec = tmpTime.Seconds;
-    xSemaphoreGive(mutexRTCHandle);
+    osMutexRelease(mutexRTCHandle);
     curTime.tm_isdst = 0;
 
     t = mktime(&curTime);
@@ -114,18 +114,12 @@ u8 isCrcOk(char* pData, int len) {
 void updSpiFlash(CircularBuffer* cbuf) {
     u16 bufEnd[2] = {0, BSG_PREAMBLE};
 
-    // osMutexWait(mutexFlashWriteHandle, osWaitForever);
-
     bufEnd[0] = calcCrc16(cbuf->buf, cbuf->readAvailable);
     cBufWriteToBuf(cbuf, (u8*)bufEnd, 4);
-    spiFlash64.lock = 0;
     spiFlashWrPg(cbuf->buf, cbuf->readAvailable, 0, spiFlash64.headNumPg);
     cBufReset(cbuf);
     
     D(printf("updSpiFlash()\r\n"));
-
-    // osSemaphoreRelease(semCreateWebPckgHandle);
-    // osMutexRelease(mutexFlashWriteHandle);
 }
 
 u8 waitGoodCsq(u32 timeout) {
@@ -149,20 +143,18 @@ u8 waitGoodCsq(u32 timeout) {
 void saveData(u8* data, u8 sz, u8 cmdData, CircularBuffer* cbuf) {
     u16 bufEnd[2] = {0, BSG_PREAMBLE};
 
-    // osMutexWait(mutexFlashWriteHandle, osWaitForever);
+    osMutexWait(mutexGPSBufHandle, osWaitForever);
 
     if (cbuf->writeAvailable < sz + 2 + 4) {
         bufEnd[0] = calcCrc16(cbuf->buf, cbuf->readAvailable);
         cBufWriteToBuf(cbuf, (u8*)bufEnd, 4);
         spiFlashWrPg(cbuf->buf, cbuf->readAvailable, 0, spiFlash64.headNumPg);
         cBufReset(cbuf);
-
-        // osSemaphoreRelease(semCreateWebPckgHandle);
     } else {
         cBufWriteToBuf(cbuf, &cmdData, 1);
         cBufWriteToBuf(cbuf, data, sz);
     }
-    // osMutexRelease(mutexFlashWriteHandle);
+    osMutexRelease(mutexGPSBufHandle);
 }
 
 u8 isDataFromFlashOk(char* pData, u8 len) {

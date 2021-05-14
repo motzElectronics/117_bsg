@@ -9,9 +9,11 @@
 #include "../xDrvrs/Inc/spiflash.h"
 SPIFlash spiFlash64;
 
+extern osMutexId mutexSpiFlashHandle;
+
 void spiFlashInit(u8* buf){
 	
-	spiFlash64.lock = 1;
+	osMutexWait(mutexSpiFlashHandle, 60000);
 	spiMemInfo.pHSpi = &hspi2;
 	SPIFLASH_CS_UNSEL;
 	osDelay(100);
@@ -32,7 +34,7 @@ void spiFlashInit(u8* buf){
 	spiFlash64.blSz = spiFlash64.secSz * 16;
 	spiFlash64.capacityKb = (spiFlash64.secCnt * spiFlash64.secSz) / 1024;
 	spiFlash64.headNumPg = 0;
-	spiFlash64.lock = 0;
+	osMutexRelease(mutexSpiFlashHandle);
 	spiFlashRdPg(buf, 256, 0, BSG_SAVE_NUM_PAGE);
 	tmp = buf[0] | buf[1] << 8 | buf[2] << 16 | buf[3] << 24;
 	if(tmp < SPIFLASH_NUM_PG_GNSS) 
@@ -86,15 +88,13 @@ u8 spiFlashRxData(u8* data, u16 sz){
 void spiFlashES(u32 numSec)
 {
 	u32 secAddr;
-
-	while(spiFlash64.lock == 1)
-		osDelay(100);
+    // D(printf("spiFlash ErSec %d\r\n", numSec));
+	
+	osMutexWait(mutexSpiFlashHandle, 60000);
 
 	secAddr = numSec * spiFlash64.secSz;
-	u8 data[] = {SPIFLASH_SE, ((secAddr & 0xFF0000) >> 16),
-			((secAddr & 0xFF00) >> 8), (secAddr & 0xFF)};
+	u8 data[] = {SPIFLASH_SE, ((secAddr & 0xFF0000) >> 16), ((secAddr & 0xFF00) >> 8), (secAddr & 0xFF)};
 
-	spiFlash64.lock = 1;
 	spiFlashWaitReady();
 	spiFlashWrEn();
 
@@ -104,7 +104,7 @@ void spiFlashES(u32 numSec)
 
 	spiFlashWaitReady();
 	osDelay(10);
-	spiFlash64.lock = 0;
+	osMutexRelease(mutexSpiFlashHandle);
 }
 
 u8 spiFlashWaitReady(){
@@ -131,7 +131,7 @@ void spiFlashWrEn(){
 }
 
 u8 spiFlashWrPg(u8 *pBuf, u32 sz, u32 offset, u32 numPage){
-	// D(printf("spiFlash WrPg\r\n"));
+	// D(printf("spiFlash WrPg %d\r\n", numPage));
 	u32 addr;
 	u8 ret = 0;
 	if(spiFlash64.tailNumPg > spiFlash64.headNumPg && 
@@ -146,10 +146,7 @@ u8 spiFlashWrPg(u8 *pBuf, u32 sz, u32 offset, u32 numPage){
 	else if(spiFlash64.headNumPg % SPIFLASH_NUM_PG_IN_SEC == 0)
 		spiFlashES(spiFlash64.headNumPg / SPIFLASH_NUM_PG_IN_SEC);
 
-	while(spiFlash64.lock == 1)
-		osDelay(200);
-	
-	spiFlash64.lock = 1;
+	osMutexWait(mutexSpiFlashHandle, 60000);
 	
 	if((offset + sz) > spiFlash64.pgSz)
 		sz = spiFlash64.pgSz - offset;
@@ -172,16 +169,16 @@ u8 spiFlashWrPg(u8 *pBuf, u32 sz, u32 offset, u32 numPage){
 	spiFlashWaitReady();
 	osDelay(10);
 	spiFlash64.headNumPg = (spiFlash64.headNumPg + 1) % SPIFLASH_NUM_PG_GNSS;
-	spiFlash64.lock = 0;
+	
+	osMutexRelease(mutexSpiFlashHandle);
 	return ret;
 }
 
 void spiFlashRdPg(u8 *pBuf, u32 sz, u32 offset, u32 numPage){
-	// D(printf("spiFlash RdPg\r\n"));
+	// D(printf("spiFlash RdPg %d\r\n", numPage));
 	u32 addr;
-	while(spiFlash64.lock == 1)
-		osDelay(200);
-	spiFlash64.lock = 1;
+	
+	osMutexWait(mutexSpiFlashHandle, 60000);
 
 	if((offset + sz) > spiFlash64.pgSz)
 		sz = spiFlash64.pgSz - offset;
@@ -196,29 +193,5 @@ void spiFlashRdPg(u8 *pBuf, u32 sz, u32 offset, u32 numPage){
 
 	osDelay(10);
 	spiFlash64.tailNumPg = (spiFlash64.tailNumPg + 1) % SPIFLASH_NUM_PG_GNSS;
-	spiFlash64.lock = 0;
+	osMutexRelease(mutexSpiFlashHandle);
 }
-
-//u32 spiFlashReadByte(u8 *pBuffer, u32 Bytes_Address){
-//	while(w25qxx.Lock==1)
-//		W25qxx_Delay(1);
-//
-//	w25qxx.Lock=1;
-//
-//	W25QFLASH_CS_SELECT;
-//	W25qxx_Spi(W25_FAST_READ);
-//
-//	if(w25qxx.ID >= W25Q256)
-//		W25qxx_Spi((Bytes_Address & 0xFF000000) >> 24);
-//
-//	W25qxx_Spi((Bytes_Address & 0xFF0000) >> 16);
-//	W25qxx_Spi((Bytes_Address& 0xFF00) >> 8);
-//	W25qxx_Spi(Bytes_Address & 0xFF);
-//	W25qxx_Spi(0);
-//
-//	*pBuffer = W25qxx_Spi(W25QXX_DUMMY_BYTE);
-//
-//	W25QFLASH_CS_UNSELECT;
-//
-//	w25qxx.Lock = 0;
-//}

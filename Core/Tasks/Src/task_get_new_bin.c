@@ -7,7 +7,11 @@ extern osThreadId getGPSHandle;
 extern osThreadId getNewBinHandle;
 extern osThreadId keepAliveHandle;
 extern osThreadId createWebPckgHandle;
+
+extern osMutexId mutexGPSBufHandle;
 extern osMutexId mutexWebHandle;
+extern osMutexId mutexRTCHandle;
+extern osMutexId mutexSpiFlashHandle;
 
 extern CircularBuffer circBufAllPckgs;
 
@@ -107,6 +111,9 @@ void updBootInfo() {
 }
 
 void lockAllTasks() {
+    osMutexWait(mutexGPSBufHandle, osWaitForever);
+    osMutexWait(mutexRTCHandle, osWaitForever);
+    osMutexWait(mutexSpiFlashHandle, osWaitForever);
     osMutexWait(mutexWebHandle, osWaitForever);
 
     vTaskSuspend(webExchangeHandle);
@@ -114,6 +121,9 @@ void lockAllTasks() {
     vTaskSuspend(keepAliveHandle);
     vTaskSuspend(createWebPckgHandle);
 
+    osMutexRelease(mutexGPSBufHandle);
+    osMutexRelease(mutexRTCHandle);
+    osMutexRelease(mutexSpiFlashHandle);
     osMutexRelease(mutexWebHandle);
 }
 

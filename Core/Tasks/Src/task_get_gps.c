@@ -20,6 +20,8 @@ extern CircularBuffer rxUart1CircBuf;
 extern CircularBuffer circBufAllPckgs;
 
 void taskGetGPS(void const *argument) {
+    u8 ret;
+    u8 numIteration = 0;
     cBufInit(&circBufGnss, uInfoGnss.pRxBuf, uInfoGnss.szRxBuf, CIRC_TYPE_GNSS);
 
     spiFlashInit(circBufAllPckgs.buf);
@@ -33,16 +35,26 @@ void taskGetGPS(void const *argument) {
     unLockTasks();
 
     for (;;) {
-        waitRx("", &uInfoGnss.irqFlags, 1000, 10000);
+        waitRx("", &uInfoGnss.irqFlags, 10, 10000);
         if (uInfoGnss.irqFlags.isIrqRx) {
             uInfoGnss.irqFlags.isIrqRx = 0;
             while (cBufRead(&circBufGnss, (u8 *)bufGnss, CIRC_TYPE_GNSS, 0)) {
                 // D(printf("GPS : %s", bufGnss));
-                if (!bsg.sleepTimer.flagOn &&
-                    fillGprmc(bufGnss, &pckgGnss) == GPS_OK) {
-                    // checkStopTrain(&pckgGnss);
-                    serializePckgGnss(bufPckgGnss, &pckgGnss);
-                    saveData((u8 *)&bufPckgGnss, SZ_CMD_GRMC, CMD_DATA_GRMC, &circBufAllPckgs);
+                if (bsg.sleepTimer.flagOn) {
+                    memset(bufGnss, '\0', sizeof(bufGnss));
+                    continue;
+                }
+                ret = fillGprmc(bufGnss, &pckgGnss);
+                if (ret == GPS_OK) {
+                    if (pckgGnss.speed > (3 * 10) || !numIteration) {
+                        serializePckgGnss(bufPckgGnss, &pckgGnss);
+                        saveData((u8 *)&bufPckgGnss, SZ_CMD_GRMC, CMD_DATA_GRMC, &circBufAllPckgs);
+                    }
+                    numIteration = (numIteration + 1) % 60;
+                } else if (ret == GPS_GPRMC_ERR_INVALID_DATA_STATUS) {
+                    bsg.gpsInvaligCount++;
+                } else {
+                    bsg.gpsParseFailCount++;
                 }
                 memset(bufGnss, '\0', sizeof(bufGnss));
             }

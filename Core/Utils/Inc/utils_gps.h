@@ -13,6 +13,9 @@
 #define GPS_GPRMC_ERR_PARS_COURSE 4
 #define GPS_GPRMC_ERR_PARS_TIME 5
 #define GPS_GPRMC_ERR_PARS_DATE 6
+#define GPS_GPRMC_ERR_7 7
+#define GPS_GPRMC_ERR_8 8
+#define GPS_GPRMC_ERR_PARS 9
 
 typedef struct __attribute__((__packed__)) {
     u32         sec;

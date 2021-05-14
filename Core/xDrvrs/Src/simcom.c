@@ -37,7 +37,7 @@ void simInit() {
         D(printf("simInit AT: %s\r\n", token));
         if ((strcmp(token, SIM_OK_TEXT)) != 0) {
             D(printf("ERROR: simInit() AT: %s\r\n", token));
-            simBadAnsw = (simBadAnsw + 1) % 10;
+            simBadAnsw = (simBadAnsw + 1) % 16;
             if (!simBadAnsw) {
                 D(printf("WARINTING!: T O T A L  R E S E T\r\n"));
                 osDelay(3000);
@@ -45,11 +45,12 @@ void simInit() {
             }
         } else {
             // bsg.erFlags.simAT = 0;
+            // simCmd("CGNSCMD=0,\"$PMTK314,0,1,0,0,0,0,0,0,0,0,0,0,0,0*35\"", NULL, 3, SIM_OK_TEXT);
             osDelay(5000);
             if (SIM_GPS_INIT() != SIM_SUCCESS) {
                 fail++;
                 // bsg.erFlags.simSAPBR = 1;
-                if (fail > 10) {
+                if (fail > 20) {
                     fail = 0;
                     HAL_NVIC_SystemReset();
                 }
@@ -67,6 +68,7 @@ void simInit() {
 char* simGetStatusAnsw(u32 timeout) {
     waitIdle("", &(uInfoSim.irqFlags), 200, timeout);
     if (uInfoSim.irqFlags.isIrqIdle) {
+        uInfoSim.irqFlags.isIrqIdle = 0;
         return (char*)uInfoSim.pRxBuf;
     } else {
         return SIM_NO_RESPONSE_TEXT;
@@ -74,6 +76,7 @@ char* simGetStatusAnsw(u32 timeout) {
 }
 
 char* simTxATCmd(char* command, u16 sz, u32 timeout) {
+    uInfoSim.irqFlags.isIrqIdle = 0;
     uartTx(command, sz, &uInfoSim);
     return simGetStatusAnsw(timeout);
 }
@@ -113,7 +116,7 @@ void copyStr(char* dist, char* source, u16 distSz) {
 }
 
 char* simDownloadData(char* data, u16 sz) {
-    return simTxATCmd(data, sz, 40000);
+    return simTxATCmd(data, sz, 90000);
 }
 
 u8 simCheckCSQ() {
@@ -241,7 +244,7 @@ u8 simTCPSend(u8* data, u16 sz) {
         D(printf("ERROR SZ\r\n"));
         return SIM_FAIL;
     }
-    D(printf("simDownloadData() sz:%d\r\n", sz));
+    // D(printf("simDownloadData() sz:%d\r\n", sz));
     memset(params, '\0', 8);
     sprintf(params, "%d", sz);
     if (simCmd(SIM_CIPSEND, params, 1, "> ") == SIM_FAIL) {
@@ -253,11 +256,15 @@ u8 simTCPSend(u8* data, u16 sz) {
 
     ttt = HAL_GetTick() - ttt;
 
-    if (strcmp((const char*)token, (const char*)"SEND OK") != 0) {
+    if (strcmp((const char*)token, (const char*)"SEND OK") == 0) {
+        D(printf("OK: simTCPSend() time %d\r\n", ttt));
+        return SIM_SUCCESS;
+    } else if (strcmp((const char*)token, (const char*)"SEND FAIL") == 0) {
         D(printf("ER: simDownloadData() %s time %d\r\n", token, ttt));
         return SIM_FAIL;
     } else {
-        D(printf("OK: simTCPSend() time %d\r\n", ttt));
+        D(printf("ER: simDownloadData() %s time %d\r\n", token, ttt));
+        return SIM_TIMEOUT;
     }
     return SIM_SUCCESS;
 }
@@ -280,8 +287,19 @@ u8 procReturnStatus(u8 ret) {
         notSend = 0;
     }
 
-    if (notSend == 1) {
-        D(printf("ERROR: TCP SEND FAILED\r\n"));
+    if (ret == TCP_SEND_ER) {
+        D(printf("TCP_SEND_ER %d!\r\n\r\n", notSend));
+        if (notSend == 5) {
+            D(printf("UNABLE TO SEND 5!\r\n"));
+            simReset();
+            ret = TCP_SEND_ER_LOST_PCKG;
+            notSend = 0;
+        }
+    } else if (ret == TCP_CONNECT_ER) {
+        osDelay(1000);
+        NVIC_SystemReset();
+    } else if (ret != TCP_OK) {
+        D(printf("UNABLE TO SEND!\r\n"));
         simReset();
         ret = TCP_SEND_ER_LOST_PCKG;
         notSend = 0;
@@ -312,10 +330,16 @@ u8 openTcp() {
 
 u8 sendTcp(u8* data, u16 sz) {
     u8 ret = TCP_OK;
-    // if (!bsg.isTCPOpen) {
-    //     return TCP_SEND_ER;
-    // }
-    if (!waitGoodCsq(120)) {
+    u8 cnt = 0;
+    while (!bsg.isTCPOpen) {
+        if (cnt == 15) {
+            ret = TCP_CONNECT_ER;
+            break;
+        }
+        cnt++;
+        ret = openTcp();
+    }
+    if (ret == TCP_OK && !waitGoodCsq(90)) {
         D(printf("ER: waitGoodCsq\r\n"));
         ret = TCP_CSQ_ER;
     }
@@ -338,12 +362,11 @@ u8 sendTcp(u8* data, u16 sz) {
 // }
 
 void gnssInit(){
-	D(printf("gnssInit()\r\n"));
-	HAL_GPIO_WritePin(GNSS_EN_GPIO_Port, GNSS_EN_Pin, GPIO_PIN_SET);
-	osDelay(3000);
-	HAL_UART_Transmit(uInfoGnss.pHuart, (u8*)"$PMTK314,0,1,0,0,0,0,0,0,0,0,0,0,0,0*35\r\n", 
-		sizeof("$PMTK314,0,1,0,0,0,0,0,0,0,0,0,0,0,0*35\r\n"), 1000);
-		
-	uartRxDma(&uInfoGnss);
-	
+    D(printf("gnssInit()\r\n"));
+    HAL_GPIO_WritePin(GNSS_EN_GPIO_Port, GNSS_EN_Pin, GPIO_PIN_SET);
+    osDelay(3000);
+    HAL_UART_Transmit(uInfoGnss.pHuart, (u8*)"$PMTK314,0,1,0,0,0,0,0,0,0,0,0,0,0,0*35\r\n", 
+                            sizeof("$PMTK314,0,1,0,0,0,0,0,0,0,0,0,0,0,0*35\r\n"), 1000);
+
+    uartRxDma(&uInfoGnss);
 }

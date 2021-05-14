@@ -20,7 +20,7 @@ u8 fillGprmc(char* pData, PckgGnss* pckg) {
     u8 ret = GPS_OK;
     char* token;
 
-    token = strsep(&pData, ",");  //$GPRMC,
+    token = strsep(&pData, ",");
     token = strsep(&pData, ",");  // hhmmss.ss
     if (*token != '\0')
         setTime(&pckg->dateTime, token);
@@ -51,8 +51,11 @@ u8 fillGprmc(char* pData, PckgGnss* pckg) {
         else
             return GPS_GPRMC_ERR_PARS_DATE;
 
-    } else
+    } else if (*token == 'V') {
         return GPS_GPRMC_ERR_INVALID_DATA_STATUS;
+    } else {
+        return GPS_GPRMC_ERR_PARS;
+    }
     return ret;
 }
 

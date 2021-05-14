@@ -33,8 +33,12 @@ void taskCreateWebPckg(void const *argument)
     for (;;)
     {
         delayPages = spiFlash64.headNumPg >= spiFlash64.tailNumPg ? spiFlash64.headNumPg - spiFlash64.tailNumPg : spiFlash64.headNumPg + (SPIFLASH_NUM_PG_GNSS - spiFlash64.tailNumPg);
-        while ((delayPages > BSG_THRESHOLD_CNT_PAGES || (xSemaphoreTake(semCreateWebPckgHandle, 1) == pdTRUE)) && (curPckg = getFreePckg()) != NULL)
+        while (delayPages > BSG_THRESHOLD_CNT_PAGES || (osSemaphoreWait(semCreateWebPckgHandle, 1) == osOK))
         {
+            curPckg = getFreePckg();
+            if (curPckg == NULL) {
+                break;
+            }
             clearAllPages();
             if (bsg.csq < 10) {
                 amntPages = delayPages > 3 ? 3 : delayPages;
@@ -63,7 +67,7 @@ void taskCreateWebPckg(void const *argument)
             szAllPages = getSzAllPages();
             initWebPckg(curPckg, szAllPages, 0);
             addPagesToWebPckg(curPckg);
-            xQueueSendToBack(queueWebPckgHandle, &curPckg, portMAX_DELAY);
+            osMessagePut(queueWebPckgHandle, (u32)curPckg, osWaitForever);
             delayPages = spiFlash64.headNumPg >= spiFlash64.tailNumPg ? spiFlash64.headNumPg - spiFlash64.tailNumPg : spiFlash64.headNumPg + (SPIFLASH_NUM_PG_GNSS - spiFlash64.tailNumPg);
         }
 

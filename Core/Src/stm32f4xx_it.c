@@ -249,11 +249,9 @@ void USART1_IRQHandler(void)
   HAL_UART_IRQHandler(&huart1);
   /* USER CODE BEGIN USART1_IRQn 1 */
     if ((__HAL_UART_GET_FLAG(&huart1, UART_FLAG_IDLE) != RESET) &&
-		  (__HAL_UART_GET_IT_SOURCE(&huart1, UART_IT_IDLE) != RESET)){
-	  uInfoSim.irqFlags.isIrqIdle = 1;
-    //   printf("Idle: %s\r\n", uInfoSim.pRxBuf);
-//	  printf("INTERRUPT: IDLE\r\n");
-  }
+        (__HAL_UART_GET_IT_SOURCE(&huart1, UART_IT_IDLE) != RESET)){
+        uInfoSim.irqFlags.isIrqIdle = 1;
+    }
 
   __HAL_UART_CLEAR_PEFLAG(&huart1);
   /* USER CODE END USART1_IRQn 1 */
@@ -264,13 +262,18 @@ void USART1_IRQHandler(void)
   */
 void USART2_IRQHandler(void)
 {
-  /* USER CODE BEGIN USART2_IRQn 0 */
+    /* USER CODE BEGIN USART2_IRQn 0 */
 
-  /* USER CODE END USART2_IRQn 0 */
-  HAL_UART_IRQHandler(&huart2);
-  /* USER CODE BEGIN USART2_IRQn 1 */
+    /* USER CODE END USART2_IRQn 0 */
+    HAL_UART_IRQHandler(&huart2);
+    /* USER CODE BEGIN USART2_IRQn 1 */
+    if ((__HAL_UART_GET_FLAG(&huart2, UART_FLAG_IDLE) != RESET) &&
+        (__HAL_UART_GET_IT_SOURCE(&huart2, UART_IT_IDLE) != RESET)){
+        uInfoGnss.irqFlags.isIrqIdle = 1;
+    }
 
-  /* USER CODE END USART2_IRQn 1 */
+    __HAL_UART_CLEAR_PEFLAG(&huart2);
+    /* USER CODE END USART2_IRQn 1 */
 }
 
 /**

@@ -247,68 +247,66 @@ static u8 usartSimBufTx[USART_SZ_BUF_TX_USART1];
 
 
 void uartInitInfo(){
-  uInfoGnss.irqFlags.regIrq = 0;
-  uInfoGnss.pRxBuf = usart2BufRx;
-  uInfoGnss.szRxBuf = USART_SZ_BUF_RX_USART2;
-  uInfoGnss.pHuart = &huart2;
-  
+    uInfoGnss.irqFlags.regIrq = 0;
+    uInfoGnss.pRxBuf = usart2BufRx;
+    uInfoGnss.szRxBuf = USART_SZ_BUF_RX_USART2;
+    uInfoGnss.pHuart = &huart2;
 
-  uInfoSim.irqFlags.regIrq = 0;
-  uInfoSim.pRxBuf = usartSimBufRx;
-  uInfoSim.szRxBuf = USART_SZ_BUF_RX_USART1;
-  uInfoSim.szTxBuf = USART_SZ_BUF_TX_USART1;
-  uInfoSim.pTxBuf = usartSimBufTx;
-  uInfoSim.pHuart = &huart1;
-  uartRxDma(&uInfoSim);
-
+    uInfoSim.irqFlags.regIrq = 0;
+    uInfoSim.pRxBuf = usartSimBufRx;
+    uInfoSim.szRxBuf = USART_SZ_BUF_RX_USART1;
+    uInfoSim.szTxBuf = USART_SZ_BUF_TX_USART1;
+    uInfoSim.pTxBuf = usartSimBufTx;
+    uInfoSim.pHuart = &huart1;
+    uartRxDma(&uInfoSim);
+    
+    __HAL_UART_ENABLE_IT(&huart1, UART_IT_IDLE);
 }
 
 void uartRxDma(UartInfo* pUInf){
-  HAL_UART_Receive_DMA(pUInf->pHuart, pUInf->pRxBuf, pUInf->szRxBuf);
+    HAL_UART_Receive_DMA(pUInf->pHuart, pUInf->pRxBuf, pUInf->szRxBuf);
 }
 
 void uartClearInfo(UartInfo* pUinf){
-  pUinf->irqFlags.regIrq = 0;
-  memset(pUinf->pRxBuf, '\0', pUinf->szRxBuf);
+    pUinf->irqFlags.regIrq = 0;
+    memset(pUinf->pRxBuf, '\0', pUinf->szRxBuf);
 }
 
 void uartTx(char* data, u16 sz, UartInfo* pUInf){
-  uartClearInfo(pUInf);
-	__HAL_DMA_DISABLE(pUInf->pHuart->hdmarx);
-	__HAL_DMA_SET_COUNTER(pUInf->pHuart->hdmarx, pUInf->szRxBuf);
-	__HAL_DMA_ENABLE(pUInf->pHuart->hdmarx);
-	waitRx("", &(pUInf->irqFlags), 10, USART_TIMEOUT);
-	__HAL_UART_DISABLE_IT(pUInf->pHuart, UART_IT_IDLE);
-	osDelay(100);
-	pUInf->irqFlags.regIrq = 0;
+    uartClearInfo(pUInf);
+    __HAL_DMA_DISABLE(pUInf->pHuart->hdmarx);
+    __HAL_DMA_SET_COUNTER(pUInf->pHuart->hdmarx, pUInf->szRxBuf);
+    __HAL_DMA_ENABLE(pUInf->pHuart->hdmarx);
+    waitRx("", &(pUInf->irqFlags), 10, USART_TIMEOUT);
+    __HAL_UART_DISABLE_IT(pUInf->pHuart, UART_IT_IDLE);
+    osDelay(100);
+    pUInf->irqFlags.regIrq = 0;
 
-  HAL_UART_Transmit_DMA(pUInf->pHuart, (u8*)data, sz);
+    HAL_UART_Transmit_DMA(pUInf->pHuart, (u8*)data, sz);
 
-	waitTx("", &(pUInf->irqFlags), 50, USART_TIMEOUT);
-
+    waitTx("", &(pUInf->irqFlags), 50, USART_TIMEOUT);
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef* uartHandle){
-	if(uartHandle->Instance == USART1){
-		uInfoSim.irqFlags.isIrqRx = 1;
-		uartRxDma(&uInfoSim);
-	}else if(uartHandle->Instance == USART2){
-    uInfoGnss.irqFlags.isIrqRx = 1;
-		uartRxDma(&uInfoGnss);
-	}
-
+    if(uartHandle->Instance == USART1){
+        uInfoSim.irqFlags.isIrqRx = 1;
+        uartRxDma(&uInfoSim);
+    }else if(uartHandle->Instance == USART2){
+        uInfoGnss.irqFlags.isIrqRx = 1;
+        uartRxDma(&uInfoGnss);
+    }
 }
 
 void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart){
-	if(huart->Instance == USART2){
-//		printf("GPS: RxHalfCpltCallback\r\n");
-//		printf("GNSS HALFIRQ\r\n");
-		uInfoGnss.irqFlags.isIrqRx = 1;
-//		printf("%s", gnssUartInfo.rxBuffer);
-//		test++;
-//		if(test == 2)
-//			printf("test\r\n");
-	}
+    if(huart->Instance == USART2){
+    //		printf("GPS: RxHalfCpltCallback\r\n");
+    //		printf("GNSS HALFIRQ\r\n");
+        uInfoGnss.irqFlags.isIrqRx = 1;
+    //		printf("%s", gnssUartInfo.rxBuffer);
+    //		test++;
+    //		if(test == 2)
+    //			printf("test\r\n");
+    }
 }
 
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart){
@@ -321,7 +319,6 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart){
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart){
   u32 error = HAL_UART_GetError(huart);
 	if(huart->Instance == USART1){
-		
 		D(printf("HAL_UART_ErrorCallback() sim800 ERROR_CODE: %d\r\n", (int)error));//		createLog(logError, LOG_SZ_ERROR, bufResponse);
 		uartRxDma(&uInfoSim);
 	} else if(huart->Instance == USART2){

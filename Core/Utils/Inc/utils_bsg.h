@@ -25,7 +25,7 @@
 
 #define BSG_MSG_NO_GPS (char*)"0000.000000,N,00000.000000,E,+0000,000,000"
 
-#define BSG_ID_FIRMWARE 2
+#define BSG_ID_FIRMWARE 9
 #define BSG_ID_BOOT 2
 #define BSG_ID_TRAINCAR 0
 #define BSG_ID_TRAIN 1706
@@ -62,6 +62,8 @@ typedef struct {
     u8 isTCPOpen;
     u8 tcpErrCnt;
     u8 csq;
+    u32 gpsInvaligCount;
+    u32 gpsParseFailCount;
     SleepTimer sleepTimer;
 } BSG;
 
@@ -112,7 +114,9 @@ typedef enum {
     TEL_CD_GENINF_PHONE_NUM1,
     TEL_CD_GENINF_PHONE_NUM2,
     TEL_CD_GENINF_SIMCARD_MONEY,
-    TEL_CD_GENINF_NUM_PCB
+    TEL_CD_GENINF_NUM_PCB,
+    TEL_CD_GENINF_GPS_INV_CNT,
+    TEL_CD_GENINF_GPS_PARSE_ER_CNT
 } TELEMETRY_CODE_GEN_INF;
 
 typedef enum {
