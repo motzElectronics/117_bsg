@@ -1,4 +1,5 @@
 #include "../Tasks/Inc/task_get_new_bin.h"
+
 #include "../Tasks/Inc/task_keep_alive.h"
 #include "../Utils/Inc/utils_pckgs_manager.h"
 
@@ -7,6 +8,7 @@ extern osThreadId getGPSHandle;
 extern osThreadId getNewBinHandle;
 extern osThreadId keepAliveHandle;
 extern osThreadId createWebPckgHandle;
+extern osThreadId getTrainDataHandle;
 
 extern osMutexId mutexGPSBufHandle;
 extern osMutexId mutexWebHandle;
@@ -15,17 +17,17 @@ extern osMutexId mutexSpiFlashHandle;
 
 extern CircularBuffer circBufAllPckgs;
 
-u8 isRxNewFirmware = 0;
-static u8 bufNumBytesFirmware[8];
+u8                     isRxNewFirmware = 0;
+static u8              bufNumBytesFirmware[8];
 static PckgUpdFirmware pckgInfoFirmware;
-static u8 partFirmware[SZ_PART_FIRMW + 1];
-static u32 flashAddrFirmware = FLASH_ADDR_BUF_NEW_FIRMWARE;
-static u32 szSoft = 0;
+static u8              partFirmware[SZ_PART_FIRMW + 1];
+static u32             flashAddrFirmware = FLASH_ADDR_BUF_NEW_FIRMWARE;
+static u32             szSoft = 0;
 
 void taskGetNewBin(void const* argument) {
     u32 curSzSoft = 0;
     u32 szPartSoft;
-    u8 cntFailTCPReq = 0;
+    u8  cntFailTCPReq = 0;
 
     FLASH_Erase_Sector(FLASH_SECTOR_1, VOLTAGE_RANGE_3);
 
@@ -36,10 +38,12 @@ void taskGetNewBin(void const* argument) {
     isRxNewFirmware = 1;
 
     if (!bsg.isTCPOpen) {
-        while (openTcp() != TCP_OK);
+        while (openTcp() != TCP_OK)
+            ;
     }
 
-    while (!(szSoft = getSzFirmware()));
+    while (!(szSoft = getSzFirmware()))
+        ;
     flashClearPage(FLASH_SECTOR_6);
     flashClearPage(FLASH_SECTOR_7);
     clearAllWebPckgs();
@@ -58,7 +62,8 @@ void taskGetNewBin(void const* argument) {
             memset(partFirmware, 0xFF, SZ_PART_FIRMW + 1);
 
             if (!bsg.isTCPOpen) {
-                while (openTcp() != TCP_OK);
+                while (openTcp() != TCP_OK)
+                    ;
                 cntFailTCPReq = 0;
             }
 
@@ -80,7 +85,8 @@ void taskGetNewBin(void const* argument) {
             }
         } else {
             if (!bsg.isTCPOpen) {
-                while (openTcp() != TCP_OK);
+                while (openTcp() != TCP_OK)
+                    ;
             }
             if (sendMsgFWUpdated() != SUCCESS) {
                 D(printf("ERROR: Send FW UPDATED\r\n"));
@@ -120,6 +126,7 @@ void lockAllTasks() {
     vTaskSuspend(getGPSHandle);
     vTaskSuspend(keepAliveHandle);
     vTaskSuspend(createWebPckgHandle);
+    vTaskSuspend(getTrainDataHandle);
 
     osMutexRelease(mutexGPSBufHandle);
     osMutexRelease(mutexRTCHandle);
@@ -140,7 +147,7 @@ u32 getSzFirmware() {
 }
 
 ErrorStatus getPartFirmware(u8* reqData, u8* answBuf, u16 szAnsw, u8 szReq) {
-    WebPckg* curPckg;
+    WebPckg*    curPckg;
     ErrorStatus ret = SUCCESS;
     curPckg = createWebPckgReq(CMD_REQUEST_PART_FIRMWARE, reqData, szReq, SZ_REQUEST_GET_PART_FIRMWARE);
     osMutexWait(mutexWebHandle, osWaitForever);

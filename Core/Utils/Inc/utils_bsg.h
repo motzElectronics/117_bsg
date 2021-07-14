@@ -17,19 +17,19 @@
 #include "usart.h"
 
 #define BSG_THRESHOLD_CNT_PAGES 2
-#define BSG_ID_DEV_BSG 0x12
-#define BSG_ADDR_ID_MCU 0x1FFF7A10
+#define BSG_ID_DEV_BSG          0x12
+#define BSG_ADDR_ID_MCU         0x1FFF7A10
 
 #define SZ_PART_NEW_SOFTWARE 1360
-#define SZ_MAX_TX_DATA 4096
+#define SZ_MAX_TX_DATA       4096
 
 #define BSG_MSG_NO_GPS (char*)"0000.000000,N,00000.000000,E,+0000,000,000"
 
-#define BSG_ID_FIRMWARE 9
-#define BSG_ID_BOOT 2
-#define BSG_ID_TRAINCAR 0
-#define BSG_ID_TRAIN 1706
-#define BSG_VER_BETA_FIRMWARE (char)'B'
+#define BSG_ID_FIRMWARE         8
+#define BSG_ID_BOOT             2
+#define BSG_ID_TRAINCAR         0
+#define BSG_ID_TRAIN            1706
+#define BSG_VER_BETA_FIRMWARE   (char)'B'
 #define BSG_VER_STABLE_FIRMWARE (char)'S'
 
 #define BSG_CNT_INVALID_GNSS_DATA 5
@@ -44,34 +44,34 @@
 
 typedef union {
     struct {
-        u8 cntr : 3;
+        u8 cntr   : 3;
         u8 flagOn : 1;
     };
     u8 regSleepTimer;
 } SleepTimer;
 
 typedef struct {
-    u32 idMCU[3];
-    u16 idTrain;
-    u8 idTrainCar;
-    u16 idReceiver;
-    u8 idDev;
-    u8 idFirmware;
-    u8 idBoot;
-    u8 isSentData;
-    u8 isTCPOpen;
-    u8 tcpErrCnt;
-    u8 csq;
-    u32 gpsInvaligCount;
-    u32 gpsParseFailCount;
+    u32        idMCU[3];
+    u16        idTrain;
+    u8         idTrainCar;
+    u16        idReceiver;
+    u8         idDev;
+    u8         idFirmware;
+    u8         idBoot;
+    u8         isSentData;
+    u8         isTCPOpen;
+    u8         tcpErrCnt;
+    u8         csq;
+    u32        gpsInvaligCount;
+    u32        gpsParseFailCount;
     SleepTimer sleepTimer;
 } BSG;
 
 typedef struct {
     u32 unixTimeStamp;
     u32 data;
-    u8 group;
-    u8 code;
+    u8  group;
+    u8  code;
 } PckgTelemetry;
 
 typedef struct {
@@ -79,7 +79,13 @@ typedef struct {
     u32 toByte;
 } PckgUpdFirmware;
 
-typedef enum { CMD_DATA_GRMC = 4, CMD_DATA_TELEMETRY = 5 } CMD_DATA;
+typedef enum {
+    CMD_DATA_VOLTAMPER = 1,
+    CMD_DATA_ENERGY,
+    CMD_DATA_TEMP,
+    CMD_DATA_GRMC,
+    CMD_DATA_TELEMETRY
+} CMD_DATA_TYPE;
 
 typedef enum {
     TEL_OFF_DEV = 0x0010,
@@ -106,7 +112,8 @@ typedef enum {
     TEL_LVL_CSQ = 0x7010
 } TYPE_TELEMETRY;
 
-typedef enum { TEL_GR_GENINF = 1, TEL_GR_HARDWARE_STATUS } TELEMETRY_GROUP;
+typedef enum { TEL_GR_GENINF = 1,
+               TEL_GR_HARDWARE_STATUS } TELEMETRY_GROUP;
 
 typedef enum {
     TEL_CD_GENINF_NUM_FIRMWARE = 1,
@@ -138,24 +145,25 @@ typedef enum {
     CMD_REQUEST_PART_FIRMWARE
 } CMD_REQUEST;
 
-typedef enum { MSG_TEMP = 0xF000, MSG_TELEMETRY = 0x0000 } TYPE_MSG;
+typedef enum { MSG_TEMP = 0xF000,
+               MSG_TELEMETRY = 0x0000 } TYPE_MSG;
 
-extern BSG bsg;
+extern BSG      bsg;
 extern DateTime dateTimeGprmc;
 
 void bsgInit();
 
 u32 getFlashData(u32 ADDR);
 
-u8 isCrcOk(char* pData, int len);
+u8   isCrcOk(char* pData, int len);
 void getServerTime();
 
 void updSpiFlash(CircularBuffer* cbuf);
-u8 waitGoodCsq(u32 timeout);
+u8   waitGoodCsq(u32 timeout);
 
 void saveData(u8* data, u8 sz, u8 cmdData, CircularBuffer* cbuf);
-u32 getUnixTimeStamp();
-u8 isDataFromFlashOk(char* pData, u8 len);
+u32  getUnixTimeStamp();
+u8   isDataFromFlashOk(char* pData, u8 len);
 void copyTelemetry(u8* buf, PckgTelemetry* pckgTel);
 void saveTelemetry(PckgTelemetry* pckg, CircularBuffer* cbuf);
 

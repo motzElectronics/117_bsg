@@ -1,6 +1,6 @@
 #include "../Tasks/Inc/task_get_gps.h"
-#include "../Tasks/Inc/task_keep_alive.h"
 
+#include "../Tasks/Inc/task_keep_alive.h"
 #include "tim.h"
 extern osMutexId mutexGPSBufHandle;
 
@@ -8,13 +8,14 @@ extern osThreadId webExchangeHandle;
 extern osThreadId keepAliveHandle;
 extern osThreadId createWebPckgHandle;
 extern osThreadId getNewBinHandle;
+extern osThreadId getTrainDataHandle;
 
 extern osSemaphoreId semCreateWebPckgHandle;
 
-static char bufGnss[200];
+static char     bufGnss[200];
 static PckgGnss pckgGnss;
-static u8 bufPckgGnss[SZ_CMD_GRMC];
-CircularBuffer circBufGnss = {.buf = NULL, .max = 0};
+static u8       bufPckgGnss[SZ_CMD_GRMC];
+CircularBuffer  circBufGnss = {.buf = NULL, .max = 0};
 
 extern CircularBuffer rxUart1CircBuf;
 extern CircularBuffer circBufAllPckgs;
@@ -28,7 +29,8 @@ void taskGetGPS(void const *argument) {
     cBufReset(&circBufAllPckgs);
 
     simInit();
-    while (openTcp() != TCP_OK);
+    while (openTcp() != TCP_OK)
+        ;
     getServerTime();
 
     generateInitTelemetry();
@@ -71,6 +73,7 @@ void unLockTasks() {
     vTaskResume(webExchangeHandle);
     vTaskResume(createWebPckgHandle);
     vTaskResume(keepAliveHandle);
+    vTaskResume(getTrainDataHandle);
 }
 
 void checkStopTrain(PckgGnss *pckg) {
@@ -90,8 +93,8 @@ void checkStopTrain(PckgGnss *pckg) {
 
 void generateInitTelemetry() {
     PckgTelemetry pckgTel;
-    long long phoneNum;
-    u32 tmp;
+    long long     phoneNum;
+    u32           tmp;
     pckgTel.group = TEL_GR_GENINF;
     pckgTel.code = TEL_CD_GENINF_NUM_FIRMWARE;
     pckgTel.data = BSG_ID_FIRMWARE;
@@ -119,5 +122,5 @@ void generateInitTelemetry() {
     saveTelemetry(&pckgTel, &circBufAllPckgs);
 
     updSpiFlash(&circBufAllPckgs);
-	xSemaphoreGive(semCreateWebPckgHandle);
+    xSemaphoreGive(semCreateWebPckgHandle);
 }

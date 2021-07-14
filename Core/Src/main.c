@@ -111,6 +111,7 @@ int main(void)
   MX_RTC_Init();
   MX_TIM10_Init();
   MX_CRC_Init();
+  MX_USART6_UART_Init();
   /* USER CODE BEGIN 2 */
     // D(printf("OK: start main prog\r\n"));
     volatile FIRMWARE_INFO info = {.header = 0x1122334455667788,
@@ -248,7 +249,7 @@ void urlsInit() {
 }
 /* USER CODE END 4 */
 
-/**
+ /**
   * @brief  Period elapsed callback in non blocking mode
   * @note   This function is called  when TIM1 interrupt took place, inside
   * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment

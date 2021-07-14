@@ -62,6 +62,8 @@ void Error_Handler(void);
 #define GNSS_EN_GPIO_Port GPIOA
 #define SPI2_CS_MEM_Pin GPIO_PIN_12
 #define SPI2_CS_MEM_GPIO_Port GPIOB
+#define USART6_RE_Pin GPIO_PIN_8
+#define USART6_RE_GPIO_Port GPIOC
 #define GSM_PWRKEY_Pin GPIO_PIN_8
 #define GSM_PWRKEY_GPIO_Port GPIOA
 #define LED_1_Pin GPIO_PIN_11
@@ -71,6 +73,7 @@ void Error_Handler(void);
 #define SIM_PWR_EN_Pin GPIO_PIN_11
 #define SIM_PWR_EN_GPIO_Port GPIOC
 /* USER CODE BEGIN Private defines */
+#include "debug.h"
 #include "stdbool.h"
 #include "stdio.h"
 #include "stdlib.h"
@@ -86,7 +89,7 @@ void Error_Handler(void);
 
 #define LOG_SZ_ERROR 100
 #define WAIT_TIMEOUT 15000
-#define DUMMY_BYTE 0xFF
+#define DUMMY_BYTE   0xFF
 
 #define URL_TCP_ADDR (char*)"188.242.176.25"
 #define URL_TCP_PORT 8086
@@ -94,39 +97,39 @@ void Error_Handler(void);
 #define BSG_SZ_UART_MSG 132
 #define BSG_SZ_TEMP_MSG 4
 
-#define SZ_CMD_ENERGY 12
-#define SZ_CMD_VOLTAMPER 8
-#define SZ_CMD_TEMP 8
-#define SZ_CMD_GRMC 20
-#define SZ_CMD_TELEMETRY 10
+#define SZ_CMD_ENERGY              12
+#define SZ_CMD_VOLTAMPER           8
+#define SZ_CMD_TEMP                8
+#define SZ_CMD_GRMC                20
+#define SZ_CMD_TELEMETRY           10
 #define SZ_CMD_TELEMETRY_PHONE_NUM 14
 
-#define SZ_PAGE 255
+#define SZ_PAGE                  255
 #define SZ_BUF_ENERGY_FROM_UART1 500
-#define AMOUNT_MAX_PAGES 5
-#define SZ_PAGES 1275  // SZ_PAGE * AMOUNT_MAX_PAGES
+#define AMOUNT_MAX_PAGES         5
+#define SZ_PAGES                 1275  // SZ_PAGE * AMOUNT_MAX_PAGES
 
-#define BSG_PREAMBLE 0xABCD
+#define BSG_PREAMBLE     0xABCD
 #define BSG_PREAMBLE_LSB 0xAB
 #define BSG_PREAMBLE_MSB 0xCD
 
 #define SZ_WEB_PCKG 1400
 
-extern char logError[LOG_SZ_ERROR];
-typedef uint8_t u8;
-typedef uint16_t u16;
-typedef uint32_t u32;
-typedef uint64_t u64;
+extern char          logError[LOG_SZ_ERROR];
+typedef uint8_t      u8;
+typedef uint16_t     u16;
+typedef uint32_t     u32;
+typedef uint64_t     u64;
 typedef unsigned int uint;
 
-typedef int8_t s8;
+typedef int8_t  s8;
 typedef int16_t s16;
 typedef int32_t s32;
 
 typedef union {
     struct {
-        u8 isIrqTx : 1;
-        u8 isIrqRx : 1;
+        u8 isIrqTx   : 1;
+        u8 isIrqRx   : 1;
         u8 isIrqIdle : 3;
     };
     u8 regIrq;
@@ -142,23 +145,23 @@ typedef struct {
 } DateTime;
 
 typedef struct {
-    u64 header;
-    u8 numFirmware;
+    u64  header;
+    u8   numFirmware;
     char verFirmware;
-    u8 numTrainCar;
+    u8   numTrainCar;
 } FIRMWARE_INFO;
 
 typedef struct {
     char* tcpAddr;
-    u32 tcpPort;
+    u32   tcpPort;
 } Urls;
 
 extern Urls urls;
-u8 waitRx(char* waitStr, IrqFlags* pFlags, u16 pause, u32 timeout);
-u8 waitTx(char* waitStr, IrqFlags* pFlags, u16 pause, u32 timeout);
-u8 waitIdle(char* waitStr, IrqFlags* pFlags, u16 pause, u32 timeout);
-u8 waitIdleCnt(char* waitStr, IrqFlags* pFlags, u8 cnt, u16 pause, u32 timeout);
-void urlsInit();
+u8          waitRx(char* waitStr, IrqFlags* pFlags, u16 pause, u32 timeout);
+u8          waitTx(char* waitStr, IrqFlags* pFlags, u16 pause, u32 timeout);
+u8          waitIdle(char* waitStr, IrqFlags* pFlags, u16 pause, u32 timeout);
+u8          waitIdleCnt(char* waitStr, IrqFlags* pFlags, u8 cnt, u16 pause, u32 timeout);
+void        urlsInit();
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus
