@@ -12,30 +12,40 @@ extern UartInfo uInfoTablo;
 
 extern CircularBuffer circBufAllPckgs;
 
+u8 tmpBufPage[SZ_PAGE];
+
 void send_request(UartInfo* pUInf, u16 len);
 u16  create_request(u8* request, u8 cmd, u8* data, u8 len);
 void parse_responce(UartInfo* pUInf);
 
 void taskGetTrainData(void const* argument) {
     u16 req_len;
+    u16 iter = 0;
     osSemaphoreWait(uart6RXSemHandle, osWaitForever);
 
     vTaskSuspend(getTrainDataHandle);
 
     for (;;) {
-        u32 timeStamp = getUnixTimeStamp();
-        req_len = create_request(uInfoTablo.pTxBuf, CMD_SYNC, (u8*)&timeStamp, sizeof(timeStamp));
-        send_request(&uInfoTablo, req_len);
-        if (osSemaphoreWait(uart6RXSemHandle, 2000) == osOK) {
-            parse_responce(&uInfoTablo);
+        if (iter % 20 == 0) {
+            u32 timeStamp = getUnixTimeStamp();
+            req_len = create_request(uInfoTablo.pTxBuf, CMD_SYNC, (u8*)&timeStamp, sizeof(timeStamp));
+            send_request(&uInfoTablo, req_len);
+            if (osSemaphoreWait(uart6RXSemHandle, 2000) == osOK) {
+                parse_responce(&uInfoTablo);
+                osDelay(100);
+            }
         }
 
-        req_len = create_request(uInfoTablo.pTxBuf, CMD_DATA, (u8*)&uInfoTablo.szRxBuf, sizeof(uInfoTablo.szRxBuf));
-        send_request(&uInfoTablo, req_len);
-        if (osSemaphoreWait(uart6RXSemHandle, 2000) == osOK) {
-            parse_responce(&uInfoTablo);
+        if (iter % 20 == 10) {
+            req_len = create_request(uInfoTablo.pTxBuf, CMD_DATA, (u8*)&uInfoTablo.szRxBuf, sizeof(uInfoTablo.szRxBuf));
+            send_request(&uInfoTablo, req_len);
+            if (osSemaphoreWait(uart6RXSemHandle, 2000) == osOK) {
+                parse_responce(&uInfoTablo);
+            }
         }
-        osDelay(4000);
+
+        osDelay(100);
+        iter++;
     }
 }
 
@@ -77,9 +87,16 @@ void parse_tablo_data(u8* data_all, u16 len_all) {
         ptr += 2;
         data = (u8*)(&data_all[ptr]);
 
+        if (len_pg > SZ_PAGE) {
+            LOG(LEVEL_ERROR, "Returned big page (len %d)\r\n", len_pg);
+            return;
+        }
+
+        memset(tmpBufPage, 0, SZ_PAGE);
+        memcpy(tmpBufPage, data, len_pg);
         bufEnd[0] = calcCrc16(data, len_pg);
-        memcpy(&data[len_pg], bufEnd, 4);
-        spiFlashWrPg(data, len_pg + 4, 0, spiFlash64.headNumPg);
+        memcpy(&tmpBufPage[len_pg], bufEnd, 4);
+        spiFlashWrPg(tmpBufPage, len_pg + 4, 0, spiFlash64.headNumPg);
 
         LOG(LEVEL_INFO, "Returned page (len %d)\r\n", len_pg);
 

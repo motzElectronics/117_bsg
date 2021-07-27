@@ -1,14 +1,15 @@
 #include "../Tasks/Inc/task_keep_alive.h"
-#include "../Utils/Inc/utils_pckgs_manager.h"
-#include "../Utils/Inc/utils_bsg.h"
 
-extern osThreadId webExchangeHandle;
-extern osThreadId getGPSHandle;
-extern osThreadId keepAliveHandle;
-extern osThreadId getNewBinHandle;
-extern osThreadId createWebPckgHandle;
-extern osMutexId mutexWebHandle;
-extern osMessageQId queueWebPckgHandle;
+#include "../Utils/Inc/utils_bsg.h"
+#include "../Utils/Inc/utils_pckgs_manager.h"
+
+extern osThreadId    webExchangeHandle;
+extern osThreadId    getGPSHandle;
+extern osThreadId    keepAliveHandle;
+extern osThreadId    getNewBinHandle;
+extern osThreadId    createWebPckgHandle;
+extern osMutexId     mutexWebHandle;
+extern osMessageQId  queueWebPckgHandle;
 extern osSemaphoreId semCreateWebPckgHandle;
 
 extern u8 isRxNewFirmware;
@@ -17,118 +18,116 @@ extern CircularBuffer circBufAllPckgs;
 
 u8 bufTxData[20];
 
-void taskKeepAlive(void const * argument){
+void taskKeepAlive(void const* argument) {
     u16 timeout = 1;
     vTaskSuspend(keepAliveHandle);
-    
-    for(;;)
-    {
-        if(!(timeout % 60) && !isRxNewFirmware){
+
+    for (;;) {
+        if (!(timeout % 60) && !isRxNewFirmware) {
             D(printf("\r\ngetNumFirmware\r\n\r\n"));
             getNumFirmware();
         }
-        if (!(timeout % 30) && !isRxNewFirmware) {
-            D(printf("sendMsgGpsInvalidCount\r\n"));
-            sendMsgGpsInvalidCount();
-        }
-        if(!(timeout % 600) && !isRxNewFirmware){
+        // if (!(timeout % 30) && !isRxNewFirmware) {
+        //     D(printf("sendMsgGpsInvalidCount\r\n"));
+        //     sendMsgGpsInvalidCount();
+        // }
+        if (!(timeout % 600) && !isRxNewFirmware) {
             D(printf("\r\ngenerateMsgKeepAlive\r\n\r\n"));
             generateMsgKeepAlive();
         }
-        if(!(timeout % 5400) && !isRxNewFirmware){
+        if (!(timeout % 5400) && !isRxNewFirmware) {
             D(printf("\r\nupdRTC\r\n\r\n"));
             updRTC();
         }
-        
+
         timeout++;
         osDelay(2000);
     }
 }
 
-void updRTC(){
-
+void updRTC() {
     getServerTime();
 }
 
-void generateMsgKeepAlive(){
+void generateMsgKeepAlive() {
     PckgTelemetry pckgTel;
-	pckgTel.group = TEL_GR_HARDWARE_STATUS;
-	pckgTel.code = TEL_CD_HW_BSG_ALIVE;
-	pckgTel.data = 0;
-	saveTelemetry(&pckgTel, &circBufAllPckgs);
+    pckgTel.group = TEL_GR_HARDWARE_STATUS;
+    pckgTel.code = TEL_CD_HW_BSG_ALIVE;
+    pckgTel.data = 0;
+    saveTelemetry(&pckgTel, &circBufAllPckgs);
 }
 
 void generateMsgFWUpdated() {
     PckgTelemetry pckgTel;
     pckgTel.group = TEL_GR_HARDWARE_STATUS;
-	pckgTel.code = TEL_CD_HW_UPDATED;
-	pckgTel.data = 0;
-	saveTelemetry(&pckgTel, &circBufAllPckgs);
+    pckgTel.code = TEL_CD_HW_UPDATED;
+    pckgTel.data = 0;
+    saveTelemetry(&pckgTel, &circBufAllPckgs);
 }
 
 void generateMsgDevOff() {
     PckgTelemetry pckgTel;
     pckgTel.group = TEL_GR_HARDWARE_STATUS;
-	pckgTel.code = TEL_CD_HW_BSG;
-	pckgTel.data = 0;
-	saveTelemetry(&pckgTel, &circBufAllPckgs);
+    pckgTel.code = TEL_CD_HW_BSG;
+    pckgTel.data = 0;
+    saveTelemetry(&pckgTel, &circBufAllPckgs);
 }
 
 ErrorStatus sendMsgFWUpdated() {
-    ErrorStatus ret = SUCCESS;
+    ErrorStatus   ret = SUCCESS;
     PckgTelemetry pckgTel;
 
     D(printf("sendMsgFWUpdated\r\n"));
 
     memset(bufTxData, 0, 20);
     pckgTel.group = TEL_GR_HARDWARE_STATUS;
-	pckgTel.code = TEL_CD_HW_UPDATED;
-	pckgTel.data = 1;
+    pckgTel.code = TEL_CD_HW_UPDATED;
+    pckgTel.data = 1;
     pckgTel.unixTimeStamp = getUnixTimeStamp();
     copyTelemetry(bufTxData, &pckgTel);
-    
-	pckgTel.code = TEL_CD_HW_BSG;
-	pckgTel.data = 0;
+
+    pckgTel.code = TEL_CD_HW_BSG;
+    pckgTel.data = 0;
     copyTelemetry(&bufTxData[SZ_CMD_TELEMETRY], &pckgTel);
 
     ret = sendWebPckgData(CMD_DATA_TELEMETRY, bufTxData, SZ_CMD_TELEMETRY * 2, 2);
-    
+
     return ret;
 }
 
 ErrorStatus sendMsgDevOff() {
-    ErrorStatus ret = SUCCESS;
+    ErrorStatus   ret = SUCCESS;
     PckgTelemetry pckgTel;
 
     memset(bufTxData, 0, 20);
     pckgTel.group = TEL_GR_HARDWARE_STATUS;
-	pckgTel.code = TEL_CD_HW_BSG;
-	pckgTel.data = 0;
+    pckgTel.code = TEL_CD_HW_BSG;
+    pckgTel.data = 0;
     pckgTel.unixTimeStamp = getUnixTimeStamp();
     copyTelemetry(bufTxData, &pckgTel);
 
     ret = sendWebPckgData(CMD_DATA_TELEMETRY, bufTxData, SZ_CMD_TELEMETRY, 1);
-    
+
     return ret;
 }
 
 ErrorStatus sendMsgGpsInvalidCount() {
-    ErrorStatus ret = SUCCESS;
+    ErrorStatus   ret = SUCCESS;
     PckgTelemetry pckgTel;
 
     memset(bufTxData, 0, 20);
     pckgTel.group = TEL_GR_GENINF;
-	pckgTel.code = TEL_CD_GENINF_GPS_INV_CNT;
-	pckgTel.data = bsg.gpsInvaligCount;
+    pckgTel.code = TEL_CD_GENINF_GPS_INV_CNT;
+    pckgTel.data = bsg.gpsInvaligCount;
     pckgTel.unixTimeStamp = getUnixTimeStamp();
     copyTelemetry(bufTxData, &pckgTel);
 
-	pckgTel.code = TEL_CD_GENINF_GPS_PARSE_ER_CNT;
-	pckgTel.data = bsg.gpsParseFailCount;
+    pckgTel.code = TEL_CD_GENINF_GPS_PARSE_ER_CNT;
+    pckgTel.data = bsg.gpsParseFailCount;
     copyTelemetry(&bufTxData[SZ_CMD_TELEMETRY], &pckgTel);
 
     ret = sendWebPckgData(CMD_DATA_TELEMETRY, bufTxData, SZ_CMD_TELEMETRY * 2, 2);
-    
+
     return ret;
 }
 
@@ -137,7 +136,7 @@ ErrorStatus sendMsgGpsInvalidCount() {
 //     char strVolts[4];
 //     static u32 delayPages = 1;
 //     u8 cnt;
-    
+
 //     vTaskSuspend(getGPSHandle);
 //     vTaskSuspend(keepAliveHandle);
 
@@ -148,8 +147,8 @@ ErrorStatus sendMsgGpsInvalidCount() {
 //     while (delayPages > BSG_THRESHOLD_CNT_PAGES) {
 //         osDelay(5000);
 //         printf("delayPages %d\r\n", delayPages);
-//         delayPages = spiFlash64.headNumPg >= spiFlash64.tailNumPg ? 
-//                     spiFlash64.headNumPg - spiFlash64.tailNumPg : 
+//         delayPages = spiFlash64.headNumPg >= spiFlash64.tailNumPg ?
+//                     spiFlash64.headNumPg - spiFlash64.tailNumPg :
 //                     spiFlash64.headNumPg + (SPIFLASH_NUM_PG_GNSS - spiFlash64.tailNumPg);
 //     }
 
@@ -164,7 +163,7 @@ ErrorStatus sendMsgGpsInvalidCount() {
 //     bkte.isSentData = 0;
 //     updSpiFlash(&circBufAllPckgs);
 //     xSemaphoreGive(semCreateWebPckgHandle);
-    
+
 //     while (!bkte.isSentData) {
 //         osDelay(1000);
 //         printf("wait isSentData\r\n");
