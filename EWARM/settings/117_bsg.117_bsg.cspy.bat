@@ -25,7 +25,7 @@ if not "%~1" == "" goto debugFile
 
 @echo on 
 
-"C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.1\common\bin\cspybat" -f "C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\settings\117_bsg.117_bsg.general.xcl" --backend -f "C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\settings\117_bsg.117_bsg.driver.xcl" 
+"C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.3\common\bin\cspybat" -f "C:\MyProjects\БКТЭ-117\117_bsg\EWARM\settings\117_bsg.117_bsg.general.xcl" --backend -f "C:\MyProjects\БКТЭ-117\117_bsg\EWARM\settings\117_bsg.117_bsg.driver.xcl" 
 
 @echo off 
 goto end 
@@ -34,7 +34,7 @@ goto end
 
 @echo on 
 
-"C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.1\common\bin\cspybat" -f "C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\settings\117_bsg.117_bsg.general.xcl" "--debug_file=%~1" --backend -f "C:\Users\annsi\workspace\motz\117_x\117_bsg\EWARM\settings\117_bsg.117_bsg.driver.xcl" 
+"C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.3\common\bin\cspybat" -f "C:\MyProjects\БКТЭ-117\117_bsg\EWARM\settings\117_bsg.117_bsg.general.xcl" "--debug_file=%~1" --backend -f "C:\MyProjects\БКТЭ-117\117_bsg\EWARM\settings\117_bsg.117_bsg.driver.xcl" 
 
 @echo off 
 :end

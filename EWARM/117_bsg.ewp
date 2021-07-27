@@ -66,7 +66,7 @@
         </option>
         <option>
           <name>OGLastSavedByProductVersion</name>
-          <state>8.30.1.17146</state>
+          <state>8.40.1.21529</state>
         </option>
         <option>
           <name>GeneralEnableMisra</name>
@@ -116,7 +116,7 @@
         </option>
         <option>
           <name>GBECoreSlave</name>
-          <version>26</version>
+          <version>27</version>
           <state>39</state>
         </option>
         <option>
@@ -133,7 +133,7 @@
         </option>
         <option>
           <name>CoreVariant</name>
-          <version>26</version>
+          <version>27</version>
           <state>39</state>
         </option>
         <option>
@@ -156,7 +156,7 @@
         </option>
         <option>
           <name>GFPUCoreSlave2</name>
-          <version>26</version>
+          <version>27</version>
           <state>39</state>
         </option>
         <option>
@@ -215,7 +215,7 @@
       <name>ICCARM</name>
       <archiveVersion>2</archiveVersion>
       <data>
-        <version>34</version>
+        <version>35</version>
         <wantNonLocal>1</wantNonLocal>
         <debug>1</debug>
         <option>
@@ -265,7 +265,7 @@
         </option>
         <option>
           <name>CCDiagSuppress</name>
-          <state></state>
+          <state>Pe167</state>
         </option>
         <option>
           <name>CCDiagRemark</name>
@@ -286,7 +286,7 @@
         <option>
           <name>CCAllowList</name>
           <version>1</version>
-          <state>11111110</state>
+          <state>00000000</state>
         </option>
         <option>
           <name>CCDebugInfo</name>
@@ -373,7 +373,7 @@
         </option>
         <option>
           <name>CCOptLevel</name>
-          <state>3</state>
+          <state>0</state>
         </option>
         <option>
           <name>CCOptStrategy</name>
@@ -382,7 +382,7 @@
         </option>
         <option>
           <name>CCOptLevelSlave</name>
-          <state>3</state>
+          <state>0</state>
         </option>
         <option>
           <name>CompilerMisraRules98</name>
@@ -470,6 +470,10 @@
         <option>
           <name>IccRTTI2</name>
           <state>0</state>
+        </option>
+        <option>
+          <name>OICompilerExtraOption</name>
+          <state>1</state>
         </option>
       </data>
     </settings>
@@ -691,7 +695,7 @@
       <name>ILINK</name>
       <archiveVersion>0</archiveVersion>
       <data>
-        <version>21</version>
+        <version>23</version>
         <wantNonLocal>1</wantNonLocal>
         <debug>1</debug>
         <option>
@@ -1007,6 +1011,26 @@
           <name>IlinkTrustzoneImportLibraryOut</name>
           <state>117_bsg_import_lib.o</state>
         </option>
+        <option>
+          <name>OILinkExtraOption</name>
+          <state>1</state>
+        </option>
+        <option>
+          <name>IlinkRawBinaryFile2</name>
+          <state></state>
+        </option>
+        <option>
+          <name>IlinkRawBinarySymbol2</name>
+          <state></state>
+        </option>
+        <option>
+          <name>IlinkRawBinarySegment2</name>
+          <state></state>
+        </option>
+        <option>
+          <name>IlinkRawBinaryAlign2</name>
+          <state></state>
+        </option>
       </data>
     </settings>
     <settings>
@@ -1058,6 +1082,9 @@
           <name>$PROJ_DIR$\..\Core\Src\freertos.c</name>
         </file>
         <file>
+          <name>$PROJ_DIR$\..\Core\Src\crc.c</name>
+        </file>
+        <file>
           <name>$PROJ_DIR$\..\Core\Src\dma.c</name>
         </file>
         <file>
@@ -1070,7 +1097,7 @@
           <name>$PROJ_DIR$\..\Core\Src\spi.c</name>
         </file>
         <file>
-          <name>$PROJ_DIR$/../Core/Src/tim.c</name>
+          <name>$PROJ_DIR$\..\Core\Src\tim.c</name>
         </file>
         <file>
           <name>$PROJ_DIR$\..\Core\Src\usart.c</name>
@@ -1097,19 +1124,25 @@
       <group>
         <name>Tasks</name>
         <file>
+          <name>$PROJ_DIR$\..\Core\Tasks\Src\task_create_webpckg.c</name>
+        </file>
+        <file>
           <name>$PROJ_DIR$\..\Core\Tasks\Src\task_get_gps.c</name>
         </file>
         <file>
           <name>$PROJ_DIR$\..\Core\Tasks\Src\task_get_new_bin.c</name>
         </file>
         <file>
-          <name>$PROJ_DIR$\..\Core\Tasks\Src\task_http.c</name>
+          <name>$PROJ_DIR$\..\Core\Tasks\Src\task_get_train_data.c</name>
         </file>
         <file>
           <name>$PROJ_DIR$\..\Core\Tasks\Src\task_iwdg.c</name>
         </file>
         <file>
           <name>$PROJ_DIR$\..\Core\Tasks\Src\task_keep_alive.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\Core\Tasks\Src\task_web_excahnge.c</name>
         </file>
       </group>
       <group>
@@ -1121,9 +1154,6 @@
           <name>$PROJ_DIR$\..\Core\Utils\Src\m_utils_bsg.c</name>
         </file>
         <file>
-          <name>$PROJ_DIR$\..\Core\Utils\Src\m_utils_json.c</name>
-        </file>
-        <file>
           <name>$PROJ_DIR$\..\Core\Utils\Src\utils_crc.c</name>
         </file>
         <file>
@@ -1131,6 +1161,9 @@
         </file>
         <file>
           <name>$PROJ_DIR$\..\Core\Utils\Src\utils_gps.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\Core\Utils\Src\utils_pckgs_manager.c</name>
         </file>
       </group>
     </group>
@@ -1145,6 +1178,9 @@
     </group>
     <group>
       <name>STM32F4xx_HAL_Driver</name>
+      <file>
+        <name>$PROJ_DIR$\..\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_crc.c</name>
+      </file>
       <file>
         <name>$PROJ_DIR$\..\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_rcc.c</name>
       </file>

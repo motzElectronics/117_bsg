@@ -7,8 +7,13 @@
 #include "../Utils/Inc/circularBuffer.h"
 
 u16 getAdcVoltBat();
-void pwrOffBkte();
+void pwrOffBsg();
 void updRTC();
 void generateMsgKeepAlive();
 void generateMsgDevOff();
+
+ErrorStatus sendMsgFWUpdated();
+ErrorStatus sendMsgDevOff();
+ErrorStatus sendMsgGpsInvalidCount();
+
 #endif

@@ -5,5 +5,9 @@
 #include "cmsis_os.h"
 #include "../Utils/Inc/circularBuffer.h"
 #include "../Utils/Inc/utils_gps.h"
+
+void unLockTasks();
 void checkStopTrain(PckgGnss* pckg);
+void generateInitTelemetry();
+
 #endif

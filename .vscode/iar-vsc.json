@@ -1,6 +1,6 @@
 {
-    "ewp": "c:\\Users\\annsi\\workspace\\motz\\117_x\\117_bsg\\EWARM\\117_bsg.ewp",
+    "ewp": "c:\\MyProjects\\БКТЭ-117\\117_bsg\\EWARM\\117_bsg.ewp",
     "configuration": "117_bsg",
-    "compiler": "C:\\Program Files (x86)\\IAR Systems\\Embedded Workbench 8.1\\arm\\bin\\iccarm.exe",
-    "workbench": "C:\\Program Files (x86)\\IAR Systems\\Embedded Workbench 8.1"
+    "compiler": "C:\\Program Files (x86)\\IAR Systems\\Embedded Workbench 8.3\\arm\\bin\\iccarm.exe",
+    "workbench": "C:\\Program Files (x86)\\IAR Systems\\Embedded Workbench 8.3"
 }

@@ -92,7 +92,6 @@ void cBufSafeWrite(CBufHandle cbuf, u8* data, u8 sz, osMutexId mutex, TickType_t
 u16 cBufRead(CBufHandle cbuf, u8* dist, CircTypeBuf typeBuf, u8 sz);
 void copyGetDatafromBuf(CBufHandle cbuf, u8* dist, u16 sz, CircTypeBuf type);
 u8 getLenMsgSimUart(CBufHandle cbuf);
-u8 getLenMsgEnergyUart(CBufHandle cbuf);
 u16 getLenMsgUblox(CircularBuffer* cbuf);
 
 //TODO: int circular_buf_get_range(circular_buf_t cbuf, uint8_t *data, size_t len);
