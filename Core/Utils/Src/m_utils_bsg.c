@@ -1,15 +1,15 @@
 #include "../Utils/Inc/utils_bsg.h"
 #include "../Utils/Inc/utils_gps.h"
 #include "../Utils/Inc/utils_pckgs_manager.h"
-#include "rtc.h"
 #include "cmsis_os.h"
+#include "rtc.h"
 
-extern BSG bsg;
-extern osMutexId mutexGPSBufHandle;
-extern osMutexId mutexRTCHandle;
-extern osMutexId mutexWebHandle;
-extern osThreadId getNewBinHandle;
-extern osSemaphoreId semCreateWebPckgHandle;
+extern BSG            bsg;
+extern osMutexId      mutexGPSBufHandle;
+extern osMutexId      mutexRTCHandle;
+extern osMutexId      mutexWebHandle;
+extern osThreadId     getNewBinHandle;
+extern osSemaphoreId  semCreateWebPckgHandle;
 extern CircularBuffer circBufTTLVtoFlash;
 extern CircularBuffer circBufAllPckgs;
 
@@ -34,7 +34,7 @@ void bsgInit() {
 }
 
 u32 getUnixTimeStamp() {
-    time_t t;
+    time_t           t;
     static struct tm curTime;
 
     osMutexWait(mutexRTCHandle, osWaitForever);
@@ -56,7 +56,7 @@ u32 getUnixTimeStamp() {
 
 void getServerTime() {
     u8 bufTime[4];
-    if (generateWebPckgReq(CMD_REQUEST_SERVER_TIME, NULL, 0, SZ_REQUEST_GET_SERVER_TIME, bufTime, 4) == ERROR) {
+    if (generateWebPckgReq(CMD_REQUEST_SERVER_TIME, NULL, 0, SZ_REQUEST_GET_SERVER_TIME, bufTime, 4, &bsg.idMCU) == ERROR) {
         D(printf("ERROR: bad server time\r\n"));
     } else {
         time_t t =
@@ -82,15 +82,35 @@ void getServerTime() {
     }
 }
 
-void getNumFirmware() {
+void getBsgNumFw() {
     u8 bufFirmware[4];
-    if (generateWebPckgReq(CMD_REQUEST_NUM_FIRMWARE, NULL, 0, SZ_REQUEST_GET_NUM_FIRMWARE, bufFirmware, 4) == ERROR) {
-        D(printf("ERROR: getNumFirmware()\r\n"));
+    if (generateWebPckgReq(CMD_REQUEST_NUM_FIRMWARE, NULL, 0, SZ_REQUEST_GET_NUM_FIRMWARE, bufFirmware, 4, &bsg.idMCU) == ERROR) {
+        D(printf("ERROR: getBsgNumFw()\r\n"));
     } else {
         u32 numFirmware = bufFirmware[0] << 24 | bufFirmware[1] << 16 | bufFirmware[2] << 8 | bufFirmware[3];
-            D(printf("FIRMWARE v.:%d\r\n", (int)numFirmware));
+        D(printf("BSG FIRMWARE v.:%d\r\n", (int)numFirmware));
         if (numFirmware != BSG_ID_FIRMWARE && numFirmware > 0) {
             D(printf("New FIRMWARE v.:%d\r\n", (int)numFirmware));
+            bsg.updTarget = UPD_TARGET_BSG;
+            vTaskResume(getNewBinHandle);
+        }
+    }
+}
+
+void getTabloNumFw() {
+    u8 bufFirmware[4];
+    if ((bsg.tablo.idMCU[0] == 0 && bsg.tablo.idMCU[1] == 0 && bsg.tablo.idMCU[2] == 0) || bsg.tablo.idFirmware == 0) {
+        D(printf("ERROR: null tablo id mcu or firmware\r\n"));
+        return;
+    }
+    if (generateWebPckgReq(CMD_REQUEST_NUM_FIRMWARE, NULL, 0, SZ_REQUEST_GET_NUM_FIRMWARE, bufFirmware, 4, &bsg.tablo.idMCU) == ERROR) {
+        D(printf("ERROR: getBsgNumFw()\r\n"));
+    } else {
+        u32 numFirmware = bufFirmware[0] << 24 | bufFirmware[1] << 16 | bufFirmware[2] << 8 | bufFirmware[3];
+        D(printf("Tablo FIRMWARE v.:%d\r\n", (int)numFirmware));
+        if (numFirmware != bsg.tablo.idFirmware && numFirmware > 0) {
+            D(printf("New FIRMWARE v.:%d\r\n", (int)numFirmware));
+            bsg.updTarget = UPD_TARGET_TABLO;
             vTaskResume(getNewBinHandle);
         }
     }
@@ -118,12 +138,12 @@ void updSpiFlash(CircularBuffer* cbuf) {
     cBufWriteToBuf(cbuf, (u8*)bufEnd, 4);
     spiFlashWrPg(cbuf->buf, cbuf->readAvailable, 0, spiFlash64.headNumPg);
     cBufReset(cbuf);
-    
+
     D(printf("updSpiFlash()\r\n"));
 }
 
 u8 waitGoodCsq(u32 timeout) {
-    u8 csq = 0;
+    u8  csq = 0;
     u16 cntNOCsq = 0;
     u16 cntNOCsqMax = timeout / 3;
 

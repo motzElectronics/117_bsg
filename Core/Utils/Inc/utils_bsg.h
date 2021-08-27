@@ -8,6 +8,7 @@
 #ifndef INC_UTILS_BSG_H_
 #define INC_UTILS_BSG_H_
 
+#include "../Tasks/Inc/task_get_train_data.h"
 #include "../Utils/Inc/circularBuffer.h"
 #include "../Utils/Inc/utils_crc.h"
 #include "../xDrvrs/Inc/simcom.h"
@@ -42,6 +43,9 @@
 
 #define BSG_BIG_DIF_RTC_SERVTIME 600
 
+#define UPD_TARGET_BSG   0
+#define UPD_TARGET_TABLO 1
+
 typedef union {
     struct {
         u8 cntr   : 3;
@@ -57,13 +61,17 @@ typedef struct {
     u16        idReceiver;
     u8         idDev;
     u8         idFirmware;
+    u8         idNewFirmware;
+    u8         szNewFirmware;
     u8         idBoot;
     u8         isSentData;
     u8         isTCPOpen;
+    u8         updTarget;
     u8         tcpErrCnt;
     u8         csq;
     u32        gpsInvaligCount;
     u32        gpsParseFailCount;
+    TabloInfo  tablo;
     SleepTimer sleepTimer;
 } BSG;
 
@@ -135,7 +143,9 @@ typedef enum {
     TEL_CD_HW_BATTERY,
     TEL_CD_HW_BSG_ALIVE,
     TEL_CD_HW_WIRELESS_SENS_RSSI,
-    TEL_CD_HW_UPDATED
+    TEL_CD_HW_UPDATED,
+    TEL_CD_HW_UPDATE_LEN,
+    TEL_CD_HW_UPDATE_ERR
 } TELEMETRY_CODE_STATES;
 
 typedef enum {
@@ -167,6 +177,7 @@ u8   isDataFromFlashOk(char* pData, u8 len);
 void copyTelemetry(u8* buf, PckgTelemetry* pckgTel);
 void saveTelemetry(PckgTelemetry* pckg, CircularBuffer* cbuf);
 
-void getNumFirmware();
+void getBsgNumFw();
+void getTabloNumFw();
 
 #endif /* INC_UTILS_BSG_H_ */

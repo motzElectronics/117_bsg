@@ -162,7 +162,7 @@ void MX_FREERTOS_Init(void) {
     keepAliveHandle = osThreadCreate(osThread(keepAlive), NULL);
 
     /* definition and creation of getNewBin */
-    osThreadDef(getNewBin, taskGetNewBin, osPriorityNormal, 0, 300);
+    osThreadDef(getNewBin, taskGetNewBin, osPriorityNormal, 0, 350);
     getNewBinHandle = osThreadCreate(osThread(getNewBin), NULL);
 
     /* definition and creation of manageIWDG */
@@ -178,7 +178,7 @@ void MX_FREERTOS_Init(void) {
     webExchangeHandle = osThreadCreate(osThread(webExchange), NULL);
 
     /* definition and creation of getTrainData */
-    osThreadDef(getTrainData, taskGetTrainData, osPriorityNormal, 0, 256);
+    osThreadDef(getTrainData, taskGetTrainData, osPriorityNormal, 0, 300);
     getTrainDataHandle = osThreadCreate(osThread(getTrainData), NULL);
 
     /* USER CODE BEGIN RTOS_THREADS */

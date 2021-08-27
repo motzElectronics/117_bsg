@@ -19,9 +19,9 @@ u8 isJson = 1;
 void simInit() {
     char* retMsg;
     char* token;
-    u8 fail = 0;
-    u8 simBadAnsw = 0;
-    u8 isInit = 0;
+    u8    fail = 0;
+    u8    simBadAnsw = 0;
+    u8    isInit = 0;
 
     bsg.isTCPOpen = 0;
 
@@ -120,7 +120,7 @@ char* simDownloadData(char* data, u16 sz) {
 }
 
 u8 simCheckCSQ() {
-    u8 csq = 0;
+    u8    csq = 0;
     char* retMsg;
     char* token;
 
@@ -214,7 +214,7 @@ u8 simTCPinit() {
 
 u8 simTCPOpen() {
     static char params[40];
-    char* token;
+    char*       token;
     memset(params, '\0', 40);
     sprintf(params, "\"%s\",\"%s\",%d", (char*)"TCP", urls.tcpAddr,
             urls.tcpPort);
@@ -235,8 +235,8 @@ u8 simTCPOpen() {
 
 u8 simTCPSend(u8* data, u16 sz) {
     static char params[8];
-    char* token;
-    char* retMsg;
+    char*       token;
+    char*       retMsg;
 
     u32 ttt = HAL_GetTick();
 
@@ -289,13 +289,14 @@ u8 procReturnStatus(u8 ret) {
 
     if (ret == TCP_SEND_ER) {
         D(printf("TCP_SEND_ER %d!\r\n\r\n", notSend));
-        if (notSend == 5) {
-            D(printf("UNABLE TO SEND 5!\r\n"));
-            simReset();
-            ret = TCP_SEND_ER_LOST_PCKG;
-            notSend = 0;
-        }
+        //if (notSend == 5) {
+        //D(printf("UNABLE TO SEND 5!\r\n"));
+        simReset();
+        ret = TCP_SEND_ER_LOST_PCKG;
+        notSend = 0;
+        //}
     } else if (ret == TCP_CONNECT_ER) {
+        D(printf("CONNECT ERROR - TOTAL RESET!\r\n"));
         osDelay(1000);
         NVIC_SystemReset();
     } else if (ret != TCP_OK) {
@@ -361,12 +362,12 @@ u8 sendTcp(u8* data, u16 sz) {
 //     uartRxDma(&uInfoGnss);
 // }
 
-void gnssInit(){
+void gnssInit() {
     D(printf("gnssInit()\r\n"));
     HAL_GPIO_WritePin(GNSS_EN_GPIO_Port, GNSS_EN_Pin, GPIO_PIN_SET);
     osDelay(3000);
-    HAL_UART_Transmit(uInfoGnss.pHuart, (u8*)"$PMTK314,0,1,0,0,0,0,0,0,0,0,0,0,0,0*35\r\n", 
-                            sizeof("$PMTK314,0,1,0,0,0,0,0,0,0,0,0,0,0,0*35\r\n"), 1000);
+    HAL_UART_Transmit(uInfoGnss.pHuart, (u8*)"$PMTK314,0,1,0,0,0,0,0,0,0,0,0,0,0,0*35\r\n",
+                      sizeof("$PMTK314,0,1,0,0,0,0,0,0,0,0,0,0,0,0*35\r\n"), 1000);
 
     uartRxDma(&uInfoGnss);
 }

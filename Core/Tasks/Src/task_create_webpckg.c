@@ -61,7 +61,7 @@ void taskCreateWebPckg(void const *argument) {
                 }
             }
             szAllPages = getSzAllPages();
-            initWebPckg(curPckg, szAllPages, 0);
+            initWebPckg(curPckg, szAllPages, 0, &bsg.idMCU);
             addPagesToWebPckg(curPckg);
             osMessagePut(queueWebPckgHandle, (u32)curPckg, osWaitForever);
             delayPages = spiFlash64.headNumPg >= spiFlash64.tailNumPg ? spiFlash64.headNumPg - spiFlash64.tailNumPg : spiFlash64.headNumPg + (SPIFLASH_NUM_PG_GNSS - spiFlash64.tailNumPg);

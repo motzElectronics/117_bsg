@@ -2,11 +2,11 @@
 
 #include "../Utils/Inc/utils_bsg.h"
 
-WebPckg webPckgs[CNT_WEBPCKGS + 1];
-static u16 webPream = BSG_PREAMBLE;
-static u8 endBytes[] = {0x0D, 0x0A};  // reverse order
+WebPckg             webPckgs[CNT_WEBPCKGS + 1];
+static u16          webPream = BSG_PREAMBLE;
+static u8           endBytes[] = {0x0D, 0x0A};  // reverse order
 extern osMessageQId queueWebPckgHandle;
-extern osMutexId mutexWebHandle;
+extern osMutexId    mutexWebHandle;
 
 void addInfo(WebPckg* pPckg, u8* src, u16 sz) {
     memcpy(&pPckg->buf[pPckg->shift], src, sz);
@@ -25,7 +25,7 @@ void clearAllWebPckgs() {
     }
 }
 
-void initWebPckg(WebPckg* pPckg, u16 len, u8 isReq) {
+void initWebPckg(WebPckg* pPckg, u16 len, u8 isReq, u8* idMCU) {
     static u32 num = 0;
     num++;
     memset(pPckg->buf, '\0', SZ_WEB_PCKG);
@@ -33,7 +33,7 @@ void initWebPckg(WebPckg* pPckg, u16 len, u8 isReq) {
     pPckg->isRequest = isReq;
     addInfo(pPckg, (u8*)&webPream, 2);
     addInfo(pPckg, (u8*)&num, 4);
-    addInfo(pPckg, (u8*)&bsg.idMCU, 12);
+    addInfo(pPckg, (u8*)idMCU, 12);
     addInfo(pPckg, (u8*)&len, 2);
 }
 
@@ -58,7 +58,6 @@ void closeWebPckg(WebPckg* pPckg) {
 void freeWebPckg(WebPckg* pckg) {
     pckg->isFull = 0;
 }
-
 
 WebPckg* getFreePckg() {
     for (u8 i = 0; i < CNT_WEBPCKGS; i++) {
@@ -104,13 +103,13 @@ void waitAnswServer(u8 req) {
     }
 }
 
-WebPckg* createWebPckgReq(u8 CMD_REQ, u8* data, u8 sz, u8 szReq) {
-    u8 req[10];
+WebPckg* createWebPckgReq(u8 CMD_REQ, u8* data, u8 sz, u8 szReq, u8* idMCU) {
+    u8       req[10];
     WebPckg* curPckg;
     req[0] = CMD_REQ;
     req[1] = 1;
     curPckg = getFreePckg();
-    initWebPckg(curPckg, szReq, 1);
+    initWebPckg(curPckg, szReq, 1, idMCU);
     if (sz) {
         memcpy(req + 2, data, sz);
     }
@@ -120,15 +119,15 @@ WebPckg* createWebPckgReq(u8 CMD_REQ, u8* data, u8 sz, u8 szReq) {
     return curPckg;
 }
 
-ErrorStatus sendWebPckgData(u8 CMD_DATA, u8* data, u8 sz, u8 szReq) {
-    WebPckg* curPckg;
-    u8 req[32];
+ErrorStatus sendWebPckgData(u8 CMD_DATA, u8* data, u8 sz, u8 szReq, u8* idMCU) {
+    WebPckg*    curPckg;
+    u8          req[32];
     ErrorStatus ret = SUCCESS;
-    //curPckg = createWebPckgReq(CMD_DATA, data, sz, szReq);
+
     req[0] = CMD_DATA;
     req[1] = szReq;
     curPckg = getFreePckg();
-    initWebPckg(curPckg, sz + 2, 0);
+    initWebPckg(curPckg, sz + 2, 0, &bsg.idMCU);
     if (sz) {
         memcpy(req + 2, data, sz);
     }
@@ -146,15 +145,15 @@ ErrorStatus sendWebPckgData(u8 CMD_DATA, u8* data, u8 sz, u8 szReq) {
     return ret;
 }
 
-ErrorStatus generateWebPckgReq(u8 CMD_REQ, u8* data, u8 sz, u8 szReq, u8* answ, u16 szAnsw) {
+ErrorStatus generateWebPckgReq(u8 CMD_REQ, u8* data, u8 sz, u8 szReq, u8* answ, u16 szAnsw, u8* idMCU) {
     ErrorStatus ret = SUCCESS;
-    u8 statSend;
-    u8 req[10];
-    WebPckg* curPckg;
+    u8          statSend;
+    u8          req[10];
+    WebPckg*    curPckg;
     req[0] = CMD_REQ;
     req[1] = 1;
     if ((curPckg = getFreePckgReq()) != NULL) {
-        initWebPckg(curPckg, szReq, 1);
+        initWebPckg(curPckg, szReq, 1, idMCU);
         if (sz) {
             memcpy(req + 2, data, sz);
         }

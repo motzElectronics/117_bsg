@@ -23,9 +23,13 @@ void taskKeepAlive(void const* argument) {
     vTaskSuspend(keepAliveHandle);
 
     for (;;) {
-        if (!(timeout % 60) && !isRxNewFirmware) {
-            D(printf("\r\ngetNumFirmware\r\n\r\n"));
-            getNumFirmware();
+        if (!(timeout % 20) && !isRxNewFirmware) {
+            D(printf("\r\ngetBsgNumFw\r\n\r\n"));
+            getBsgNumFw();
+        }
+        if (!(timeout % 10) && !isRxNewFirmware) {
+            D(printf("\r\ngetTabloNumFw\r\n\r\n"));
+            getTabloNumFw();
         }
         // if (!(timeout % 30) && !isRxNewFirmware) {
         //     D(printf("sendMsgGpsInvalidCount\r\n"));
@@ -76,6 +80,12 @@ void generateMsgDevOff() {
 ErrorStatus sendMsgFWUpdated() {
     ErrorStatus   ret = SUCCESS;
     PckgTelemetry pckgTel;
+    u8*           idMCU;
+    if (bsg.updTarget == UPD_TARGET_TABLO) {
+        idMCU = (u8*)&bsg.tablo.idMCU;
+    } else {
+        idMCU = (u8*)&bsg.idMCU;
+    }
 
     D(printf("sendMsgFWUpdated\r\n"));
 
@@ -90,7 +100,35 @@ ErrorStatus sendMsgFWUpdated() {
     pckgTel.data = 0;
     copyTelemetry(&bufTxData[SZ_CMD_TELEMETRY], &pckgTel);
 
-    ret = sendWebPckgData(CMD_DATA_TELEMETRY, bufTxData, SZ_CMD_TELEMETRY * 2, 2);
+    ret = sendWebPckgData(CMD_DATA_TELEMETRY, bufTxData, SZ_CMD_TELEMETRY * 2, 2, idMCU);
+
+    return ret;
+}
+
+ErrorStatus sendMsgFWUpdateBegin() {
+    ErrorStatus   ret = SUCCESS;
+    PckgTelemetry pckgTel;
+    u8            ptr = 0;
+    u8*           idMCU;
+    if (bsg.updTarget == UPD_TARGET_TABLO) {
+        idMCU = (u8*)&bsg.tablo.idMCU;
+    } else {
+        idMCU = (u8*)&bsg.idMCU;
+    }
+
+    D(printf("sendMsgFWUpdated\r\n"));
+
+    memset(bufTxData, 0, 64);
+    pckgTel.group = TEL_GR_HARDWARE_STATUS;
+    pckgTel.code = TEL_CD_HW_UPDATED;
+    pckgTel.data = bsg.idNewFirmware;
+    pckgTel.unixTimeStamp = getUnixTimeStamp();
+    copyTelemetry(&bufTxData[SZ_CMD_TELEMETRY * ptr++], &pckgTel);
+    pckgTel.code = TEL_CD_HW_UPDATE_LEN;
+    pckgTel.data = bsg.szNewFirmware;
+    copyTelemetry(&bufTxData[SZ_CMD_TELEMETRY * ptr++], &pckgTel);
+
+    ret = sendWebPckgData(CMD_DATA_TELEMETRY, bufTxData, SZ_CMD_TELEMETRY * ptr, ptr, idMCU);
 
     return ret;
 }
@@ -106,7 +144,7 @@ ErrorStatus sendMsgDevOff() {
     pckgTel.unixTimeStamp = getUnixTimeStamp();
     copyTelemetry(bufTxData, &pckgTel);
 
-    ret = sendWebPckgData(CMD_DATA_TELEMETRY, bufTxData, SZ_CMD_TELEMETRY, 1);
+    ret = sendWebPckgData(CMD_DATA_TELEMETRY, bufTxData, SZ_CMD_TELEMETRY, 1, &bsg.idMCU);
 
     return ret;
 }
@@ -126,7 +164,7 @@ ErrorStatus sendMsgGpsInvalidCount() {
     pckgTel.data = bsg.gpsParseFailCount;
     copyTelemetry(&bufTxData[SZ_CMD_TELEMETRY], &pckgTel);
 
-    ret = sendWebPckgData(CMD_DATA_TELEMETRY, bufTxData, SZ_CMD_TELEMETRY * 2, 2);
+    ret = sendWebPckgData(CMD_DATA_TELEMETRY, bufTxData, SZ_CMD_TELEMETRY * 2, 2, &bsg.idMCU);
 
     return ret;
 }

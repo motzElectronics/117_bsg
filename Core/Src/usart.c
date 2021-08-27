@@ -394,7 +394,7 @@ void uart6Tx(char* data, u16 sz, UartInfo* pUInf) {
     USART_RE6_WRITE_EN();
     __HAL_UART_DISABLE_IT(pUInf->pHuart, UART_IT_IDLE);
 
-    HAL_UART_Transmit(pUInf->pHuart, (u8*)data, sz, 100);
+    HAL_UART_Transmit(pUInf->pHuart, (u8*)data, sz, 300);
 
     __HAL_UART_ENABLE_IT(pUInf->pHuart, UART_IT_IDLE);
     USART_RE6_READ_EN();

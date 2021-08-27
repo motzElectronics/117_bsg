@@ -1,5 +1,6 @@
 #include "../Tasks/Inc/task_get_new_bin.h"
 
+#include "../Tasks/Inc/task_get_train_data.h"
 #include "../Tasks/Inc/task_keep_alive.h"
 #include "../Utils/Inc/utils_pckgs_manager.h"
 
@@ -24,29 +25,62 @@ static u8              partFirmware[SZ_PART_FIRMW + 1];
 static u32             flashAddrFirmware = FLASH_ADDR_BUF_NEW_FIRMWARE;
 static u32             szSoft = 0;
 
-void taskGetNewBin(void const* argument) {
-    u32 curSzSoft = 0;
-    u32 szPartSoft;
-    u8  cntFailTCPReq = 0;
+void big_update_func();
 
+void taskGetNewBin(void const* argument) {
     FLASH_Erase_Sector(FLASH_SECTOR_1, VOLTAGE_RANGE_3);
 
     vTaskSuspend(getNewBinHandle);
-    D(printf("taskCreateWebPckg\r\n"));
+    D(printf("taskGetNewBin\r\n"));
 
     lockAllTasks();
     isRxNewFirmware = 1;
 
-    if (!bsg.isTCPOpen) {
-        while (openTcp() != TCP_OK)
-            ;
+    for (;;) {
+        big_update_func();
+        osDelay(3000);
     }
 
-    while (!(szSoft = getSzFirmware()))
-        ;
+    /* USER CODE END taskGetNewBin */
+}
+
+void big_update_func() {
+    u32 curSzSoft = 0;
+    u32 szPartSoft;
+    u8  cntFailTCPReq = 0;
+    u8  cntFailTablo = 0;
+    u8  res;
+
+    bsg.isTCPOpen = 0;
+    while (openTcp() != TCP_OK) {}
+
+    while (!(szSoft = getSzFirmware())) {}
+
     flashClearPage(FLASH_SECTOR_6);
     flashClearPage(FLASH_SECTOR_7);
     clearAllWebPckgs();
+
+    if (bsg.updTarget == UPD_TARGET_TABLO) {
+        res = 0;
+        cntFailTablo = 0;
+        while (!res) {
+            res = tablo_send_request(CMD_NEW_FW, NULL, 0);
+            cntFailTablo++;
+            if (cntFailTablo > 5) {
+                return;
+            }
+        }
+
+        res = 0;
+        cntFailTablo = 0;
+        while (!res || szSoft != bsg.tablo.fwSize) {
+            res = tablo_send_request(CMD_FW_LEN, (u8*)&szSoft, sizeof(u32));
+            cntFailTablo++;
+            if (cntFailTablo > 5) {
+                return;
+            }
+        }
+    }
 
     for (;;) {
         if (szSoft != curSzSoft) {
@@ -62,19 +96,32 @@ void taskGetNewBin(void const* argument) {
             memset(partFirmware, 0xFF, SZ_PART_FIRMW + 1);
 
             if (!bsg.isTCPOpen) {
-                while (openTcp() != TCP_OK)
-                    ;
+                while (openTcp() != TCP_OK) {}
                 cntFailTCPReq = 0;
             }
 
             osDelay(100);
             if (getPartFirmware(bufNumBytesFirmware, partFirmware, szPartSoft + 4, 8) == SUCCESS &&
                 isCrcOk(partFirmware, szPartSoft)) {
-                curSzSoft += szPartSoft;
-                D(printf("OK: DOWNLOAD %d BYTES\r\n", (int)curSzSoft));
                 // HAL_GPIO_TogglePin(LED4G_GPIO_Port, LED4G_Pin);
                 cntFailTCPReq = 0;
-                flashWrite(partFirmware, szPartSoft, &flashAddrFirmware);
+
+                if (bsg.updTarget == UPD_TARGET_TABLO) {
+                    res = 0;
+                    cntFailTablo = 0;
+                    while (!res || (curSzSoft + szPartSoft) != bsg.tablo.fwCurSize) {
+                        res = tablo_send_fw_part(curSzSoft, partFirmware, szPartSoft);
+                        cntFailTablo++;
+                        if (cntFailTablo > 5) {
+                            return;
+                        }
+                    }
+                } else if (bsg.updTarget == UPD_TARGET_BSG) {
+                    flashWrite(partFirmware, szPartSoft, &flashAddrFirmware);
+                }
+
+                curSzSoft += szPartSoft;
+                D(printf("OK: DOWNLOAD %d BYTES\r\n", (int)curSzSoft));
             } else {
                 D(printf("ERROR: httpPost() DOWNLOAD\r\n"));
                 cntFailTCPReq++;
@@ -85,19 +132,31 @@ void taskGetNewBin(void const* argument) {
             }
         } else {
             if (!bsg.isTCPOpen) {
-                while (openTcp() != TCP_OK)
-                    ;
+                while (openTcp() != TCP_OK) {}
             }
             if (sendMsgFWUpdated() != SUCCESS) {
                 D(printf("ERROR: Send FW UPDATED\r\n"));
             }
             D(printf("DOWNLOAD COMPLETE\r\n"));
-            updBootInfo();
-            osDelay(100);
+
+            if (bsg.updTarget == UPD_TARGET_TABLO) {
+                res = 0;
+                cntFailTablo = 0;
+                while (!res) {
+                    res = tablo_send_request(CMD_FW_END, NULL, 0);
+                    cntFailTablo++;
+                    if (cntFailTablo > 5) {
+                        return;
+                    }
+                }
+            } else if (bsg.updTarget == UPD_TARGET_BSG) {
+                updBootInfo();
+            }
+
+            osDelay(1000);
             NVIC_SystemReset();
         }
     }
-    /* USER CODE END taskGetNewBin */
 }
 
 void updBootInfo() {
@@ -135,8 +194,14 @@ void lockAllTasks() {
 }
 
 u32 getSzFirmware() {
-    u8 bufSzFirmware[4];
-    if (generateWebPckgReq(CMD_REQUEST_SZ_FIRMWARE, NULL, 0, SZ_REQUEST_GET_SZ_FIRMWARE, bufSzFirmware, 4) == ERROR) {
+    u8  bufSzFirmware[4];
+    u8* idMCU;
+    if (bsg.updTarget == UPD_TARGET_TABLO) {
+        idMCU = (u8*)&bsg.tablo.idMCU;
+    } else {
+        idMCU = (u8*)&bsg.idMCU;
+    }
+    if (generateWebPckgReq(CMD_REQUEST_SZ_FIRMWARE, NULL, 0, SZ_REQUEST_GET_SZ_FIRMWARE, bufSzFirmware, 4, idMCU) == ERROR) {
         D(printf("ERROR: sz firmware\r\n"));
         return 0;
     } else {
@@ -149,7 +214,15 @@ u32 getSzFirmware() {
 ErrorStatus getPartFirmware(u8* reqData, u8* answBuf, u16 szAnsw, u8 szReq) {
     WebPckg*    curPckg;
     ErrorStatus ret = SUCCESS;
-    curPckg = createWebPckgReq(CMD_REQUEST_PART_FIRMWARE, reqData, szReq, SZ_REQUEST_GET_PART_FIRMWARE);
+
+    u8* idMCU;
+    if (bsg.updTarget == UPD_TARGET_TABLO) {
+        idMCU = (u8*)&bsg.tablo.idMCU;
+    } else {
+        idMCU = (u8*)&bsg.idMCU;
+    }
+
+    curPckg = createWebPckgReq(CMD_REQUEST_PART_FIRMWARE, reqData, szReq, SZ_REQUEST_GET_PART_FIRMWARE, idMCU);
     osMutexWait(mutexWebHandle, osWaitForever);
     if (sendTcp(curPckg->buf, curPckg->shift) != TCP_OK) {
         D(printf("ERROR: part Firmware\r\n"));
