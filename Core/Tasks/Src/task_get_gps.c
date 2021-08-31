@@ -29,8 +29,7 @@ void taskGetGPS(void const *argument) {
     cBufReset(&circBufAllPckgs);
 
     simInit();
-    while (openTcp() != TCP_OK)
-        ;
+    while (openTcp() != TCP_OK) {}
     getServerTime();
 
     generateInitTelemetry();
@@ -48,12 +47,14 @@ void taskGetGPS(void const *argument) {
                 }
                 ret = fillGprmc(bufGnss, &pckgGnss);
                 if (ret == GPS_OK) {
-                    if (pckgGnss.speed > (3 * 10) || !numIteration) {
+                    updateCurCoords(&pckgGnss);
+                    if (pckgGnss.coords.speed > (3 * 10) || !numIteration) {
                         serializePckgGnss(bufPckgGnss, &pckgGnss);
                         saveData((u8 *)&bufPckgGnss, SZ_CMD_GRMC, CMD_DATA_GRMC, &circBufAllPckgs);
                     }
                     numIteration = (numIteration + 1) % 60;
                 } else if (ret == GPS_GPRMC_ERR_INVALID_DATA_STATUS) {
+                    bsg.cur_gps.valid = 0;
                     bsg.gpsInvaligCount++;
                 } else {
                     bsg.gpsParseFailCount++;
@@ -78,7 +79,7 @@ void unLockTasks() {
 
 void checkStopTrain(PckgGnss *pckg) {
     static u8 cntr = 0;
-    if (pckg->speed < (5 * 10)) {
+    if (pckg->coords.speed < (5 * 10)) {
         cntr++;
         if (cntr == 5) {
             cntr = 0;

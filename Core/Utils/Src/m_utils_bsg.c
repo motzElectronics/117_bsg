@@ -33,6 +33,11 @@ void bsgInit() {
     bsg.gpsParseFailCount = 0;
 }
 
+void updateCurCoords(PckgGnss* pckgGnss) {
+    bsg.cur_gps.valid = 1;
+    memcpy(&bsg.cur_gps.coords, &pckgGnss->coords, sizeof(gps_coords_t));
+}
+
 u32 getUnixTimeStamp() {
     time_t           t;
     static struct tm curTime;
@@ -99,16 +104,16 @@ void getBsgNumFw() {
 
 void getTabloNumFw() {
     u8 bufFirmware[4];
-    if ((bsg.tablo.idMCU[0] == 0 && bsg.tablo.idMCU[1] == 0 && bsg.tablo.idMCU[2] == 0) || bsg.tablo.idFirmware == 0) {
+    if ((bsg.tablo.info.idMCU[0] == 0 && bsg.tablo.info.idMCU[1] == 0 && bsg.tablo.info.idMCU[2] == 0) || bsg.tablo.info.idFirmware == 0) {
         D(printf("ERROR: null tablo id mcu or firmware\r\n"));
         return;
     }
-    if (generateWebPckgReq(CMD_REQUEST_NUM_FIRMWARE, NULL, 0, SZ_REQUEST_GET_NUM_FIRMWARE, bufFirmware, 4, &bsg.tablo.idMCU) == ERROR) {
+    if (generateWebPckgReq(CMD_REQUEST_NUM_FIRMWARE, NULL, 0, SZ_REQUEST_GET_NUM_FIRMWARE, bufFirmware, 4, &bsg.tablo.info.idMCU) == ERROR) {
         D(printf("ERROR: getBsgNumFw()\r\n"));
     } else {
         u32 numFirmware = bufFirmware[0] << 24 | bufFirmware[1] << 16 | bufFirmware[2] << 8 | bufFirmware[3];
         D(printf("Tablo FIRMWARE v.:%d\r\n", (int)numFirmware));
-        if (numFirmware != bsg.tablo.idFirmware && numFirmware > 0) {
+        if (numFirmware != bsg.tablo.info.idFirmware && numFirmware > 0 && bsg.tablo.info.idFirmware > 0) {
             D(printf("New FIRMWARE v.:%d\r\n", (int)numFirmware));
             bsg.updTarget = UPD_TARGET_TABLO;
             vTaskResume(getNewBinHandle);

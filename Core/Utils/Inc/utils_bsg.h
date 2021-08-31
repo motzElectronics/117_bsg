@@ -54,25 +54,49 @@ typedef union {
     u8 regSleepTimer;
 } SleepTimer;
 
+typedef __packed struct {
+    u32 sec;
+    u16 fst;
+} Coord;
+
+typedef __packed struct {
+    Coord latitude;
+    Coord longitude;
+    u16   course;
+    u16   speed;
+} gps_coords_t;
+
+typedef __packed struct {
+    u8           valid;
+    gps_coords_t coords;
+} gps_state_t;
+
+typedef __packed struct {
+    u32          unixTimeStamp;
+    gps_coords_t coords;
+    DateTime     dateTime;
+} PckgGnss;
+
 typedef struct {
-    u32        idMCU[3];
-    u16        idTrain;
-    u8         idTrainCar;
-    u16        idReceiver;
-    u8         idDev;
-    u8         idFirmware;
-    u8         idNewFirmware;
-    u8         szNewFirmware;
-    u8         idBoot;
-    u8         isSentData;
-    u8         isTCPOpen;
-    u8         updTarget;
-    u8         tcpErrCnt;
-    u8         csq;
-    u32        gpsInvaligCount;
-    u32        gpsParseFailCount;
-    TabloInfo  tablo;
-    SleepTimer sleepTimer;
+    u32         idMCU[3];
+    u16         idTrain;
+    u8          idTrainCar;
+    u16         idReceiver;
+    u8          idDev;
+    u8          idFirmware;
+    u8          idNewFirmware;
+    u8          szNewFirmware;
+    u8          idBoot;
+    u8          isSentData;
+    u8          isTCPOpen;
+    u8          updTarget;
+    u8          tcpErrCnt;
+    u8          csq;
+    u32         gpsInvaligCount;
+    u32         gpsParseFailCount;
+    TabloInfo   tablo;
+    SleepTimer  sleepTimer;
+    gps_state_t cur_gps;
 } BSG;
 
 typedef struct {
@@ -162,22 +186,22 @@ extern BSG      bsg;
 extern DateTime dateTimeGprmc;
 
 void bsgInit();
+void updateCurCoords(PckgGnss* pckgGnss);
 
-u32 getFlashData(u32 ADDR);
-
-u8   isCrcOk(char* pData, int len);
-void getServerTime();
-
-void updSpiFlash(CircularBuffer* cbuf);
-u8   waitGoodCsq(u32 timeout);
-
-void saveData(u8* data, u8 sz, u8 cmdData, CircularBuffer* cbuf);
 u32  getUnixTimeStamp();
-u8   isDataFromFlashOk(char* pData, u8 len);
-void copyTelemetry(u8* buf, PckgTelemetry* pckgTel);
-void saveTelemetry(PckgTelemetry* pckg, CircularBuffer* cbuf);
-
+void getServerTime();
 void getBsgNumFw();
 void getTabloNumFw();
+
+u32 getFlashData(u32 ADDR);
+u8  waitGoodCsq(u32 timeout);
+
+u8 isCrcOk(char* pData, int len);
+u8 isDataFromFlashOk(char* pData, u8 len);
+
+void updSpiFlash(CircularBuffer* cbuf);
+void saveData(u8* data, u8 sz, u8 cmdData, CircularBuffer* cbuf);
+void copyTelemetry(u8* buf, PckgTelemetry* pckgTel);
+void saveTelemetry(PckgTelemetry* pckg, CircularBuffer* cbuf);
 
 #endif /* INC_UTILS_BSG_H_ */

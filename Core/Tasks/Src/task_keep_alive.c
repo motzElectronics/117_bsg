@@ -82,7 +82,7 @@ ErrorStatus sendMsgFWUpdated() {
     PckgTelemetry pckgTel;
     u8*           idMCU;
     if (bsg.updTarget == UPD_TARGET_TABLO) {
-        idMCU = (u8*)&bsg.tablo.idMCU;
+        idMCU = (u8*)&bsg.tablo.info.idMCU;
     } else {
         idMCU = (u8*)&bsg.idMCU;
     }
@@ -111,7 +111,7 @@ ErrorStatus sendMsgFWUpdateBegin() {
     u8            ptr = 0;
     u8*           idMCU;
     if (bsg.updTarget == UPD_TARGET_TABLO) {
-        idMCU = (u8*)&bsg.tablo.idMCU;
+        idMCU = (u8*)&bsg.tablo.info.idMCU;
     } else {
         idMCU = (u8*)&bsg.idMCU;
     }

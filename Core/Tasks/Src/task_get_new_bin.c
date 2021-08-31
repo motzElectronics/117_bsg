@@ -197,7 +197,7 @@ u32 getSzFirmware() {
     u8  bufSzFirmware[4];
     u8* idMCU;
     if (bsg.updTarget == UPD_TARGET_TABLO) {
-        idMCU = (u8*)&bsg.tablo.idMCU;
+        idMCU = (u8*)&bsg.tablo.info.idMCU;
     } else {
         idMCU = (u8*)&bsg.idMCU;
     }
@@ -217,7 +217,7 @@ ErrorStatus getPartFirmware(u8* reqData, u8* answBuf, u16 szAnsw, u8 szReq) {
 
     u8* idMCU;
     if (bsg.updTarget == UPD_TARGET_TABLO) {
-        idMCU = (u8*)&bsg.tablo.idMCU;
+        idMCU = (u8*)&bsg.tablo.info.idMCU;
     } else {
         idMCU = (u8*)&bsg.idMCU;
     }

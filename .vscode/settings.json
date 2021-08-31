@@ -4,6 +4,7 @@
         "spiflash.h": "c",
         "utils_bsg.h": "c",
         "utils_pckgs_manager.h": "c",
-        "utils_crc.h": "c"
+        "utils_crc.h": "c",
+        "circularbuffer.h": "c"
     }
 }

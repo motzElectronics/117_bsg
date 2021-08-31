@@ -17,7 +17,7 @@ void setDate(DateTime* dt, char* gpsUbloxDate) {
 }
 
 u8 fillGprmc(char* pData, PckgGnss* pckg) {
-    u8 ret = GPS_OK;
+    u8    ret = GPS_OK;
     char* token;
 
     token = strsep(&pData, ",");
@@ -28,19 +28,19 @@ u8 fillGprmc(char* pData, PckgGnss* pckg) {
         return GPS_GPRMC_ERR_PARS_TIME;
     token = strsep(&pData, ",");  // validity - A-ok, V-invalid
     if (*token == 'A') {
-        if ((ret = setCoords(&pData, &pckg->latitude)) != GPS_OK) return ret;
-        if ((ret = setCoords(&pData, &pckg->longitude)) != GPS_OK) return ret;
+        if ((ret = setCoords(&pData, &pckg->coords.latitude)) != GPS_OK) return ret;
+        if ((ret = setCoords(&pData, &pckg->coords.longitude)) != GPS_OK) return ret;
 
         token = strsep(&pData, ",");  // speed
         if (*token != '\0') {
-            pckg->speed = (int)(atof(token) * 1.8 * 10);
+            pckg->coords.speed = (int)(atof(token) * 1.8 * 10);
         } else {
             return GPS_GPRMC_ERR_PARS_SPEED;
         }
 
         token = strsep(&pData, ",");  // course
         if (*token != '\0') {
-            pckg->course = (int)(atof(token) * 10);
+            pckg->coords.course = (int)(atof(token) * 10);
         } else {
             return GPS_GPRMC_ERR_PARS_COURSE;
         }
@@ -73,7 +73,7 @@ char* strsep(char** stringp, const char* delim) {
 }
 
 u8 setCoords(char** pData, Coord* coord) {
-    u8 ret = GPS_OK;
+    u8    ret = GPS_OK;
     char* token;
     char* token1;
     char* savePtr;

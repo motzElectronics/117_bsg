@@ -15,10 +15,14 @@ typedef enum {
     UPD_FINISH
 } UpdateStep;
 
+typedef __packed struct {
+    u32 idMCU[3];
+    u8  idFirmware;
+    u8  idBoot;
+} iu_info_t;
+
 typedef struct {
-    u32        idMCU[3];
-    u8         idFirmware;
-    u8         idBoot;
+    iu_info_t  info;
     UpdateStep updStep;
     u32        fwCurSize;
     u32        fwSize;
@@ -29,10 +33,10 @@ typedef enum {
     CMD_TELEMETRY,
     CMD_CFG,
     CMD_SYNC,
+    CMD_GNSS,
     CMD_ERROR,
     CMD_NEW_FW = 16,
-    CMD_GET_UID,
-    CMD_GET_FW_NUM,
+    CMD_GET_INFO,
     CMD_FW_LEN,
     CMD_FW_PART,
     CMD_FW_END

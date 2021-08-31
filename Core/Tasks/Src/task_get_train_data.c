@@ -24,8 +24,9 @@ void taskGetTrainData(void const* argument) {
 
     vTaskSuspend(getTrainDataHandle);
 
-    while (!tablo_send_request(CMD_GET_UID, NULL, 0)) {}
-    while (!tablo_send_request(CMD_GET_FW_NUM, NULL, 0) || bsg.tablo.idFirmware == 0) {}
+    while (!tablo_send_request(CMD_GET_INFO, NULL, 0) || bsg.tablo.info.idFirmware == 0 || bsg.tablo.info.idMCU[0] == 0) {
+        osDelay(500);
+    }
 
     for (;;) {
         if (iter % 20 == 0) {
@@ -33,8 +34,10 @@ void taskGetTrainData(void const* argument) {
             tablo_send_request(CMD_SYNC, (u8*)&timeStamp, sizeof(timeStamp));
         } else if (iter % 20 == 10) {
             tablo_send_request(CMD_DATA, (u8*)&uInfoTablo.szRxBuf, sizeof(uInfoTablo.szRxBuf));
-        } else if (iter % 200 == 5) {
-            tablo_send_request(CMD_GET_FW_NUM, NULL, 0);
+        } else if (iter % 50 == 7) {
+            tablo_send_request(CMD_GNSS, (u8*)&bsg.cur_gps, sizeof(gps_state_t));
+        } else if (iter % 400 == 5) {
+            tablo_send_request(CMD_GET_INFO, NULL, 0);
         }
 
         osDelay(1000);
@@ -139,6 +142,10 @@ void parse_tablo_sync(u8* data_all, u16 len_all) {
     LOG(LEVEL_INFO, "Time syncronized\r\n");
 }
 
+void parse_tablo_gnss(u8* data_all, u16 len_all) {
+    LOG(LEVEL_INFO, "Coordinates sended\r\n");
+}
+
 void parse_tablo_error(u8* data_all, u16 len_all) {
     u8 error_type = data_all[0];
 
@@ -149,15 +156,16 @@ void parse_tablo_new_fw(u8* data_all, u16 len_all) {
     LOG(LEVEL_INFO, "FW download sterted\r\n");
 }
 
-void parse_tablo_uid(u8* data_all, u16 len_all) {
-    memcpy(&bsg.tablo.idMCU, data_all, 12);
-    LOG(LEVEL_INFO, "Returned Tablo UID ");
-    printf("%08x%08x%08x\r\n", (uint)bsg.tablo.idMCU[0], (uint)bsg.tablo.idMCU[1], (uint)bsg.tablo.idMCU[2]);
+void parse_tablo_iu_info(u8* data_all, u16 len_all) {
+    iu_info_t* info = (iu_info_t*)data_all;
+
+    memcpy(&bsg.tablo.info, data_all, sizeof(iu_info_t));
+    LOG(LEVEL_INFO, "Returned Tablo UID: ");
+    printf("%08x%08x%08x\r\n", (uint)info->idMCU[0], (uint)info->idMCU[1], (uint)info->idMCU[2]);
+    LOG(LEVEL_INFO, "Returned Tablo FW Num: %d\r\n", info->idFirmware);
 }
 
 void parse_tablo_fw_num(u8* data_all, u16 len_all) {
-    bsg.tablo.idFirmware = data_all[0];
-    LOG(LEVEL_INFO, "Returned Tablo FW Num %d\r\n", bsg.tablo.idFirmware);
 }
 
 void parse_tablo_fw_len(u8* data_all, u16 len_all) {
@@ -175,7 +183,7 @@ void parse_tablo_fw_part(u8* data_all, u16 len_all) {
     bsg.tablo.fwCurSize = *(u32*)(data_all + 8);
     bsg.tablo.updStep = UPD_DOWNLOAD;
 
-    LOG(LEVEL_INFO, "Returned Tablo FW Part %d %d\r\n", write_from, write_to, bsg.tablo.fwCurSize);
+    LOG(LEVEL_INFO, "Returned Tablo FW Part %d %d %d\r\n", write_from, write_to, bsg.tablo.fwCurSize);
 }
 
 void parse_tablo_fw_end(u8* data_all, u16 len_all) {
@@ -208,6 +216,9 @@ u8 tablo_parse_responce(UartInfo* pUInf) {
         case CMD_SYNC:
             parse_tablo_sync(data, hdr->length);
             break;
+        case CMD_GNSS:
+            parse_tablo_gnss(data, hdr->length);
+            break;
         case CMD_ERROR:
             parse_tablo_error(data, hdr->length);
             return 0;
@@ -215,11 +226,8 @@ u8 tablo_parse_responce(UartInfo* pUInf) {
         case CMD_NEW_FW:
             parse_tablo_new_fw(data, hdr->length);
             break;
-        case CMD_GET_UID:
-            parse_tablo_uid(data, hdr->length);
-            break;
-        case CMD_GET_FW_NUM:
-            parse_tablo_fw_num(data, hdr->length);
+        case CMD_GET_INFO:
+            parse_tablo_iu_info(data, hdr->length);
             break;
         case CMD_FW_LEN:
             parse_tablo_fw_len(data, hdr->length);
