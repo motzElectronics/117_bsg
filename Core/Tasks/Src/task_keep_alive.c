@@ -23,12 +23,12 @@ void taskKeepAlive(void const* argument) {
     vTaskSuspend(keepAliveHandle);
 
     for (;;) {
-        if (!(timeout % 20) && !isRxNewFirmware) {
-            D(printf("\r\ngetBsgNumFw\r\n\r\n"));
+        if ((timeout % 120 == 10) && !isRxNewFirmware) {
+            D(printf("getBsgNumFw\r\n\r\n"));
             getBsgNumFw();
         }
-        if (!(timeout % 10) && !isRxNewFirmware) {
-            D(printf("\r\ngetTabloNumFw\r\n\r\n"));
+        if ((timeout % 120 == 20) && !isRxNewFirmware) {
+            D(printf("getTabloNumFw\r\n\r\n"));
             getTabloNumFw();
         }
         // if (!(timeout % 30) && !isRxNewFirmware) {
@@ -81,10 +81,13 @@ ErrorStatus sendMsgFWUpdated() {
     ErrorStatus   ret = SUCCESS;
     PckgTelemetry pckgTel;
     u8*           idMCU;
+
     if (bsg.updTarget == UPD_TARGET_TABLO) {
         idMCU = (u8*)&bsg.tablo.info.idMCU;
-    } else {
+    } else if (bsg.updTarget == UPD_TARGET_BSG) {
         idMCU = (u8*)&bsg.idMCU;
+    } else {
+        return ERROR;
     }
 
     D(printf("sendMsgFWUpdated\r\n"));
@@ -110,10 +113,13 @@ ErrorStatus sendMsgFWUpdateBegin() {
     PckgTelemetry pckgTel;
     u8            ptr = 0;
     u8*           idMCU;
+
     if (bsg.updTarget == UPD_TARGET_TABLO) {
         idMCU = (u8*)&bsg.tablo.info.idMCU;
-    } else {
+    } else if (bsg.updTarget == UPD_TARGET_BSG) {
         idMCU = (u8*)&bsg.idMCU;
+    } else {
+        return ERROR;
     }
 
     D(printf("sendMsgFWUpdated\r\n"));

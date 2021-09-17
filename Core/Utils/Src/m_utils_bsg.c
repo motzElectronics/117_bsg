@@ -109,7 +109,7 @@ void getTabloNumFw() {
         return;
     }
     if (generateWebPckgReq(CMD_REQUEST_NUM_FIRMWARE, NULL, 0, SZ_REQUEST_GET_NUM_FIRMWARE, bufFirmware, 4, &bsg.tablo.info.idMCU) == ERROR) {
-        D(printf("ERROR: getBsgNumFw()\r\n"));
+        D(printf("ERROR: getTabloNumFw()\r\n"));
     } else {
         u32 numFirmware = bufFirmware[0] << 24 | bufFirmware[1] << 16 | bufFirmware[2] << 8 | bufFirmware[3];
         D(printf("Tablo FIRMWARE v.:%d\r\n", (int)numFirmware));

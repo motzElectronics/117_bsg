@@ -198,9 +198,12 @@ u32 getSzFirmware() {
     u8* idMCU;
     if (bsg.updTarget == UPD_TARGET_TABLO) {
         idMCU = (u8*)&bsg.tablo.info.idMCU;
-    } else {
+    } else if (bsg.updTarget == UPD_TARGET_BSG) {
         idMCU = (u8*)&bsg.idMCU;
+    } else {
+        return ERROR;
     }
+
     if (generateWebPckgReq(CMD_REQUEST_SZ_FIRMWARE, NULL, 0, SZ_REQUEST_GET_SZ_FIRMWARE, bufSzFirmware, 4, idMCU) == ERROR) {
         D(printf("ERROR: sz firmware\r\n"));
         return 0;
@@ -218,8 +221,10 @@ ErrorStatus getPartFirmware(u8* reqData, u8* answBuf, u16 szAnsw, u8 szReq) {
     u8* idMCU;
     if (bsg.updTarget == UPD_TARGET_TABLO) {
         idMCU = (u8*)&bsg.tablo.info.idMCU;
-    } else {
+    } else if (bsg.updTarget == UPD_TARGET_BSG) {
         idMCU = (u8*)&bsg.idMCU;
+    } else {
+        return ERROR;
     }
 
     curPckg = createWebPckgReq(CMD_REQUEST_PART_FIRMWARE, reqData, szReq, SZ_REQUEST_GET_PART_FIRMWARE, idMCU);

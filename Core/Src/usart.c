@@ -411,13 +411,6 @@ void uartIdleHandler(UART_HandleTypeDef* huart) {
         uInfoTablo.pRxBuf[pkt_len] = 0;
 
         osSemaphoreRelease(uart6RXSemHandle);
-
-        // ppru_parse_request(uInfoTablo.pRxBuf, pkt_len);
-
-        // uartClearInfo(&uInfoTablo);
-        // __HAL_DMA_DISABLE(huart->hdmarx);
-        // __HAL_DMA_SET_COUNTER(huart->hdmarx, uInfoTablo.szRxBuf);
-        // __HAL_DMA_ENABLE(huart->hdmarx);
     }
 }
 
@@ -459,7 +452,7 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef* huart) {
         D(printf("ErrorCallback() gnss ERROR_CODE: %d\r\n", (int)error));
         uartRxDma(&uInfoGnss);
     } else if (huart->Instance == USART6) {
-        uartClearInfo(&uInfoTablo);
+        // uartClearInfo(&uInfoTablo);
         __HAL_DMA_DISABLE(uInfoTablo.pHuart->hdmarx);
         __HAL_DMA_SET_COUNTER(uInfoTablo.pHuart->hdmarx, uInfoTablo.szRxBuf);
         __HAL_DMA_ENABLE(uInfoTablo.pHuart->hdmarx);

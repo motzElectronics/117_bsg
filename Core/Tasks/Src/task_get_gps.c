@@ -48,11 +48,11 @@ void taskGetGPS(void const *argument) {
                 ret = fillGprmc(bufGnss, &pckgGnss);
                 if (ret == GPS_OK) {
                     updateCurCoords(&pckgGnss);
-                    if (pckgGnss.coords.speed > (3 * 10) || !numIteration) {
+                    if (!numIteration) {
                         serializePckgGnss(bufPckgGnss, &pckgGnss);
                         saveData((u8 *)&bufPckgGnss, SZ_CMD_GRMC, CMD_DATA_GRMC, &circBufAllPckgs);
                     }
-                    numIteration = (numIteration + 1) % 60;
+                    numIteration = (numIteration + 1) % 120;
                 } else if (ret == GPS_GPRMC_ERR_INVALID_DATA_STATUS) {
                     bsg.cur_gps.valid = 0;
                     bsg.gpsInvaligCount++;

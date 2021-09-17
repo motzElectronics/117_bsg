@@ -121,7 +121,7 @@ WebPckg* createWebPckgReq(u8 CMD_REQ, u8* data, u8 sz, u8 szReq, u8* idMCU) {
 
 ErrorStatus sendWebPckgData(u8 CMD_DATA, u8* data, u8 sz, u8 szReq, u8* idMCU) {
     WebPckg*    curPckg;
-    u8          req[32];
+    u8          req[64];
     ErrorStatus ret = SUCCESS;
 
     req[0] = CMD_DATA;
@@ -150,6 +150,7 @@ ErrorStatus generateWebPckgReq(u8 CMD_REQ, u8* data, u8 sz, u8 szReq, u8* answ, 
     u8          statSend;
     u8          req[10];
     WebPckg*    curPckg;
+
     req[0] = CMD_REQ;
     req[1] = 1;
     if ((curPckg = getFreePckgReq()) != NULL) {
@@ -162,19 +163,22 @@ ErrorStatus generateWebPckgReq(u8 CMD_REQ, u8* data, u8 sz, u8 szReq, u8* answ, 
         showWebPckg(curPckg);
 
         osMutexWait(mutexWebHandle, osWaitForever);
+        bsg.isTCPOpen = 0;
         statSend = sendTcp(curPckg->buf, curPckg->shift);
         if (statSend != TCP_OK)
             ret = ERROR;
         else if (uInfoSim.pRxBuf[11] == '\0' && uInfoSim.pRxBuf[12] == '\0' &&
                  uInfoSim.pRxBuf[13] == '\0' && uInfoSim.pRxBuf[14] == '\0') {
             uInfoSim.irqFlags.isIrqIdle = 0;
-            if (waitIdle("wait req answ", &(uInfoSim.irqFlags), 200, 10000)) {
+            if (waitIdle("wait req answ", &(uInfoSim.irqFlags), 100, 10000)) {
                 memcpy(answ, &uInfoSim.pRxBuf[11], szAnsw);
             } else {
                 D(printf("ERROR: NO ANSW REQ\r\n"));
                 ret = ERROR;
+                bsg.isTCPOpen = 0;
             }
         } else {
+            osDelay(10);
             memcpy(answ, &uInfoSim.pRxBuf[11], szAnsw);
         }
         clearWebPckg(curPckg);

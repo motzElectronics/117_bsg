@@ -351,17 +351,6 @@ u8 sendTcp(u8* data, u16 sz) {
     return procReturnStatus(ret);
 }
 
-// void gnssInit() {
-//     char *str = "$PMTK314,0,1,0,0,0,0,0,0,0,0,0,0,0,0*35\r\n";
-//     D(printf("gnssInit()\r\n"));
-
-//     HAL_GPIO_WritePin(GNSS_EN_GPIO_Port, GNSS_EN_Pin, GPIO_PIN_SET);
-//     osDelay(3000);
-//     HAL_UART_Transmit(uInfoGnss.pHuart, (u8*)str, sizeof(str), 1000);
-
-//     uartRxDma(&uInfoGnss);
-// }
-
 void gnssInit() {
     D(printf("gnssInit()\r\n"));
     HAL_GPIO_WritePin(GNSS_EN_GPIO_Port, GNSS_EN_Pin, GPIO_PIN_SET);

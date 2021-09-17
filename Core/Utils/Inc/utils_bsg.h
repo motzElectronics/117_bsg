@@ -78,22 +78,28 @@ typedef __packed struct {
 } PckgGnss;
 
 typedef struct {
-    u32         idMCU[3];
-    u16         idTrain;
-    u8          idTrainCar;
-    u16         idReceiver;
-    u8          idDev;
-    u8          idFirmware;
-    u8          idNewFirmware;
-    u8          szNewFirmware;
-    u8          idBoot;
-    u8          isSentData;
-    u8          isTCPOpen;
-    u8          updTarget;
-    u8          tcpErrCnt;
-    u8          csq;
-    u32         gpsInvaligCount;
-    u32         gpsParseFailCount;
+    u32 idMCU[3];
+    u16 idTrain;
+    u8  idTrainCar;
+    u16 idReceiver;
+    u8  idDev;
+    u8  idFirmware;
+    u8  idNewFirmware;
+    u8  szNewFirmware;
+    u8  idBoot;
+    u8  isSentData;
+    u8  isTCPOpen;
+    u8  updTarget;
+    u8  tcpErrCnt;
+    u8  csq;
+
+    //  Statistics
+    u32 gpsInvaligCount;
+    u32 gpsParseFailCount;
+    u32 pageWrCount;
+    u32 pageRdCount;
+    u32 pageBadCount;
+
     TabloInfo   tablo;
     SleepTimer  sleepTimer;
     gps_state_t cur_gps;
@@ -120,32 +126,12 @@ typedef enum {
 } CMD_DATA_TYPE;
 
 typedef enum {
-    TEL_OFF_DEV = 0x0010,
-    TEL_ON_DEV = 0x0001,
-    TEL_KEEP_ALIVE = 0x0013,
-    TEL_ID_FIRMWARE = 0x1001,
-    TEL_CHANGE_TIME = 0x1011,
-    TEL_BIG_DIFFER_RTC_SERVERTIME = 0x1030,
-    TEL_SERV_FLASH_CIRC_BUF_FULL = 0x2001,
-    TEL_SERV_FLASH_CIRC_BUF_END_HEAD = 0x2002,
-    TEL_SERV_FLASH_CIRC_BUF_END_TAIL = 0x2003,
-    TEL_SERV_FLASH_CIRC_BUF_HALF_HEAD = 0x2004,
-    TEL_SERV_FLASH_CIRC_BUF_HALF_TAIL = 0x2005,
-    TEL_BAD_RESPONSE_SERVER = 0x2006,
-    TEL_BAD_RTC_TIME = 0x2007,
-    TEL_BAD_ALL_CRC = 0x2008,
-    TEL_LORA_LINK_EDGE = 0x2020,
-    TEL_LORA_LINK_MASTER = 0x2021,
-    TEL_LORA_FLAGS = 0x2022,
-    TEL_LORA_BAD_CRC = 0x2023,
-    TEL_NO_FATFS = 2030,
-    TEL_NO_DS2482 = 2031,
-    TEL_PERIPH_STAT = 2032,
-    TEL_LVL_CSQ = 0x7010
-} TYPE_TELEMETRY;
-
-typedef enum { TEL_GR_GENINF = 1,
-               TEL_GR_HARDWARE_STATUS } TELEMETRY_GROUP;
+    TEL_GR_GENINF = 1,
+    TEL_GR_HARDWARE_STATUS,
+    TEL_GR_PROJECT_127,
+    TEL_GR_PROJECT_127_STAT,
+    TEL_GR_PROJECT_127_MEM
+} TELEMETRY_GROUP;
 
 typedef enum {
     TEL_CD_GENINF_NUM_FIRMWARE = 1,
@@ -171,6 +157,35 @@ typedef enum {
     TEL_CD_HW_UPDATE_LEN,
     TEL_CD_HW_UPDATE_ERR
 } TELEMETRY_CODE_STATES;
+
+typedef enum {
+    TEL_CD_127_BKT_FW = 1,
+    TEL_CD_127_PPRU_FW,
+    TEL_CD_127_DOORS,
+    TEL_CD_HW_PPRU_RSSI
+} TELEMETRY_CODE_127;
+
+typedef enum {
+    TEL_CD_127_BSG_ERR = 1,
+    TEL_CD_127_MU_ERR,
+    TEL_CD_127_MU_STRANGE,
+    TEL_CD_127_MU_SEND = 4,
+    TEL_CD_127_MU_ERR_ANSW,
+    TEL_CD_127_MU_ERR_REQ,
+    TEL_CD_127_MU_MISS_DOOR,
+    TEL_CD_127_MU_EMPTY = 8,
+    TEL_CD_127_MU_PARSE_ERR,
+    TEL_CD_127_MU_RSSI_STAT
+} TELEMETRY_CODE_127_STAT;
+
+typedef enum {
+    TEL_CD_127_IU_PAGE_WR = 1,
+    TEL_CD_127_IU_PAGE_RD,
+    TEL_CD_127_IU_PAGE_BAD,
+    TEL_CD_127_BSG_PAGE_WR = 3,
+    TEL_CD_127_BSG_PAGE_RD,
+    TEL_CD_127_BSG_PAGE_BAD,
+} TELEMETRY_CODE_127_MEM;
 
 typedef enum {
     CMD_REQUEST_SERVER_TIME = 0x11,

@@ -29,10 +29,10 @@ void taskGetTrainData(void const* argument) {
     }
 
     for (;;) {
-        if (iter % 20 == 0) {
+        if (iter % 50 == 6) {
             u32 timeStamp = getUnixTimeStamp();
             tablo_send_request(CMD_SYNC, (u8*)&timeStamp, sizeof(timeStamp));
-        } else if (iter % 20 == 10) {
+        } else if (iter % 3 == 1) {
             tablo_send_request(CMD_DATA, (u8*)&uInfoTablo.szRxBuf, sizeof(uInfoTablo.szRxBuf));
         } else if (iter % 50 == 7) {
             tablo_send_request(CMD_GNSS, (u8*)&bsg.cur_gps, sizeof(gps_state_t));
@@ -47,20 +47,24 @@ void taskGetTrainData(void const* argument) {
 
 u8 tablo_send_request(u8 cmd, u8* data, u8 len) {
     u16 req_len;
+    u8  res = 0;
     req_len = tablo_create_request(uInfoTablo.pTxBuf, cmd, data, len);
 
     tablo_send_pack(&uInfoTablo, req_len);
     if (osSemaphoreWait(uart6RXSemHandle, 5000) == osOK) {
-        return tablo_parse_responce(&uInfoTablo);
+        __HAL_DMA_DISABLE(uInfoTablo.pHuart->hdmarx);
+        res = tablo_parse_responce(&uInfoTablo);
+        __HAL_DMA_SET_COUNTER(uInfoTablo.pHuart->hdmarx, uInfoTablo.szRxBuf);
+        __HAL_DMA_DISABLE(uInfoTablo.pHuart->hdmarx);
     }
-    return 0;
+    return res;
 }
 
 u16 tablo_create_request(u8* request, u8 cmd, u8* data, u8 len) {
     u16          ptr = 0;
     cmd_header_t hdr;
 
-    LOG(LEVEL_MAIN, "tablo_create_request %d\r\n", cmd);
+    // LOG(LEVEL_DEBUG, "tablo_create_request %d\r\n", cmd);
 
     hdr.cmd_type = cmd;
     hdr.length = len;
@@ -87,6 +91,7 @@ u8 tablo_send_fw_part(u32 write_from, u8* data, u16 len) {
     u16          ptr = 0;
     cmd_header_t hdr;
     u32          write_to;
+    u8           res = 0;
 
     LOG(LEVEL_MAIN, "tablo send FW part %d %d\r\n", write_from, len);
 
@@ -105,9 +110,12 @@ u8 tablo_send_fw_part(u32 write_from, u8* data, u16 len) {
 
     tablo_send_pack(&uInfoTablo, ptr);
     if (osSemaphoreWait(uart6RXSemHandle, 5000) == osOK) {
-        return tablo_parse_responce(&uInfoTablo);
+        __HAL_DMA_DISABLE(uInfoTablo.pHuart->hdmarx);
+        res = tablo_parse_responce(&uInfoTablo);
+        __HAL_DMA_SET_COUNTER(uInfoTablo.pHuart->hdmarx, uInfoTablo.szRxBuf);
+        __HAL_DMA_DISABLE(uInfoTablo.pHuart->hdmarx);
     }
-    return 0;
+    return res;
 }
 
 void parse_tablo_data(u8* data_all, u16 len_all) {
@@ -196,9 +204,16 @@ u8 tablo_parse_responce(UartInfo* pUInf) {
     u8*           data;
     u16           crc_calc;
 
+    u16 pkt_len = uInfoTablo.szRxBuf - pUInf->pHuart->hdmarx->Instance->NDTR;
+
+    if (pkt_len < CMD_HDR_SIZE + CMD_CRC_SIZE) {
+        LOG(LEVEL_ERROR, "Short answ, len %d\r\n", pkt_len);
+        return 0;
+    }
+
     crc_calc = calcCrc16(pUInf->pRxBuf, (hdr->length + CMD_HDR_SIZE + CMD_CRC_SIZE));
     if (crc_calc != 0) {
-        LOG(LEVEL_ERROR, "Bad crc\r\n");
+        LOG(LEVEL_ERROR, "Bad crc, len %d\r\n", pkt_len);
         return 0;
     }
 

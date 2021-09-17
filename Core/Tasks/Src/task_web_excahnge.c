@@ -1,15 +1,15 @@
 #include "../Tasks/Inc/task_web_exchange.h"
 
-extern osThreadId webExchangeHandle;
-extern osThreadId createWebPckgHandle;
-extern osThreadId createWebPckgHandle;
-extern osMutexId mutexWebHandle;
+extern osThreadId   webExchangeHandle;
+extern osThreadId   createWebPckgHandle;
+extern osThreadId   createWebPckgHandle;
+extern osMutexId    mutexWebHandle;
 extern osMessageQId queueWebPckgHandle;
 
 static WebPckg* curPckg = NULL;
 
 void taskWebExchange(void const* argument) {
-    u8 statSend = TCP_OK;
+    u8  statSend = TCP_OK;
     u32 order_num = 0;
 
     vTaskSuspend(webExchangeHandle);
