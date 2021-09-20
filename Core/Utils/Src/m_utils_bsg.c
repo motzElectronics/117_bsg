@@ -29,8 +29,7 @@ void bsgInit() {
     bsg.idFirmware = BSG_ID_FIRMWARE;
     bsg.idBoot = BSG_ID_BOOT;
     bsg.sleepTimer.flagOn = 0;
-    bsg.gpsInvaligCount = 0;
-    bsg.gpsParseFailCount = 0;
+    memset(&bsg.stat, 0, sizeof(statistics_t));
 }
 
 void updateCurCoords(PckgGnss* pckgGnss) {
@@ -141,7 +140,7 @@ void updSpiFlash(CircularBuffer* cbuf) {
 
     bufEnd[0] = calcCrc16(cbuf->buf, cbuf->readAvailable);
     cBufWriteToBuf(cbuf, (u8*)bufEnd, 4);
-    spiFlashWrPg(cbuf->buf, cbuf->readAvailable, 0, spiFlash64.headNumPg);
+    spiFlashWriteNextPg(cbuf->buf, cbuf->readAvailable, 0);
     cBufReset(cbuf);
 
     D(printf("updSpiFlash()\r\n"));
@@ -173,7 +172,7 @@ void saveData(u8* data, u8 sz, u8 cmdData, CircularBuffer* cbuf) {
     if (cbuf->writeAvailable < sz + 2 + 4) {
         bufEnd[0] = calcCrc16(cbuf->buf, cbuf->readAvailable);
         cBufWriteToBuf(cbuf, (u8*)bufEnd, 4);
-        spiFlashWrPg(cbuf->buf, cbuf->readAvailable, 0, spiFlash64.headNumPg);
+        spiFlashWriteNextPg(cbuf->buf, cbuf->readAvailable, 0);
         cBufReset(cbuf);
     } else {
         cBufWriteToBuf(cbuf, &cmdData, 1);

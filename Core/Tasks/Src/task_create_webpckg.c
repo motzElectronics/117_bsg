@@ -52,7 +52,7 @@ void taskCreateWebPckg(void const *argument) {
             // amntPages = delayPages > 3 ? 3 : delayPages;
             // amntPages = delayPages > AMOUNT_MAX_PAGES ? AMOUNT_MAX_PAGES : delayPages;
             for (u8 i = 0; i < amntPages; i++) {
-                spiFlashRdPg((u8 *)tmpBufPage, 256, 0, spiFlash64.tailNumPg);
+                spiFlashReadLastPg((u8 *)tmpBufPage, 256, 0);
 
                 if ((len = isDataFromFlashOk(tmpBufPage, 256))) {
                     parceData(tmpBufPage, len);

@@ -5,6 +5,8 @@
         "utils_bsg.h": "c",
         "utils_pckgs_manager.h": "c",
         "utils_crc.h": "c",
-        "circularbuffer.h": "c"
+        "circularbuffer.h": "c",
+        "main.h": "c",
+        "simcom.h": "c"
     }
 }

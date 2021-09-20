@@ -15,6 +15,6 @@ void generateMsgDevOff();
 ErrorStatus sendMsgFWUpdated();
 ErrorStatus sendMsgFWUpdateBegin();
 ErrorStatus sendMsgDevOff();
-ErrorStatus sendMsgGpsInvalidCount();
+ErrorStatus sendMsgStatistics();
 
 #endif

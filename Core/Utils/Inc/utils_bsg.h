@@ -37,8 +37,6 @@
 
 #define BSG_SZ_BUF_PCKG_GNSS 512
 
-#define BSG_SAVE_NUM_PAGE 2047
-
 #define LEN_TIMESTAMP 13
 
 #define BSG_BIG_DIF_RTC_SERVTIME 600
@@ -78,6 +76,19 @@ typedef __packed struct {
 } PckgGnss;
 
 typedef struct {
+    u32 gpsInvaligCount;
+    u32 gpsParseFailCount;
+
+    u32 pageWrCount;
+    u32 pageRdCount;
+    u32 pageBadCount;
+
+    u32 simSendCnt;
+    u32 simErrCnt;
+    u32 simResetCnt;
+} statistics_t;
+
+typedef struct {
     u32 idMCU[3];
     u16 idTrain;
     u8  idTrainCar;
@@ -92,17 +103,12 @@ typedef struct {
     u8  updTarget;
     u8  tcpErrCnt;
     u8  csq;
+    u8  isSpiFlashReady;
 
-    //  Statistics
-    u32 gpsInvaligCount;
-    u32 gpsParseFailCount;
-    u32 pageWrCount;
-    u32 pageRdCount;
-    u32 pageBadCount;
-
-    TabloInfo   tablo;
-    SleepTimer  sleepTimer;
-    gps_state_t cur_gps;
+    statistics_t stat;
+    TabloInfo    tablo;
+    SleepTimer   sleepTimer;
+    gps_state_t  cur_gps;
 } BSG;
 
 typedef struct {
@@ -130,7 +136,8 @@ typedef enum {
     TEL_GR_HARDWARE_STATUS,
     TEL_GR_PROJECT_127,
     TEL_GR_PROJECT_127_STAT,
-    TEL_GR_PROJECT_127_MEM
+    TEL_GR_PROJECT_127_MEM,
+    TEL_GR_SIMCOM
 } TELEMETRY_GROUP;
 
 typedef enum {
@@ -182,10 +189,16 @@ typedef enum {
     TEL_CD_127_IU_PAGE_WR = 1,
     TEL_CD_127_IU_PAGE_RD,
     TEL_CD_127_IU_PAGE_BAD,
-    TEL_CD_127_BSG_PAGE_WR = 3,
+    TEL_CD_127_BSG_PAGE_WR = 4,
     TEL_CD_127_BSG_PAGE_RD,
     TEL_CD_127_BSG_PAGE_BAD,
 } TELEMETRY_CODE_127_MEM;
+
+typedef enum {
+    TEL_CD_127_SIM_SEND = 1,
+    TEL_CD_127_SIM_ERR,
+    TEL_CD_127_SIM_RESET
+} TELEMETRY_CODE_SIMCOM;
 
 typedef enum {
     CMD_REQUEST_SERVER_TIME = 0x11,

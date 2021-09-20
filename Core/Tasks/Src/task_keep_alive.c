@@ -16,7 +16,7 @@ extern u8 isRxNewFirmware;
 
 extern CircularBuffer circBufAllPckgs;
 
-u8 bufTxData[20];
+u8 bufTxData[256];
 
 void taskKeepAlive(void const* argument) {
     u16 timeout = 1;
@@ -31,14 +31,14 @@ void taskKeepAlive(void const* argument) {
             D(printf("getTabloNumFw\r\n\r\n"));
             getTabloNumFw();
         }
-        // if (!(timeout % 30) && !isRxNewFirmware) {
-        //     D(printf("sendMsgGpsInvalidCount\r\n"));
-        //     sendMsgGpsInvalidCount();
-        // }
-        if (!(timeout % 600) && !isRxNewFirmware) {
-            D(printf("\r\ngenerateMsgKeepAlive\r\n\r\n"));
-            generateMsgKeepAlive();
+        if (!(timeout % 180) && !isRxNewFirmware) {
+            D(printf("sendMsgStatistics\r\n"));
+            sendMsgStatistics();
         }
+        // if (!(timeout % 600) && !isRxNewFirmware) {
+        //     D(printf("\r\ngenerateMsgKeepAlive\r\n\r\n"));
+        //     generateMsgKeepAlive();
+        // }
         if (!(timeout % 5400) && !isRxNewFirmware) {
             D(printf("\r\nupdRTC\r\n\r\n"));
             updRTC();
@@ -155,22 +155,46 @@ ErrorStatus sendMsgDevOff() {
     return ret;
 }
 
-ErrorStatus sendMsgGpsInvalidCount() {
+ErrorStatus sendMsgStatistics() {
     ErrorStatus   ret = SUCCESS;
     PckgTelemetry pckgTel;
 
-    memset(bufTxData, 0, 20);
+    memset(bufTxData, 0, 256);
     pckgTel.group = TEL_GR_GENINF;
     pckgTel.code = TEL_CD_GENINF_GPS_INV_CNT;
-    pckgTel.data = bsg.gpsInvaligCount;
+    pckgTel.data = bsg.stat.gpsInvaligCount;
     pckgTel.unixTimeStamp = getUnixTimeStamp();
-    copyTelemetry(bufTxData, &pckgTel);
+    saveTelemetry(&pckgTel, &circBufAllPckgs);
 
     pckgTel.code = TEL_CD_GENINF_GPS_PARSE_ER_CNT;
-    pckgTel.data = bsg.gpsParseFailCount;
-    copyTelemetry(&bufTxData[SZ_CMD_TELEMETRY], &pckgTel);
+    pckgTel.data = bsg.stat.gpsParseFailCount;
+    saveTelemetry(&pckgTel, &circBufAllPckgs);
 
-    ret = sendWebPckgData(CMD_DATA_TELEMETRY, bufTxData, SZ_CMD_TELEMETRY * 2, 2, &bsg.idMCU);
+    pckgTel.group = TEL_GR_PROJECT_127_MEM;
+    pckgTel.code = TEL_CD_127_BSG_PAGE_WR;
+    pckgTel.data = bsg.stat.pageWrCount;
+    saveTelemetry(&pckgTel, &circBufAllPckgs);
+
+    pckgTel.code = TEL_CD_127_BSG_PAGE_RD;
+    pckgTel.data = bsg.stat.pageRdCount;
+    saveTelemetry(&pckgTel, &circBufAllPckgs);
+
+    pckgTel.code = TEL_CD_127_BSG_PAGE_BAD;
+    pckgTel.data = bsg.stat.pageBadCount;
+    saveTelemetry(&pckgTel, &circBufAllPckgs);
+
+    pckgTel.group = TEL_GR_SIMCOM;
+    pckgTel.code = TEL_CD_127_SIM_SEND;
+    pckgTel.data = bsg.stat.simSendCnt;
+    saveTelemetry(&pckgTel, &circBufAllPckgs);
+
+    pckgTel.code = TEL_CD_127_SIM_ERR;
+    pckgTel.data = bsg.stat.simErrCnt;
+    saveTelemetry(&pckgTel, &circBufAllPckgs);
+
+    pckgTel.code = TEL_CD_127_SIM_RESET;
+    pckgTel.data = bsg.stat.simResetCnt;
+    saveTelemetry(&pckgTel, &circBufAllPckgs);
 
     return ret;
 }

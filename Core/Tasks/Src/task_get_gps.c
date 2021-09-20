@@ -55,9 +55,9 @@ void taskGetGPS(void const *argument) {
                     numIteration = (numIteration + 1) % 120;
                 } else if (ret == GPS_GPRMC_ERR_INVALID_DATA_STATUS) {
                     bsg.cur_gps.valid = 0;
-                    bsg.gpsInvaligCount++;
+                    bsg.stat.gpsInvaligCount++;
                 } else {
-                    bsg.gpsParseFailCount++;
+                    bsg.stat.gpsParseFailCount++;
                 }
                 memset(bufGnss, '\0', sizeof(bufGnss));
             }

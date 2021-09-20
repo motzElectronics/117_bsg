@@ -26,6 +26,7 @@ void simInit() {
     bsg.isTCPOpen = 0;
 
     while (!isInit) {
+        bsg.stat.simResetCnt++;
         simHardwareReset();
 
         gnssInit();
@@ -347,6 +348,11 @@ u8 sendTcp(u8* data, u16 sz) {
     if (ret == TCP_OK && simTCPSend(data, sz) != SIM_SUCCESS) {
         D(printf("ER: simTCPSend\r\n"));
         ret = TCP_SEND_ER;
+    }
+    if (ret == TCP_OK) {
+        bsg.stat.simSendCnt++;
+    } else {
+        bsg.stat.simErrCnt++;
     }
     return procReturnStatus(ret);
 }
