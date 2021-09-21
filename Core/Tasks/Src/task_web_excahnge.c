@@ -1,4 +1,7 @@
+#include "../Tasks/Inc/task_iwdg.h"
 #include "../Tasks/Inc/task_web_exchange.h"
+
+extern u16 iwdgTaskReg;
 
 extern osThreadId   webExchangeHandle;
 extern osThreadId   createWebPckgHandle;
@@ -15,6 +18,7 @@ void taskWebExchange(void const* argument) {
     vTaskSuspend(webExchangeHandle);
 
     for (;;) {
+        iwdgTaskReg |= IWDG_TASK_REG_WEB_EXCH;
         if (bsg.isTCPOpen == 0) {
             osMutexWait(mutexWebHandle, osWaitForever);
             openTcp();

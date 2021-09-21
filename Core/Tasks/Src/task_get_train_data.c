@@ -1,9 +1,12 @@
 #include "../Tasks/Inc/task_get_train_data.h"
 
+#include "../Tasks/Inc/task_iwdg.h"
 #include "../Utils/Inc/circularBuffer.h"
 #include "../Utils/Inc/utils_bsg.h"
 #include "../Utils/Inc/utils_crc.h"
 #include "cmsis_os.h"
+
+extern u16 iwdgTaskReg;
 
 extern osThreadId    getTrainDataHandle;
 extern osSemaphoreId uart6RXSemHandle;
@@ -29,6 +32,7 @@ void taskGetTrainData(void const* argument) {
     }
 
     for (;;) {
+        iwdgTaskReg |= IWDG_TASK_REG_TABLO;
         if (iter % 50 == 6) {
             u32 timeStamp = getUnixTimeStamp();
             tablo_send_request(CMD_SYNC, (u8*)&timeStamp, sizeof(timeStamp));

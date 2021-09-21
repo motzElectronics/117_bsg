@@ -1,8 +1,11 @@
 #include "../Tasks/Inc/task_get_new_bin.h"
 
 #include "../Tasks/Inc/task_get_train_data.h"
+#include "../Tasks/Inc/task_iwdg.h"
 #include "../Tasks/Inc/task_keep_alive.h"
 #include "../Utils/Inc/utils_pckgs_manager.h"
+
+extern u16 iwdgTaskReg;
 
 extern osThreadId webExchangeHandle;
 extern osThreadId getGPSHandle;
@@ -37,8 +40,9 @@ void taskGetNewBin(void const* argument) {
     isRxNewFirmware = 1;
 
     for (;;) {
+        iwdgTaskReg |= IWDG_TASK_REG_NEW_BIN;
         big_update_func();
-        osDelay(3000);
+        osDelay(5000);
     }
 
     /* USER CODE END taskGetNewBin */
@@ -83,6 +87,7 @@ void big_update_func() {
     }
 
     for (;;) {
+        iwdgTaskReg |= IWDG_TASK_REG_NEW_BIN;
         if (szSoft != curSzSoft) {
             if (szSoft - curSzSoft > SZ_PART_FIRMW) {
                 szPartSoft = SZ_PART_FIRMW;

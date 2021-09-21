@@ -1,7 +1,10 @@
 #include "../Tasks/Inc/task_keep_alive.h"
 
+#include "../Tasks/Inc/task_iwdg.h"
 #include "../Utils/Inc/utils_bsg.h"
 #include "../Utils/Inc/utils_pckgs_manager.h"
+
+extern u16 iwdgTaskReg;
 
 extern osThreadId    webExchangeHandle;
 extern osThreadId    getGPSHandle;
@@ -45,6 +48,7 @@ void taskKeepAlive(void const* argument) {
         }
 
         timeout++;
+        iwdgTaskReg |= IWDG_TASK_REG_ALIVE;
         osDelay(2000);
     }
 }

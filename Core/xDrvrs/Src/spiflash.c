@@ -249,15 +249,15 @@ u8 spiFlashReadLastPg(u8 *pBuf, u32 sz, u32 offset) {
     return len;
 }
 
-int getDelayPages() {
-    u32 numPage;
-    int delayPages, delayGoodPages;
+u16 getDelayPages() {
+    u16 numPage;
+    u16 delayPages, delayGoodPages;
 
     delayPages = spiFlash64.headNumPg >= spiFlash64.tailNumPg ? spiFlash64.headNumPg - spiFlash64.tailNumPg : spiFlash64.headNumPg + (SPIFLASH_NUM_PG_GNSS - spiFlash64.tailNumPg);
     delayGoodPages = delayPages;
 
     numPage = spiFlash64.tailNumPg;
-    for (u8 i = 0; i < delayPages; ++i) {
+    for (u16 i = 0; i < delayPages; ++i) {
         if (spiFlashIsPgBad(numPage)) {
             delayGoodPages--;
         }

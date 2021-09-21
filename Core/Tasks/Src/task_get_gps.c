@@ -1,7 +1,11 @@
 #include "../Tasks/Inc/task_get_gps.h"
 
+#include "../Tasks/Inc/task_iwdg.h"
 #include "../Tasks/Inc/task_keep_alive.h"
 #include "tim.h"
+
+extern u16 iwdgTaskReg;
+
 extern osMutexId mutexGPSBufHandle;
 
 extern osThreadId webExchangeHandle;
@@ -36,6 +40,7 @@ void taskGetGPS(void const *argument) {
     unLockTasks();
 
     for (;;) {
+        iwdgTaskReg |= IWDG_TASK_REG_GPS;
         waitRx("", &uInfoGnss.irqFlags, 10, 10000);
         if (uInfoGnss.irqFlags.isIrqRx) {
             uInfoGnss.irqFlags.isIrqRx = 0;

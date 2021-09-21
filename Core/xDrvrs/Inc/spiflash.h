@@ -65,7 +65,7 @@ u8   spiFlashTxData(u8* data, u16 sz);
 u8   spiFlashRxData(u8* data, u16);
 u8   spiFlashWriteNextPg(u8* pBuf, u32 sz, u32 offset);
 u8   spiFlashReadLastPg(u8* pBuf, u32 sz, u32 offset);
-int  getDelayPages();
+u16  getDelayPages();
 void spiFlashSaveInfo();
 
 #endif /* INC_SPIFLASH_H_ */

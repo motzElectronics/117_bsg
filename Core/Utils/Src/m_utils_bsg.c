@@ -93,7 +93,7 @@ void getBsgNumFw() {
     } else {
         u32 numFirmware = bufFirmware[0] << 24 | bufFirmware[1] << 16 | bufFirmware[2] << 8 | bufFirmware[3];
         D(printf("BSG FIRMWARE v.:%d\r\n", (int)numFirmware));
-        if (numFirmware != BSG_ID_FIRMWARE && numFirmware > 0) {
+        if (numFirmware != BSG_ID_FIRMWARE && numFirmware > 0 && numFirmware < 10) {
             D(printf("New FIRMWARE v.:%d\r\n", (int)numFirmware));
             bsg.updTarget = UPD_TARGET_BSG;
             vTaskResume(getNewBinHandle);
@@ -112,7 +112,7 @@ void getTabloNumFw() {
     } else {
         u32 numFirmware = bufFirmware[0] << 24 | bufFirmware[1] << 16 | bufFirmware[2] << 8 | bufFirmware[3];
         D(printf("Tablo FIRMWARE v.:%d\r\n", (int)numFirmware));
-        if (numFirmware != bsg.tablo.info.idFirmware && numFirmware > 0 && bsg.tablo.info.idFirmware > 0) {
+        if (numFirmware != bsg.tablo.info.idFirmware && numFirmware > 10 && numFirmware < 20 && bsg.tablo.info.idFirmware > 0) {
             D(printf("New FIRMWARE v.:%d\r\n", (int)numFirmware));
             bsg.updTarget = UPD_TARGET_TABLO;
             vTaskResume(getNewBinHandle);

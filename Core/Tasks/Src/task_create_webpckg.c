@@ -1,5 +1,9 @@
 #include "../Tasks/Inc/task_create_webpckg.h"
 
+#include "../Tasks/Inc/task_iwdg.h"
+
+extern u16 iwdgTaskReg;
+
 extern osThreadId    webExchangeHandle;
 extern osThreadId    keepAliveHandle;
 extern osThreadId    getNewBinHandle;
@@ -22,7 +26,7 @@ static WebPckg *curPckg;
 void taskCreateWebPckg(void const *argument) {
     // vTaskSuspend(webExchangeHandle);
 
-    s16 delayPages;
+    u16 delayPages;
     u16 szAllPages = 0;
     u8  amntPages;
     u8  len;
@@ -33,7 +37,8 @@ void taskCreateWebPckg(void const *argument) {
 
     D(printf("taskCreateWebPckg\r\n"));
     for (;;) {
-        delayPages = spiFlash64.headNumPg >= spiFlash64.tailNumPg ? spiFlash64.headNumPg - spiFlash64.tailNumPg : spiFlash64.headNumPg + (SPIFLASH_NUM_PG_GNSS - spiFlash64.tailNumPg);
+        iwdgTaskReg |= IWDG_TASK_REG_WEB_PCKG;
+        delayPages = getDelayPages();
         while (delayPages > BSG_THRESHOLD_CNT_PAGES || (osSemaphoreWait(semCreateWebPckgHandle, 1) == osOK)) {
             curPckg = getFreePckg();
             if (curPckg == NULL) {
@@ -52,19 +57,21 @@ void taskCreateWebPckg(void const *argument) {
             // amntPages = delayPages > 3 ? 3 : delayPages;
             // amntPages = delayPages > AMOUNT_MAX_PAGES ? AMOUNT_MAX_PAGES : delayPages;
             for (u8 i = 0; i < amntPages; i++) {
-                spiFlashReadLastPg((u8 *)tmpBufPage, 256, 0);
-
-                if ((len = isDataFromFlashOk(tmpBufPage, 256))) {
-                    parceData(tmpBufPage, len);
-                } else {
-                    D(printf("ERROR: bad crc isDataFromFlashOk()\r\n"));
+                len = spiFlashReadLastPg((u8 *)tmpBufPage, 256, 0);
+                if (len) {
+                    parseData(tmpBufPage, len);
                 }
             }
             szAllPages = getSzAllPages();
-            initWebPckg(curPckg, szAllPages, 0, &bsg.idMCU);
-            addPagesToWebPckg(curPckg);
-            osMessagePut(queueWebPckgHandle, (u32)curPckg, osWaitForever);
-            delayPages = spiFlash64.headNumPg >= spiFlash64.tailNumPg ? spiFlash64.headNumPg - spiFlash64.tailNumPg : spiFlash64.headNumPg + (SPIFLASH_NUM_PG_GNSS - spiFlash64.tailNumPg);
+            if (szAllPages) {
+                D(printf("Create package\r\n"));
+                initWebPckg(curPckg, szAllPages, 0, &bsg.idMCU);
+                addPagesToWebPckg(curPckg);
+                osMessagePut(queueWebPckgHandle, (u32)curPckg, osWaitForever);
+            } else {
+                freeWebPckg(curPckg);
+            }
+            delayPages = getDelayPages();
         }
 
         if (!delayPages) {
@@ -81,7 +88,7 @@ void clearAllPages() {
     }
 }
 
-void parceData(u8 *tmpBufPage, u8 len) {
+void parseData(u8 *tmpBufPage, u8 len) {
     u8 i = 0;
     while (i < len) {
         switch (tmpBufPage[i]) {
