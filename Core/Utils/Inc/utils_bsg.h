@@ -82,10 +82,16 @@ typedef struct {
     u32 pageWrCount;
     u32 pageRdCount;
     u32 pageBadCount;
+    u32 pageFromIUCount;
 
     u32 simSendCnt;
     u32 simErrCnt;
     u32 simResetCnt;
+    u32 simOpenCnt;
+    u32 simBadCsqCnt;
+    u32 simLowCsqCnt;
+    u32 simGoodCsqCnt;
+    u32 simHighCsqCnt;
 } statistics_t;
 
 typedef struct {
@@ -123,12 +129,39 @@ typedef struct {
     u32 toByte;
 } PckgUpdFirmware;
 
+typedef __packed struct {
+    u32 unixTimeStamp;
+    u8  idx;
+    u32 enAct;
+    u32 enReact;
+} PckgEnergy_127;
+
+typedef __packed struct {
+    u32 unixTimeStamp;
+    u8  idx;
+    s16 amper;
+    u16 volt;
+} PckgVoltAmper_127;
+
+typedef __packed struct {
+    u32 unixTimeStamp;
+    u8  from;
+    u8  to;
+    u8  perc_perfect;
+    u8  perc_good;
+    u8  perc_normal;
+    u8  perc_bad;
+} PckgPercRSSI_127;
+
 typedef enum {
     CMD_DATA_VOLTAMPER = 1,
     CMD_DATA_ENERGY,
     CMD_DATA_TEMP,
     CMD_DATA_GRMC,
-    CMD_DATA_TELEMETRY
+    CMD_DATA_TELEMETRY = 5,
+    CMD_DATA_VOLTAMPER_127,
+    CMD_DATA_ENERGY_127,
+    CMD_DATA_PERCRSSI_127
 } CMD_DATA_TYPE;
 
 typedef enum {
@@ -181,7 +214,6 @@ typedef enum {
     TEL_CD_127_MU_ERR_REQ,
     TEL_CD_127_MU_MISS_DOOR,
     TEL_CD_127_MU_EMPTY = 8,
-    TEL_CD_127_MU_PARSE_ERR,
     TEL_CD_127_MU_RSSI_STAT
 } TELEMETRY_CODE_127_STAT;
 
@@ -192,12 +224,18 @@ typedef enum {
     TEL_CD_127_BSG_PAGE_WR = 4,
     TEL_CD_127_BSG_PAGE_RD,
     TEL_CD_127_BSG_PAGE_BAD,
+    TEL_CD_127_BSG_PAGE_FROM_IU
 } TELEMETRY_CODE_127_MEM;
 
 typedef enum {
     TEL_CD_127_SIM_SEND = 1,
     TEL_CD_127_SIM_ERR,
-    TEL_CD_127_SIM_RESET
+    TEL_CD_127_SIM_RESET,
+    TEL_CD_127_SIM_OPEN,
+    TEL_CD_127_SIM_BAD_CSQ,
+    TEL_CD_127_SIM_LOW_CSQ,
+    TEL_CD_127_SIM_GOOD_CSQ,
+    TEL_CD_127_SIM_HIGH_CSQ
 } TELEMETRY_CODE_SIMCOM;
 
 typedef enum {

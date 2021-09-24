@@ -138,13 +138,14 @@ void parse_tablo_data(u8* data_all, u16 len_all) {
             return;
         }
 
+        bsg.stat.pageFromIUCount++;
         memset(tmpBufPage, 0, SZ_PAGE);
         memcpy(tmpBufPage, data, len_pg);
         bufEnd[0] = calcCrc16(data, len_pg);
         memcpy(&tmpBufPage[len_pg], bufEnd, 4);
         spiFlashWriteNextPg(tmpBufPage, len_pg + 4, 0);
 
-        LOG(LEVEL_DEBUG, "Returned page (len %d)\r\n", len_pg);
+        // LOG(LEVEL_DEBUG, "Returned page (len %d)\r\n", len_pg);
 
         ptr += len_pg;
     }
@@ -161,7 +162,9 @@ void parse_tablo_gnss(u8* data_all, u16 len_all) {
 void parse_tablo_error(u8* data_all, u16 len_all) {
     u8 error_type = data_all[0];
 
-    LOG(LEVEL_DEBUG, "Returned error type %d\r\n", error_type);
+    if (error_type != 2) {
+        LOG(LEVEL_DEBUG, "Returned error type %d\r\n", error_type);
+    }
 }
 
 void parse_tablo_new_fw(u8* data_all, u16 len_all) {

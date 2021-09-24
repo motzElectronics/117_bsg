@@ -174,6 +174,11 @@ u8 spiFlashWriteNextPg(u8 *pBuf, u32 sz, u32 offset) {
     u8  pdBad = 1;
     u32 numPage;
 
+    if (spiFlash64.headNumPg % (SPIFLASH_NUM_PG_IN_SEC * 2) == 0) {
+        spiFlashSaveInfo();
+        D(printf("spiFlashPeriodicSave %d\r\n", spiFlash64.headNumPg));
+    }
+
     osMutexWait(mutexSpiFlashHandle, 60000);
     numPage = spiFlash64.headNumPg;
 

@@ -58,20 +58,20 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define GNSS_EN_Pin GPIO_PIN_1
-#define GNSS_EN_GPIO_Port GPIOA
-#define SPI2_CS_MEM_Pin GPIO_PIN_12
+#define GNSS_EN_Pin           GPIO_PIN_1
+#define GNSS_EN_GPIO_Port     GPIOA
+#define SPI2_CS_MEM_Pin       GPIO_PIN_12
 #define SPI2_CS_MEM_GPIO_Port GPIOB
-#define USART6_RE_Pin GPIO_PIN_8
-#define USART6_RE_GPIO_Port GPIOC
-#define GSM_PWRKEY_Pin GPIO_PIN_8
-#define GSM_PWRKEY_GPIO_Port GPIOA
-#define LED_1_Pin GPIO_PIN_11
-#define LED_1_GPIO_Port GPIOA
-#define LED_ALIVE_Pin GPIO_PIN_12
-#define LED_ALIVE_GPIO_Port GPIOA
-#define SIM_PWR_EN_Pin GPIO_PIN_11
-#define SIM_PWR_EN_GPIO_Port GPIOC
+#define USART6_RE_Pin         GPIO_PIN_8
+#define USART6_RE_GPIO_Port   GPIOC
+#define GSM_PWRKEY_Pin        GPIO_PIN_8
+#define GSM_PWRKEY_GPIO_Port  GPIOA
+#define LED_1_Pin             GPIO_PIN_11
+#define LED_1_GPIO_Port       GPIOA
+#define LED_ALIVE_Pin         GPIO_PIN_12
+#define LED_ALIVE_GPIO_Port   GPIOA
+#define SIM_PWR_EN_Pin        GPIO_PIN_11
+#define SIM_PWR_EN_GPIO_Port  GPIOC
 /* USER CODE BEGIN Private defines */
 #include "debug.h"
 #include "stdbool.h"
@@ -102,12 +102,15 @@ void Error_Handler(void);
 #define SZ_CMD_TEMP                8
 #define SZ_CMD_GRMC                20
 #define SZ_CMD_TELEMETRY           10
+#define SZ_CMD_ENERGY_127          13
+#define SZ_CMD_VOLTAMPER_127       9
+#define SZ_CMD_PERCRSSI_127        10
 #define SZ_CMD_TELEMETRY_PHONE_NUM 14
 
 #define SZ_PAGE                  255
 #define SZ_BUF_ENERGY_FROM_UART1 500
-#define AMOUNT_MAX_PAGES         5
-#define SZ_PAGES                 1275  // SZ_PAGE * AMOUNT_MAX_PAGES
+#define AMOUNT_MAX_PAGES         6
+#define SZ_PAGES                 1530  // SZ_PAGE * AMOUNT_MAX_PAGES
 
 #define BSG_PREAMBLE     0xABCD
 #define BSG_PREAMBLE_LSB 0xAB

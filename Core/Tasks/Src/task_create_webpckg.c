@@ -15,12 +15,13 @@ extern osSemaphoreId semCreateWebPckgHandle;
 extern u8   SZ_PCKGENERGY;
 static char tmpBufPage[256];
 
-static Page     pgEnergy = {.type = CMD_DATA_ENERGY, .szType = SZ_CMD_ENERGY};
+static Page     pgEnergy = {.type = CMD_DATA_ENERGY_127, .szType = SZ_CMD_ENERGY_127};
 static Page     pgTemp = {.type = CMD_DATA_TEMP, .szType = SZ_CMD_TEMP};
-static Page     pgVoltAmper = {.type = CMD_DATA_VOLTAMPER, .szType = SZ_CMD_VOLTAMPER};
+static Page     pgVoltAmper = {.type = CMD_DATA_VOLTAMPER_127, .szType = SZ_CMD_VOLTAMPER_127};
 static Page     pgGrmc = {.type = CMD_DATA_GRMC, .szType = SZ_CMD_GRMC};
 static Page     pgTelemetry = {.type = CMD_DATA_TELEMETRY, .szType = SZ_CMD_TELEMETRY};
-static Page *   allPages[] = {&pgVoltAmper, &pgEnergy, &pgTemp, &pgGrmc, &pgTelemetry};
+static Page     pgPercRSSI = {.type = CMD_DATA_PERCRSSI_127, .szType = SZ_CMD_PERCRSSI_127};
+static Page *   allPages[] = {&pgVoltAmper, &pgEnergy, &pgTemp, &pgGrmc, &pgTelemetry, &pgPercRSSI};
 static WebPckg *curPckg;
 
 void taskCreateWebPckg(void const *argument) {
@@ -92,13 +93,13 @@ void parseData(u8 *tmpBufPage, u8 len) {
     u8 i = 0;
     while (i < len) {
         switch (tmpBufPage[i]) {
-            case CMD_DATA_ENERGY:
-                addToPage(&pgEnergy, &tmpBufPage[i + 1], SZ_CMD_ENERGY);
-                i += (SZ_CMD_ENERGY + 1);
+            case CMD_DATA_ENERGY_127:
+                addToPage(&pgEnergy, &tmpBufPage[i + 1], SZ_CMD_ENERGY_127);
+                i += (SZ_CMD_ENERGY_127 + 1);
                 break;
-            case CMD_DATA_VOLTAMPER:
-                addToPage(&pgVoltAmper, &tmpBufPage[i + 1], SZ_CMD_VOLTAMPER);
-                i += (SZ_CMD_VOLTAMPER + 1);
+            case CMD_DATA_VOLTAMPER_127:
+                addToPage(&pgVoltAmper, &tmpBufPage[i + 1], SZ_CMD_VOLTAMPER_127);
+                i += (SZ_CMD_VOLTAMPER_127 + 1);
                 break;
             case CMD_DATA_TEMP:
                 addToPage(&pgTemp, &tmpBufPage[i + 1], SZ_CMD_TEMP);
@@ -111,6 +112,10 @@ void parseData(u8 *tmpBufPage, u8 len) {
             case CMD_DATA_GRMC:
                 addToPage(&pgGrmc, &tmpBufPage[i + 1], SZ_CMD_GRMC);
                 i += (SZ_CMD_GRMC + 1);
+                break;
+            case CMD_DATA_PERCRSSI_127:
+                addToPage(&pgPercRSSI, &tmpBufPage[i + 1], SZ_CMD_PERCRSSI_127);
+                i += (SZ_CMD_PERCRSSI_127 + 1);
                 break;
             default:
                 D(printf("ER: CMD_DATA_X is wrong\r\n"));
@@ -149,5 +154,5 @@ void addPagesToWebPckg(WebPckg *pckg) {
         }
     }
     closeWebPckg(pckg);
-    showWebPckg(pckg);
+    // showWebPckg(pckg);
 }

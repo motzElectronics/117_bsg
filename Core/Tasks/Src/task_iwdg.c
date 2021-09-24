@@ -1,5 +1,7 @@
 #include "../Tasks/Inc/task_iwdg.h"
 
+#include "../xDrvrs/Inc/spiflash.h"
+
 extern IWDG_HandleTypeDef hiwdg;
 
 extern u8 isRxNewFirmware;

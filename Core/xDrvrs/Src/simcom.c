@@ -315,6 +315,7 @@ u8 openTcp() {
     if (!waitGoodCsq(5400)) {
         D(printf("ER: waitGoodCsq\r\n"));
         ret = TCP_CSQ_ER;
+        bsg.stat.simBadCsqCnt++;
     }
     if (ret == TCP_OK && simTCPinit() != SIM_SUCCESS) {
         D(printf("ER: simTCPinit\r\n"));
@@ -326,6 +327,7 @@ u8 openTcp() {
     }
     if (ret == TCP_OK) {
         bsg.isTCPOpen = 1;
+        bsg.stat.simOpenCnt++;
     }
     return procReturnStatus(ret);
 }
@@ -353,6 +355,13 @@ u8 sendTcp(u8* data, u16 sz) {
         bsg.stat.simSendCnt++;
     } else {
         bsg.stat.simErrCnt++;
+    }
+    if (bsg.csq < 15) {
+        bsg.stat.simLowCsqCnt++;
+    } else if (bsg.csq < 20) {
+        bsg.stat.simLowCsqCnt++;
+    } else {
+        bsg.stat.simHighCsqCnt++;
     }
     return procReturnStatus(ret);
 }

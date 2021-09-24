@@ -69,7 +69,7 @@ void generateMsgFWUpdated() {
     PckgTelemetry pckgTel;
     pckgTel.group = TEL_GR_HARDWARE_STATUS;
     pckgTel.code = TEL_CD_HW_UPDATED;
-    pckgTel.data = 0;
+    pckgTel.data = bsg.idNewFirmware;
     saveTelemetry(&pckgTel, &circBufAllPckgs);
 }
 
@@ -99,7 +99,7 @@ ErrorStatus sendMsgFWUpdated() {
     memset(bufTxData, 0, 20);
     pckgTel.group = TEL_GR_HARDWARE_STATUS;
     pckgTel.code = TEL_CD_HW_UPDATED;
-    pckgTel.data = 1;
+    pckgTel.data = bsg.idNewFirmware;
     pckgTel.unixTimeStamp = getUnixTimeStamp();
     copyTelemetry(bufTxData, &pckgTel);
 
@@ -187,6 +187,10 @@ ErrorStatus sendMsgStatistics() {
     pckgTel.data = bsg.stat.pageBadCount;
     saveTelemetry(&pckgTel, &circBufAllPckgs);
 
+    pckgTel.code = TEL_CD_127_BSG_PAGE_FROM_IU;
+    pckgTel.data = bsg.stat.pageFromIUCount;
+    saveTelemetry(&pckgTel, &circBufAllPckgs);
+
     pckgTel.group = TEL_GR_SIMCOM;
     pckgTel.code = TEL_CD_127_SIM_SEND;
     pckgTel.data = bsg.stat.simSendCnt;
@@ -198,6 +202,26 @@ ErrorStatus sendMsgStatistics() {
 
     pckgTel.code = TEL_CD_127_SIM_RESET;
     pckgTel.data = bsg.stat.simResetCnt;
+    saveTelemetry(&pckgTel, &circBufAllPckgs);
+
+    pckgTel.code = TEL_CD_127_SIM_OPEN;
+    pckgTel.data = bsg.stat.simOpenCnt;
+    saveTelemetry(&pckgTel, &circBufAllPckgs);
+
+    pckgTel.code = TEL_CD_127_SIM_BAD_CSQ;
+    pckgTel.data = bsg.stat.simBadCsqCnt;
+    saveTelemetry(&pckgTel, &circBufAllPckgs);
+
+    pckgTel.code = TEL_CD_127_SIM_LOW_CSQ;
+    pckgTel.data = bsg.stat.simLowCsqCnt;
+    saveTelemetry(&pckgTel, &circBufAllPckgs);
+
+    pckgTel.code = TEL_CD_127_SIM_GOOD_CSQ;
+    pckgTel.data = bsg.stat.simGoodCsqCnt;
+    saveTelemetry(&pckgTel, &circBufAllPckgs);
+
+    pckgTel.code = TEL_CD_127_SIM_HIGH_CSQ;
+    pckgTel.data = bsg.stat.simHighCsqCnt;
     saveTelemetry(&pckgTel, &circBufAllPckgs);
 
     return ret;

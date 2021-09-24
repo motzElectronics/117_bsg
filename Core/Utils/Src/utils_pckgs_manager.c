@@ -44,10 +44,10 @@ void addInfoToWebPckg(WebPckg* pPckg, u8* src, u16 sz, u8 cnt, u8 cmdData) {
 }
 
 void showWebPckg(WebPckg* pPckg) {
-    // for (u16 i = 0; i < pPckg->shift; i++) {
-    //     D(printf("%02x", pPckg->buf[i]));
-    // }
-    // D(printf("\r\n"));
+    for (u16 i = 0; i < pPckg->shift; i++) {
+        D(printf("%02x", pPckg->buf[i]));
+    }
+    D(printf("\r\n"));
 }
 
 void closeWebPckg(WebPckg* pPckg) {
@@ -115,7 +115,7 @@ WebPckg* createWebPckgReq(u8 CMD_REQ, u8* data, u8 sz, u8 szReq, u8* idMCU) {
     }
     addInfo(curPckg, req, szReq);
     closeWebPckg(curPckg);
-    showWebPckg(curPckg);
+    // showWebPckg(curPckg);
     return curPckg;
 }
 
@@ -133,7 +133,7 @@ ErrorStatus sendWebPckgData(u8 CMD_DATA, u8* data, u8 sz, u8 szReq, u8* idMCU) {
     }
     addInfo(curPckg, req, sz + 2);
     closeWebPckg(curPckg);
-    showWebPckg(curPckg);
+    // showWebPckg(curPckg);
 
     osMutexWait(mutexWebHandle, osWaitForever);
     if (sendTcp(curPckg->buf, curPckg->shift) != TCP_OK) {
@@ -160,7 +160,7 @@ ErrorStatus generateWebPckgReq(u8 CMD_REQ, u8* data, u8 sz, u8 szReq, u8* answ, 
         }
         addInfo(curPckg, req, szReq);
         closeWebPckg(curPckg);
-        showWebPckg(curPckg);
+        // showWebPckg(curPckg);
 
         osMutexWait(mutexWebHandle, osWaitForever);
         bsg.isTCPOpen = 0;
