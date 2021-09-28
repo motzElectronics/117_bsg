@@ -35,12 +35,12 @@ void simInit() {
         retMsg = simTxATCmd(SIM_CMD_AT, SIM_SZ_CMD_AT, 1000);
         token = strtok(retMsg, SIM_SEPARATOR_TEXT);
         if (token == NULL || token[0] == '\0') token = SIM_NO_RESPONSE_TEXT;
-        D(printf("simInit AT: %s\r\n", token));
+        LOG_SIM(LEVEL_INFO, "simInit AT: %s\r\n", token);
         if ((strcmp(token, SIM_OK_TEXT)) != 0) {
-            D(printf("ERROR: simInit() AT: %s\r\n", token));
+            LOG_SIM(LEVEL_ERROR, "simInit() AT: %s\r\n", token);
             simBadAnsw = (simBadAnsw + 1) % 16;
             if (!simBadAnsw) {
-                D(printf("WARINTING!: T O T A L  R E S E T\r\n"));
+                LOG_SIM(LEVEL_MAIN, "WARINTING!: T O T A L  R E S E T\r\n");
                 osDelay(3000);
                 HAL_NVIC_SystemReset();
             }
@@ -55,7 +55,7 @@ void simInit() {
                     fail = 0;
                     HAL_NVIC_SystemReset();
                 }
-                D(printf("ERROR: NOT CONNECT GPS\r\n"));
+                LOG_SIM(LEVEL_ERROR, "NOT CONNECT GPS\r\n");
             } else {
                 isInit = 1;
                 // bsg.erFlags.simSAPBR = 0;
@@ -63,7 +63,7 @@ void simInit() {
         }
     }
 
-    D(printf("OK: simInit()\r\n"));
+    LOG_SIM(LEVEL_MAIN, "OK: simInit()\r\n");
 }
 
 char* simGetStatusAnsw(u32 timeout) {
@@ -102,9 +102,9 @@ u8 simCmd(char* cmdCode, char* params, u8 retriesCnt, char* SUCCESS_RET) {
             if (strcmp((const char*)simBufError, (const char*)simBufCmd) == 0) {
                 return SIM_RESTART;
             }
-            D(printf("ERROR: %s ret: %s\r\n", simBufCmd, token));
+            LOG_SIM(LEVEL_ERROR, "%s ret: %s\r\n", simBufCmd, token);
         } else {
-            // D(printf("OK: %s ret: %s\r\n", simBufCmd, token));
+            LOG_SIM(LEVEL_DEBUG, "OK: %s ret: %s\r\n", simBufCmd, token);
             return SIM_SUCCESS;
         }
     }
@@ -117,7 +117,7 @@ void copyStr(char* dist, char* source, u16 distSz) {
 }
 
 char* simDownloadData(char* data, u16 sz) {
-    return simTxATCmd(data, sz, 90000);
+    return simTxATCmd(data, sz, 50000);
 }
 
 u8 simCheckCSQ() {
@@ -149,7 +149,7 @@ void simOff() {
 }
 
 void simHardwareReset() {
-    D(printf("WARINIG!: R E S E T !\r\n"));
+    LOG_SIM(LEVEL_MAIN, "WARINIG!: R E S E T !\r\n");
     simOff();
     simOn();
 }
@@ -167,9 +167,9 @@ u8 simTCPCheckStatus(const char* stat, u16 timeout, u16 delay) {
         token = strtok((char*)uInfoSim.pRxBuf + 6, SIM_SEPARATOR_TEXT);
         if (token == NULL || token[0] == '\0') token = SIM_NO_RESPONSE_TEXT;
         if (strcmp((const char*)token, stat) != 0) {
-            D(printf("ER: %s instead %s\r\n", token, stat));
+            LOG_SIM(LEVEL_ERROR, "%s instead %s\r\n", token, stat);
         } else {
-            D(printf("%s\r\n", token));
+            LOG_SIM(LEVEL_INFO, "%s\r\n", token);
             return SIM_SUCCESS;
         }
     }
@@ -242,10 +242,10 @@ u8 simTCPSend(u8* data, u16 sz) {
     u32 ttt = HAL_GetTick();
 
     if (sz == 0) {
-        D(printf("ERROR SZ\r\n"));
+        LOG_SIM(LEVEL_ERROR, "Wrong size\r\n");
         return SIM_FAIL;
     }
-    // D(printf("simDownloadData() sz:%d\r\n", sz));
+    LOG_SIM(LEVEL_DEBUG, "simDownloadData() sz:%d\r\n", sz);
     memset(params, '\0', 8);
     sprintf(params, "%d", sz);
     if (simCmd(SIM_CIPSEND, params, 1, "> ") == SIM_FAIL) {
@@ -258,13 +258,13 @@ u8 simTCPSend(u8* data, u16 sz) {
     ttt = HAL_GetTick() - ttt;
 
     if (strcmp((const char*)token, (const char*)"SEND OK") == 0) {
-        D(printf("OK: simTCPSend() time %d\r\n", ttt));
+        LOG_SIM(LEVEL_INFO, "simTCPSend() time %d\r\n", ttt);
         return SIM_SUCCESS;
     } else if (strcmp((const char*)token, (const char*)"SEND FAIL") == 0) {
-        D(printf("ER: simDownloadData() %s time %d\r\n", token, ttt));
+        LOG_SIM(LEVEL_ERROR, "simDownloadData() %s time %d\r\n", token, ttt);
         return SIM_FAIL;
     } else {
-        D(printf("ER: simDownloadData() %s time %d\r\n", token, ttt));
+        LOG_SIM(LEVEL_ERROR, "simDownloadData() %s time %d\r\n", token, ttt);
         return SIM_TIMEOUT;
     }
     return SIM_SUCCESS;
@@ -289,19 +289,19 @@ u8 procReturnStatus(u8 ret) {
     }
 
     if (ret == TCP_SEND_ER) {
-        D(printf("TCP_SEND_ER %d!\r\n\r\n", notSend));
+        LOG_SIM(LEVEL_ERROR, "TCP_SEND_ER %d!\r\n\r\n", notSend);
         //if (notSend == 5) {
-        //D(printf("UNABLE TO SEND 5!\r\n"));
+        //LOG_SIM(LEVEL_ERROR, "UNABLE TO SEND 5!\r\n");
         simReset();
         ret = TCP_SEND_ER_LOST_PCKG;
         notSend = 0;
         //}
     } else if (ret == TCP_CONNECT_ER) {
-        D(printf("CONNECT ERROR - TOTAL RESET!\r\n"));
+        LOG_SIM(LEVEL_ERROR, "CONNECT ERROR - TOTAL RESET!\r\n");
         osDelay(1000);
         NVIC_SystemReset();
     } else if (ret != TCP_OK) {
-        D(printf("UNABLE TO SEND!\r\n"));
+        LOG_SIM(LEVEL_ERROR, "UNABLE TO SEND!\r\n");
         simReset();
         ret = TCP_SEND_ER_LOST_PCKG;
         notSend = 0;
@@ -313,16 +313,16 @@ u8 procReturnStatus(u8 ret) {
 u8 openTcp() {
     u8 ret = TCP_OK;
     if (!waitGoodCsq(5400)) {
-        D(printf("ER: waitGoodCsq\r\n"));
+        LOG_SIM(LEVEL_ERROR, "waitGoodCsq\r\n");
         ret = TCP_CSQ_ER;
         bsg.stat.simBadCsqCnt++;
     }
     if (ret == TCP_OK && simTCPinit() != SIM_SUCCESS) {
-        D(printf("ER: simTCPinit\r\n"));
+        LOG_SIM(LEVEL_ERROR, "simTCPinit\r\n");
         ret = TCP_INIT_ER;
     }
     if (ret == TCP_OK && simTCPOpen() != SIM_SUCCESS) {
-        D(printf("ER: simTCPOpen\r\n"));
+        LOG_SIM(LEVEL_ERROR, "simTCPOpen\r\n");
         ret = TCP_OPEN_ER;
     }
     if (ret == TCP_OK) {
@@ -344,11 +344,11 @@ u8 sendTcp(u8* data, u16 sz) {
         ret = openTcp();
     }
     if (ret == TCP_OK && !waitGoodCsq(90)) {
-        D(printf("ER: waitGoodCsq\r\n"));
+        LOG_SIM(LEVEL_ERROR, "waitGoodCsq\r\n");
         ret = TCP_CSQ_ER;
     }
     if (ret == TCP_OK && simTCPSend(data, sz) != SIM_SUCCESS) {
-        D(printf("ER: simTCPSend\r\n"));
+        LOG_SIM(LEVEL_ERROR, "simTCPSend\r\n");
         ret = TCP_SEND_ER;
     }
     if (ret == TCP_OK) {
@@ -367,7 +367,7 @@ u8 sendTcp(u8* data, u16 sz) {
 }
 
 void gnssInit() {
-    D(printf("gnssInit()\r\n"));
+    LOG_SIM(LEVEL_MAIN, "gnssInit()\r\n");
     HAL_GPIO_WritePin(GNSS_EN_GPIO_Port, GNSS_EN_Pin, GPIO_PIN_SET);
     osDelay(3000);
     HAL_UART_Transmit(uInfoGnss.pHuart, (u8*)"$PMTK314,0,1,0,0,0,0,0,0,0,0,0,0,0,0*35\r\n",

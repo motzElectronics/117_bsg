@@ -3,109 +3,71 @@
 
 #include "main.h"
 
-#define DEBUG_USART 1
-#define DEBUG_PPRU  1
-#define DEBUG_PARAM 1
-#define DEBUG_CBUF  1
-#define DEBUG_FLASH 1
+#define DEBUG 1
+
+#define DEBUG_LEVEL_COMMON LEVEL_INFO
+#define DEBUG_LEVEL_USART  LEVEL_ERROR
+#define DEBUG_LEVEL_SIM    LEVEL_INFO
+#define DEBUG_LEVEL_PARAM  LEVEL_INFO
+#define DEBUG_LEVEL_CBUF   LEVEL_ERROR
+#define DEBUG_LEVEL_FLASH  LEVEL_MAIN
+#define DEBUG_LEVEL_WEB    LEVEL_INFO
+#define DEBUG_LEVEL_GPS    LEVEL_INFO
 
 #define LEVEL_ERROR 1
 #define LEVEL_MAIN  2
 #define LEVEL_INFO  3
 #define LEVEL_DEBUG 4
 
-#define DEBUG_LEVEL LEVEL_DEBUG
-// #define DEBUG_LEVEL     LEVEL_INFO
-// #define DEBUG_LEVEL     LEVEL_MAIN
-#ifndef DEBUG_LEVEL
-#define DEBUG_LEVEL LEVEL_ERROR
-#endif
+#ifdef DEBUG
+#define PRINT_TIME(millis)                                  \
+    do {                                                    \
+        printf("%06d.%03d:", millis / 1000, millis % 1000); \
+    } while (0)
 
 #define PRINT_LEVEL(level)                 \
     do {                                   \
         if (level == LEVEL_ERROR) {        \
-            printf("[error]:");            \
+            printf("[ERR] :");             \
         } else if (level == LEVEL_MAIN) {  \
-            printf("[main] :");            \
+            printf("[main]:");             \
         } else if (level == LEVEL_INFO) {  \
-            printf("[info] :");            \
+            printf("[info]:");             \
         } else if (level == LEVEL_DEBUG) { \
-            printf("[debug]:");            \
+            printf("[dbg] :");             \
         }                                  \
     } while (0)
 
-#define LOG(level, ...)             \
-    do {                            \
-        if (DEBUG_LEVEL >= level) { \
-            PRINT_LEVEL(level);     \
-            printf("Common:");      \
-            printf(__VA_ARGS__);    \
-        }                           \
+#define LOGG(str, const_level, level, ...) \
+    do {                                   \
+        if (const_level >= level) {        \
+            PRINT_TIME(HAL_GetTick());     \
+            PRINT_LEVEL(level);            \
+            printf(str);                   \
+            printf(__VA_ARGS__);           \
+        }                                  \
     } while (0)
 
-#ifdef DEBUG_USART
-#define LOG_USART(level, ...)       \
-    do {                            \
-        if (DEBUG_LEVEL >= level) { \
-            PRINT_LEVEL(level);     \
-            printf("USART :");      \
-            printf(__VA_ARGS__);    \
-        }                           \
-    } while (0)
+#define LOG(level, ...)       LOGG("     :", DEBUG_LEVEL_COMMON, level, __VA_ARGS__)
+#define LOG_USART(level, ...) LOGG("UART :", DEBUG_LEVEL_USART, level, __VA_ARGS__)
+#define LOG_SIM(level, ...)   LOGG("SIM  :", DEBUG_LEVEL_SIM, level, __VA_ARGS__)
+#define LOG_PARAM(level, ...) LOGG("PARAM:", DEBUG_LEVEL_PARAM, level, __VA_ARGS__)
+#define LOG_CBUF(level, ...)  LOGG("CBUF :", DEBUG_LEVEL_CBUF, level, __VA_ARGS__)
+#define LOG_FLASH(level, ...) LOGG("FLASH:", DEBUG_LEVEL_FLASH, level, __VA_ARGS__)
+#define LOG_WEB(level, ...)   LOGG("WEB  :", DEBUG_LEVEL_WEB, level, __VA_ARGS__)
+#define LOG_GPS(level, ...)   LOGG("GPS  :", DEBUG_LEVEL_GPS, level, __VA_ARGS__)
+
 #else
+
+#define LOG(level, ...)
 #define LOG_USART(level, ...)
-#endif
-
-#ifdef DEBUG_PPRU
-#define LOG_PPRU(level, ...)        \
-    do {                            \
-        if (DEBUG_LEVEL >= level) { \
-            PRINT_LEVEL(level);     \
-            printf("PPRU  : ");     \
-            printf(__VA_ARGS__);    \
-        }                           \
-    } while (0)
-#else
-#define LOG_PPRU(level, ...)
-#endif
-
-#ifdef DEBUG_PARAM
-#define LOG_PARAM(level, ...)       \
-    do {                            \
-        if (DEBUG_LEVEL >= level) { \
-            PRINT_LEVEL(level);     \
-            printf("PARAM :");      \
-            printf(__VA_ARGS__);    \
-        }                           \
-    } while (0)
-#else
+#define LOG_SIM(level, ...)
 #define LOG_PARAM(level, ...)
-#endif
-
-#ifdef DEBUG_CBUF
-#define LOG_CBUF(level, ...)        \
-    do {                            \
-        if (DEBUG_LEVEL >= level) { \
-            PRINT_LEVEL(level);     \
-            printf("CBUF  :");      \
-            printf(__VA_ARGS__);    \
-        }                           \
-    } while (0)
-#else
 #define LOG_CBUF(level, ...)
-#endif
-
-#ifdef DEBUG_FLASH
-#define LOG_FLASH(level, ...)       \
-    do {                            \
-        if (DEBUG_LEVEL >= level) { \
-            PRINT_LEVEL(level);     \
-            printf("FLASH :");      \
-            printf(__VA_ARGS__);    \
-        }                           \
-    } while (0)
-#else
 #define LOG_FLASH(level, ...)
+#define LOG_WEB(level, ...)
+#define LOG_GPS(level, ...)
+
 #endif
 
 #endif

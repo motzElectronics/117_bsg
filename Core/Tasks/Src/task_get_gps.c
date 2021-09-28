@@ -33,7 +33,6 @@ void taskGetGPS(void const *argument) {
     cBufReset(&circBufAllPckgs);
 
     simInit();
-    while (openTcp() != TCP_OK) {}
     getServerTime();
 
     generateInitTelemetry();
@@ -45,7 +44,7 @@ void taskGetGPS(void const *argument) {
         if (uInfoGnss.irqFlags.isIrqRx) {
             uInfoGnss.irqFlags.isIrqRx = 0;
             while (cBufRead(&circBufGnss, (u8 *)bufGnss, CIRC_TYPE_GNSS, 0)) {
-                // D(printf("GPS : %s", bufGnss));
+                LOG_GPS(LEVEL_DEBUG, "GPS : %s", bufGnss);
                 if (bsg.sleepTimer.flagOn) {
                     memset(bufGnss, '\0', sizeof(bufGnss));
                     continue;
@@ -66,16 +65,15 @@ void taskGetGPS(void const *argument) {
                 }
                 memset(bufGnss, '\0', sizeof(bufGnss));
             }
-            // D(printf("empty circBufGnss\r\n"));
         } else {
-            D(printf("ERROR: NOT WORKING GPS\r\n"));
+            LOG_GPS(LEVEL_ERROR, "ERROR: NOT WORKING GPS\r\n");
         }
     }
     /* USER CODE END taskGetGPS */
 }
 
 void unLockTasks() {
-    D(printf("unLockTasks\r\n"));
+    LOG(LEVEL_MAIN, "unLockTasks\r\n");
     vTaskResume(webExchangeHandle);
     vTaskResume(createWebPckgHandle);
     vTaskResume(keepAliveHandle);

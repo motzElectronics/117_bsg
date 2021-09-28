@@ -29,7 +29,7 @@ void spiFlashInit(u8 *buf) {
     if (tmp) {  //! change to 2017
         // bkte.hwStat.isSPIFlash = 1;
     }
-    D(printf("spiFlashId, series: %d %x\r\n", (int)id, (int)tmp));
+    LOG_FLASH(LEVEL_MAIN, "spiFlashId, series: %d %x\r\n", (int)id, (int)tmp);
 
     spiFlash64.blCnt = 128;
     spiFlash64.pgSz = 256;
@@ -82,7 +82,7 @@ u8 spiFlashRxData(u8 *data, u16 sz) {
 }
 
 void spiFlashES(u32 numSec) {
-    D(printf("spiFlash ErSec %d\r\n", numSec));
+    LOG_FLASH(LEVEL_INFO, "ErSec %d\r\n", numSec);
     u32 secAddr;
 
     secAddr = numSec * spiFlash64.secSz;
@@ -101,15 +101,14 @@ void spiFlashES(u32 numSec) {
 
 u8 spiFlashWaitReady() {
     u8 data[] = {SPIFLASH_RDSR, DUMMY_BYTE};
-    osDelay(50);
+    osDelay(10);
     u8 i = 0, ret = 0;
     do {
         SPIFLASH_CS_SEL;
-        osDelay(50);
         ret = spiFlashTxRxCmd(data, sizeof(data));
-        i++;
         SPIFLASH_CS_UNSEL;
-        osDelay(50);
+        osDelay(10);
+        i++;
     } while (((data[1] & 0x01) == 0x01) && (i < 3));
     return ret;
 }
@@ -159,7 +158,7 @@ u8 spiFlashIsPgBad(u32 numPage) {
 
 void spiFlashMarkPgBad(u32 numPage) {
     u16 curNumSec, numPgInSec;
-    D(printf("Mark bad page %d\r\n", numPage));
+    LOG_FLASH(LEVEL_ERROR, "Mark bad page %d\r\n", numPage);
 
     curNumSec = numPage / SPIFLASH_NUM_PG_IN_SEC;
     numPgInSec = numPage % SPIFLASH_NUM_PG_IN_SEC;
@@ -174,16 +173,16 @@ u8 spiFlashWriteNextPg(u8 *pBuf, u32 sz, u32 offset) {
     u8  pdBad = 1;
     u32 numPage;
 
-    if (spiFlash64.headNumPg % (SPIFLASH_NUM_PG_IN_SEC * 2) == 0) {
+    if (spiFlash64.headNumPg % (SPIFLASH_NUM_PG_IN_SEC * 4) == 0) {
         spiFlashSaveInfo();
-        D(printf("spiFlashPeriodicSave %d\r\n", spiFlash64.headNumPg));
+        LOG_FLASH(LEVEL_MAIN, "spiFlashPeriodicSave %d\r\n", spiFlash64.headNumPg);
     }
 
     osMutexWait(mutexSpiFlashHandle, 60000);
     numPage = spiFlash64.headNumPg;
 
     while (pdBad) {
-        D(printf("spiFlash WrPg %d\r\n", numPage));
+        LOG_FLASH(LEVEL_INFO, "WrPg %d\r\n", numPage);
         if (numPage % SPIFLASH_NUM_PG_IN_SEC == 0) {
             spiFlashES(numPage / SPIFLASH_NUM_PG_IN_SEC);
             if (numPgFirstES == SPIFLASH_NUM_PG_GNSS) numPgFirstES = numPage;
@@ -195,7 +194,7 @@ u8 spiFlashWriteNextPg(u8 *pBuf, u32 sz, u32 offset) {
         }
 
         if ((pdBad = spiFlashIsPgBad(numPage)) == 1) {
-            D(printf("ERROR: bad page %d\r\n", numPage));
+            LOG_FLASH(LEVEL_ERROR, "bad page %d\r\n", numPage);
             numPage = (numPage + 1) % SPIFLASH_NUM_PG_GNSS;
         }
     }
@@ -204,7 +203,10 @@ u8 spiFlashWriteNextPg(u8 *pBuf, u32 sz, u32 offset) {
         sz = spiFlash64.pgSz - offset;
 
     addr = (numPage * spiFlash64.pgSz) + offset;
+    // u32 time = HAL_GetTick();
     spiFlashWrPg(pBuf, sz, addr);
+    // time = HAL_GetTick() - time;
+    // printf("Wr %d\r\n", time);
     spiFlash64.headNumPg = (numPage + 1) % SPIFLASH_NUM_PG_GNSS;
 
     bsg.stat.pageWrCount++;
@@ -221,14 +223,14 @@ u8 spiFlashReadLastPg(u8 *pBuf, u32 sz, u32 offset) {
     numPage = spiFlash64.tailNumPg;
 
     while (pdBad) {
-        D(printf("spiFlash RdPg %d\r\n", numPage));
+        LOG_FLASH(LEVEL_INFO, "RdPg %d\r\n", numPage);
         if (!bsg.isSpiFlashReady && numPage == numPgFirstES) {
-            D(printf("\r\nSPI FLASH READY\r\n\r\n"));
+            LOG_FLASH(LEVEL_MAIN, "SPI FLASH READY\r\n\r\n");
             bsg.isSpiFlashReady = 1;
         }
 
         if ((pdBad = spiFlashIsPgBad(numPage)) == 1) {
-            D(printf("ERROR: bad page %d\r\n", numPage));
+            LOG_FLASH(LEVEL_ERROR, "bad page %d\r\n", numPage);
             numPage = (numPage + 1) % SPIFLASH_NUM_PG_GNSS;
         }
     }
@@ -237,11 +239,14 @@ u8 spiFlashReadLastPg(u8 *pBuf, u32 sz, u32 offset) {
         sz = spiFlash64.pgSz - offset;
 
     addr = (numPage * spiFlash64.pgSz) + offset;
+    // u32 time = HAL_GetTick();
     spiFlashRdPg(pBuf, sz, addr);
+    // time = HAL_GetTick() - time;
+    // printf("Rd %d\r\n", time);
 
     len = isDataFromFlashOk(pBuf, 256);
     if (len == 0) {
-        D(printf("ERROR: bad crc isDataFromFlashOk()\r\n"));
+        LOG_FLASH(LEVEL_ERROR, "bad crc isDataFromFlashOk()\r\n");
         if (bsg.isSpiFlashReady) {
             spiFlashMarkPgBad(numPage);
         }
@@ -287,7 +292,7 @@ void spiFlashSaveInfo() {
 
     spiFlashES(BSG_SAVE_NUM_PAGE / SPIFLASH_NUM_PG_IN_SEC);
 
-    D(printf("Save pages: head %d, tail %d\r\n", spiFlash64.headNumPg, spiFlash64.tailNumPg));
+    LOG_FLASH(LEVEL_MAIN, "Save pages: head %d, tail %d\r\n", spiFlash64.headNumPg, spiFlash64.tailNumPg);
 
     addr = (BSG_SAVE_NUM_PAGE * spiFlash64.pgSz);
     spiFlashWrPg(buf, 32, addr);
@@ -305,11 +310,12 @@ void spiFlashLoadInfo(u8 *buf) {
 
     tmp = buf[0] | buf[1] << 8 | buf[2] << 16 | buf[3] << 24;
     spiFlash64.headNumPg = tmp;
-    D(printf("Read headNumPg: %d\r\n", spiFlash64.headNumPg));
+    spiFlash64.tailNumPg = spiFlash64.headNumPg;
+    LOG_FLASH(LEVEL_MAIN, "Read headNumPg: %d\r\n", spiFlash64.headNumPg);
+    LOG_FLASH(LEVEL_MAIN, "Read tailNumPg: %d\r\n", spiFlash64.tailNumPg);
 
-    tmp = buf[4] | buf[5] << 8 | buf[6] << 16 | buf[7] << 24;
-    spiFlash64.tailNumPg = tmp;
-    D(printf("Read tailNumPg: %d\r\n", spiFlash64.tailNumPg));
+    // tmp = buf[4] | buf[5] << 8 | buf[6] << 16 | buf[7] << 24;
+    // spiFlash64.tailNumPg = tmp;
 
     isMapInFlash = buf[31];
 
@@ -323,7 +329,7 @@ void spiFlashLoadInfo(u8 *buf) {
 
     memset((u8 *)badPgMap, 0, sizeof(badPgMap));
     if (isMapInFlash == 0x01) {
-        spiFlashReadMap();
+        // spiFlashReadMap();
     } else {
         osMutexWait(mutexSpiFlashHandle, 60000);
         spiFlashES(BSG_BAD_PG_MAP_NUM_PAGE / SPIFLASH_NUM_PG_IN_SEC);

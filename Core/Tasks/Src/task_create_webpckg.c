@@ -36,7 +36,7 @@ void taskCreateWebPckg(void const *argument) {
 
     vTaskSuspend(createWebPckgHandle);
 
-    D(printf("taskCreateWebPckg\r\n"));
+    LOG_WEB(LEVEL_MAIN, "taskCreateWebPckg\r\n");
     for (;;) {
         iwdgTaskReg |= IWDG_TASK_REG_WEB_PCKG;
         delayPages = getDelayPages();
@@ -65,7 +65,7 @@ void taskCreateWebPckg(void const *argument) {
             }
             szAllPages = getSzAllPages();
             if (szAllPages) {
-                D(printf("Create package\r\n"));
+                LOG_WEB(LEVEL_INFO, "Create package\r\n");
                 initWebPckg(curPckg, szAllPages, 0, &bsg.idMCU);
                 addPagesToWebPckg(curPckg);
                 osMessagePut(queueWebPckgHandle, (u32)curPckg, osWaitForever);
@@ -76,7 +76,7 @@ void taskCreateWebPckg(void const *argument) {
         }
 
         if (!delayPages) {
-            // D(printf("no pckg in spiflash\r\n"));
+            LOG_WEB(LEVEL_DEBUG, "no pckg in spiflash\r\n");
             bsg.isSentData = 1;
         }
         osDelay(1000);
@@ -118,7 +118,7 @@ void parseData(u8 *tmpBufPage, u8 len) {
                 i += (SZ_CMD_PERCRSSI_127 + 1);
                 break;
             default:
-                D(printf("ER: CMD_DATA_X is wrong\r\n"));
+                LOG_WEB(LEVEL_ERROR, "ER: CMD_DATA_X is wrong\r\n");
                 return;
                 break;
         }

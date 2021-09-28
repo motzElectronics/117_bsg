@@ -44,10 +44,10 @@ void addInfoToWebPckg(WebPckg* pPckg, u8* src, u16 sz, u8 cnt, u8 cmdData) {
 }
 
 void showWebPckg(WebPckg* pPckg) {
-    for (u16 i = 0; i < pPckg->shift; i++) {
-        D(printf("%02x", pPckg->buf[i]));
-    }
-    D(printf("\r\n"));
+    // for (u16 i = 0; i < pPckg->shift; i++) {
+    //     LOG_WEB(LEVEL_INFO, "%02x", pPckg->buf[i]);
+    // }
+    // LOG_WEB(LEVEL_INFO, "\r\n");
 }
 
 void closeWebPckg(WebPckg* pPckg) {
@@ -66,7 +66,7 @@ WebPckg* getFreePckg() {
             return &webPckgs[i];
         }
     }
-    // D(printf("ER: NO FREEPCKG\r\n"));
+    // LOG_WEB(LEVEL_INFO, "ER: NO FREEPCKG\r\n"));
     return NULL;
 }
 
@@ -76,7 +76,7 @@ WebPckg* getFreePckgReq() {
         return &webPckgs[CNT_WEBPCKGS];
     }
 
-    // D(printf("ER: NO FREEPCKG\r\n"));
+    // LOG_WEB(LEVEL_INFO, "ER: NO FREEPCKG\r\n"));
     return NULL;
 }
 
@@ -137,7 +137,7 @@ ErrorStatus sendWebPckgData(u8 CMD_DATA, u8* data, u8 sz, u8 szReq, u8* idMCU) {
 
     osMutexWait(mutexWebHandle, osWaitForever);
     if (sendTcp(curPckg->buf, curPckg->shift) != TCP_OK) {
-        D(printf("ERROR: send data failed\r\n"));
+        LOG_WEB(LEVEL_ERROR, "send data failed\r\n");
         ret = ERROR;
     }
     osMutexRelease(mutexWebHandle);
@@ -173,7 +173,7 @@ ErrorStatus generateWebPckgReq(u8 CMD_REQ, u8* data, u8 sz, u8 szReq, u8* answ, 
             if (waitIdle("wait req answ", &(uInfoSim.irqFlags), 100, 10000)) {
                 memcpy(answ, &uInfoSim.pRxBuf[11], szAnsw);
             } else {
-                D(printf("ERROR: NO ANSW REQ\r\n"));
+                LOG_WEB(LEVEL_ERROR, "NO ANSW REQ\r\n");
                 ret = ERROR;
                 bsg.isTCPOpen = 0;
             }
@@ -185,7 +185,7 @@ ErrorStatus generateWebPckgReq(u8 CMD_REQ, u8* data, u8 sz, u8 szReq, u8* answ, 
         osMutexRelease(mutexWebHandle);
     } else {
         ret = ERROR;
-        D(printf("ERROR: NO FREE PCKG\r\n"));
+        LOG_WEB(LEVEL_ERROR, "NO FREE PCKG\r\n");
     }
 
     return ret;

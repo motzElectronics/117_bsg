@@ -33,18 +33,17 @@ void taskGetTrainData(void const* argument) {
 
     for (;;) {
         iwdgTaskReg |= IWDG_TASK_REG_TABLO;
-        if (iter % 50 == 6) {
+        if (iter % 500 == 6) {
             u32 timeStamp = getUnixTimeStamp();
             tablo_send_request(CMD_SYNC, (u8*)&timeStamp, sizeof(timeStamp));
-        } else if (iter % 3 == 1) {
-            tablo_send_request(CMD_DATA, (u8*)&uInfoTablo.szRxBuf, sizeof(uInfoTablo.szRxBuf));
-        } else if (iter % 50 == 7) {
+        } else if (iter % 500 == 7) {
             tablo_send_request(CMD_GNSS, (u8*)&bsg.cur_gps, sizeof(gps_state_t));
-        } else if (iter % 400 == 5) {
+        } else if (iter % 4000 == 5) {
             tablo_send_request(CMD_GET_INFO, NULL, 0);
         }
-
-        osDelay(1000);
+        osDelay(100);
+        tablo_send_request(CMD_DATA, (u8*)&uInfoTablo.szRxBuf, sizeof(uInfoTablo.szRxBuf));
+        osDelay(100);
         iter++;
     }
 }
@@ -60,6 +59,8 @@ u8 tablo_send_request(u8 cmd, u8* data, u8 len) {
         res = tablo_parse_responce(&uInfoTablo);
         __HAL_DMA_SET_COUNTER(uInfoTablo.pHuart->hdmarx, uInfoTablo.szRxBuf);
         __HAL_DMA_DISABLE(uInfoTablo.pHuart->hdmarx);
+    } else {
+        bsg.stat.tabloErrCnt++;
     }
     return res;
 }
@@ -118,6 +119,8 @@ u8 tablo_send_fw_part(u32 write_from, u8* data, u16 len) {
         res = tablo_parse_responce(&uInfoTablo);
         __HAL_DMA_SET_COUNTER(uInfoTablo.pHuart->hdmarx, uInfoTablo.szRxBuf);
         __HAL_DMA_DISABLE(uInfoTablo.pHuart->hdmarx);
+    } else {
+        bsg.stat.tabloErrCnt++;
     }
     return res;
 }
@@ -134,6 +137,7 @@ void parse_tablo_data(u8* data_all, u16 len_all) {
         data = (u8*)(&data_all[ptr]);
 
         if (len_pg > SZ_PAGE) {
+            bsg.stat.tabloErrCnt++;
             LOG(LEVEL_ERROR, "Returned big page (len %d)\r\n", len_pg);
             return;
         }
@@ -145,7 +149,7 @@ void parse_tablo_data(u8* data_all, u16 len_all) {
         memcpy(&tmpBufPage[len_pg], bufEnd, 4);
         spiFlashWriteNextPg(tmpBufPage, len_pg + 4, 0);
 
-        // LOG(LEVEL_DEBUG, "Returned page (len %d)\r\n", len_pg);
+        LOG(LEVEL_DEBUG, "Returned page (len %d)\r\n", len_pg);
 
         ptr += len_pg;
     }
@@ -162,8 +166,11 @@ void parse_tablo_gnss(u8* data_all, u16 len_all) {
 void parse_tablo_error(u8* data_all, u16 len_all) {
     u8 error_type = data_all[0];
 
-    if (error_type != 2) {
+    if (error_type == 2) {
         LOG(LEVEL_DEBUG, "Returned error type %d\r\n", error_type);
+    } else {
+        bsg.stat.tabloErrCnt++;
+        LOG(LEVEL_ERROR, "Returned error type %d\r\n", error_type);
     }
 }
 
@@ -214,12 +221,14 @@ u8 tablo_parse_responce(UartInfo* pUInf) {
     u16 pkt_len = uInfoTablo.szRxBuf - pUInf->pHuart->hdmarx->Instance->NDTR;
 
     if (pkt_len < CMD_HDR_SIZE + CMD_CRC_SIZE) {
+        bsg.stat.tabloErrCnt++;
         LOG(LEVEL_ERROR, "Short answ, len %d\r\n", pkt_len);
         return 0;
     }
 
     crc_calc = calcCrc16(pUInf->pRxBuf, (hdr->length + CMD_HDR_SIZE + CMD_CRC_SIZE));
     if (crc_calc != 0) {
+        bsg.stat.tabloErrCnt++;
         LOG(LEVEL_ERROR, "Bad crc, len %d\r\n", pkt_len);
         return 0;
     }
@@ -261,6 +270,7 @@ u8 tablo_parse_responce(UartInfo* pUInf) {
             parse_tablo_fw_end(data, hdr->length);
             break;
         default:
+            bsg.stat.tabloErrCnt++;
             return 0;
             break;
     }

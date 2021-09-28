@@ -40,7 +40,7 @@ void taskWebExchange(void const* argument) {
 
             osMutexWait(mutexWebHandle, osWaitForever);
             memcpy(&order_num, &curPckg->buf[2], 4);
-            printf("TCP Send: sz %d, num %d, addr 0x%08x\r\n", curPckg->shift, order_num, curPckg);
+            LOG_WEB(LEVEL_INFO, "TCP Send: sz %d, num %d, addr 0x%08x\r\n", curPckg->shift, order_num, curPckg);
             statSend = sendTcp(curPckg->buf, curPckg->shift);
             if (statSend == TCP_OK) {
                 clearWebPckg(curPckg);

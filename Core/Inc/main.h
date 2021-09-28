@@ -104,7 +104,7 @@ void Error_Handler(void);
 #define SZ_CMD_TELEMETRY           10
 #define SZ_CMD_ENERGY_127          13
 #define SZ_CMD_VOLTAMPER_127       9
-#define SZ_CMD_PERCRSSI_127        10
+#define SZ_CMD_PERCRSSI_127        15
 #define SZ_CMD_TELEMETRY_PHONE_NUM 14
 
 #define SZ_PAGE                  255

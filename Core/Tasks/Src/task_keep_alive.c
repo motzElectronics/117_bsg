@@ -26,24 +26,24 @@ void taskKeepAlive(void const* argument) {
     vTaskSuspend(keepAliveHandle);
 
     for (;;) {
-        if ((timeout % 120 == 10) && !isRxNewFirmware) {
-            D(printf("getBsgNumFw\r\n\r\n"));
+        if ((timeout % 300 == 10) && !isRxNewFirmware) {
+            LOG(LEVEL_MAIN, "getBsgNumFw\r\n\r\n");
             getBsgNumFw();
         }
-        if ((timeout % 120 == 20) && !isRxNewFirmware) {
-            D(printf("getTabloNumFw\r\n\r\n"));
+        if ((timeout % 300 == 20) && !isRxNewFirmware) {
+            LOG(LEVEL_MAIN, "getTabloNumFw\r\n\r\n");
             getTabloNumFw();
         }
         if (!(timeout % 180) && !isRxNewFirmware) {
-            D(printf("sendMsgStatistics\r\n"));
+            LOG(LEVEL_MAIN, "sendMsgStatistics\r\n");
             sendMsgStatistics();
         }
         // if (!(timeout % 600) && !isRxNewFirmware) {
-        //     D(printf("\r\ngenerateMsgKeepAlive\r\n\r\n"));
+        //     LOG(LEVEL_MAIN, "\r\ngenerateMsgKeepAlive\r\n\r\n");
         //     generateMsgKeepAlive();
         // }
         if (!(timeout % 5400) && !isRxNewFirmware) {
-            D(printf("\r\nupdRTC\r\n\r\n"));
+            LOG(LEVEL_MAIN, "updRTC\r\n\r\n");
             updRTC();
         }
 
@@ -94,7 +94,7 @@ ErrorStatus sendMsgFWUpdated() {
         return ERROR;
     }
 
-    D(printf("sendMsgFWUpdated\r\n"));
+    LOG(LEVEL_MAIN, "sendMsgFWUpdated\r\n");
 
     memset(bufTxData, 0, 20);
     pckgTel.group = TEL_GR_HARDWARE_STATUS;
@@ -126,7 +126,7 @@ ErrorStatus sendMsgFWUpdateBegin() {
         return ERROR;
     }
 
-    D(printf("sendMsgFWUpdated\r\n"));
+    LOG(LEVEL_MAIN, "sendMsgFWUpdated\r\n");
 
     memset(bufTxData, 0, 64);
     pckgTel.group = TEL_GR_HARDWARE_STATUS;
@@ -172,6 +172,11 @@ ErrorStatus sendMsgStatistics() {
 
     pckgTel.code = TEL_CD_GENINF_GPS_PARSE_ER_CNT;
     pckgTel.data = bsg.stat.gpsParseFailCount;
+    saveTelemetry(&pckgTel, &circBufAllPckgs);
+
+    pckgTel.group = TEL_GR_PROJECT_127_STAT;
+    pckgTel.code = TEL_CD_127_IU_ERR;
+    pckgTel.data = bsg.stat.tabloErrCnt;
     saveTelemetry(&pckgTel, &circBufAllPckgs);
 
     pckgTel.group = TEL_GR_PROJECT_127_MEM;
@@ -226,47 +231,3 @@ ErrorStatus sendMsgStatistics() {
 
     return ret;
 }
-
-// void powerOffBsg()
-// {
-//     char strVolts[4];
-//     static u32 delayPages = 1;
-//     u8 cnt;
-
-//     vTaskSuspend(getGPSHandle);
-//     vTaskSuspend(keepAliveHandle);
-
-//     osDelay(2000);
-//     D(printf("OK: PWR OFF START\r\n"));
-//     D(printf("OK: PWR OFF WAIT: %d\r\n", getUnixTimeStamp()));
-
-//     while (delayPages > BSG_THRESHOLD_CNT_PAGES) {
-//         osDelay(5000);
-//         printf("delayPages %d\r\n", delayPages);
-//         delayPages = spiFlash64.headNumPg >= spiFlash64.tailNumPg ?
-//                     spiFlash64.headNumPg - spiFlash64.tailNumPg :
-//                     spiFlash64.headNumPg + (SPIFLASH_NUM_PG_GNSS - spiFlash64.tailNumPg);
-//     }
-
-//     while ((cnt = getCntFreePckg()) != CNT_WEBPCKGS) {
-//         osDelay(5000);
-//         printf("getCntFreePckg %d\r\n", cnt);
-//     }
-
-//     generateMsgFWUpdated();
-//     generateMsgDevOff();
-//     D(printf("OFF  VOLT: %d\r\n", bkte.pwrInfo.adcVoltBat));
-//     bkte.isSentData = 0;
-//     updSpiFlash(&circBufAllPckgs);
-//     xSemaphoreGive(semCreateWebPckgHandle);
-
-//     while (!bkte.isSentData) {
-//         osDelay(1000);
-//         printf("wait isSentData\r\n");
-//     }
-
-//     D(printf("OK: PWR OFF SENT TELEMETRY: %d\r\n", getUnixTimeStamp()));
-
-//     osDelay(5000);
-//     NVIC_SystemReset();
-// }

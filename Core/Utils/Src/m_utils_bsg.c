@@ -19,8 +19,8 @@ static RTC_DateTypeDef tmpDate;
 void bsgInit() {
     for (u8 i = 0; i < 3; i++)
         bsg.idMCU[i] = getFlashData(BSG_ADDR_ID_MCU + (i * 4));
-    D(printf("%08x%08x%08x\r\n", (uint)bsg.idMCU[0], (uint)bsg.idMCU[1],
-             (uint)bsg.idMCU[2]));
+    LOG(LEVEL_MAIN, "%08x%08x%08x\r\n", (uint)bsg.idMCU[0], (uint)bsg.idMCU[1],
+        (uint)bsg.idMCU[2]);
 
     bsg.idTrain = BSG_ID_TRAIN;
     bsg.idTrainCar = BSG_ID_TRAINCAR;
@@ -61,7 +61,7 @@ u32 getUnixTimeStamp() {
 void getServerTime() {
     u8 bufTime[4];
     if (generateWebPckgReq(CMD_REQUEST_SERVER_TIME, NULL, 0, SZ_REQUEST_GET_SERVER_TIME, bufTime, 4, &bsg.idMCU) == ERROR) {
-        D(printf("ERROR: bad server time\r\n"));
+        LOG_WEB(LEVEL_ERROR, "ERROR: bad server time\r\n");
     } else {
         time_t t =
             bufTime[0] << 24 | bufTime[1] << 16 | bufTime[2] << 8 | bufTime[3];
@@ -89,12 +89,12 @@ void getServerTime() {
 void getBsgNumFw() {
     u8 bufFirmware[4];
     if (generateWebPckgReq(CMD_REQUEST_NUM_FIRMWARE, NULL, 0, SZ_REQUEST_GET_NUM_FIRMWARE, bufFirmware, 4, &bsg.idMCU) == ERROR) {
-        D(printf("ERROR: getBsgNumFw()\r\n"));
+        LOG_WEB(LEVEL_ERROR, "ERROR: getBsgNumFw()\r\n");
     } else {
         u32 numFirmware = bufFirmware[0] << 24 | bufFirmware[1] << 16 | bufFirmware[2] << 8 | bufFirmware[3];
-        D(printf("BSG FIRMWARE v.:%d\r\n", (int)numFirmware));
+        LOG_WEB(LEVEL_INFO, "BSG FIRMWARE v.:%d\r\n", (int)numFirmware);
         if (numFirmware != BSG_ID_FIRMWARE && numFirmware > 0 && numFirmware < 10) {
-            D(printf("New FIRMWARE v.:%d\r\n", (int)numFirmware));
+            LOG_WEB(LEVEL_MAIN, "New FIRMWARE v.:%d\r\n", (int)numFirmware);
             bsg.updTarget = UPD_TARGET_BSG;
             vTaskResume(getNewBinHandle);
         }
@@ -104,16 +104,16 @@ void getBsgNumFw() {
 void getTabloNumFw() {
     u8 bufFirmware[4];
     if ((bsg.tablo.info.idMCU[0] == 0 && bsg.tablo.info.idMCU[1] == 0 && bsg.tablo.info.idMCU[2] == 0) || bsg.tablo.info.idFirmware == 0) {
-        D(printf("ERROR: null tablo id mcu or firmware\r\n"));
+        LOG_WEB(LEVEL_ERROR, "ERROR: null tablo id mcu or firmware\r\n");
         return;
     }
     if (generateWebPckgReq(CMD_REQUEST_NUM_FIRMWARE, NULL, 0, SZ_REQUEST_GET_NUM_FIRMWARE, bufFirmware, 4, &bsg.tablo.info.idMCU) == ERROR) {
-        D(printf("ERROR: getTabloNumFw()\r\n"));
+        LOG_WEB(LEVEL_ERROR, "ERROR: getTabloNumFw()\r\n");
     } else {
         u32 numFirmware = bufFirmware[0] << 24 | bufFirmware[1] << 16 | bufFirmware[2] << 8 | bufFirmware[3];
-        D(printf("Tablo FIRMWARE v.:%d\r\n", (int)numFirmware));
+        LOG_WEB(LEVEL_INFO, "Tablo FIRMWARE v.:%d\r\n", (int)numFirmware);
         if (numFirmware != bsg.tablo.info.idFirmware && numFirmware > 10 && numFirmware < 20 && bsg.tablo.info.idFirmware > 0) {
-            D(printf("New FIRMWARE v.:%d\r\n", (int)numFirmware));
+            LOG_WEB(LEVEL_MAIN, "New FIRMWARE v.:%d\r\n", (int)numFirmware);
             bsg.updTarget = UPD_TARGET_TABLO;
             vTaskResume(getNewBinHandle);
         }
@@ -126,7 +126,7 @@ u8 isCrcOk(char* pData, int len) {
     u32 crcCalc = crc32_byte(pData, len);
     u32 crcRecv = pData[len] << 24 | pData[len + 1] << 16 | pData[len + 2] << 8 | pData[len + 3];
     if (crcCalc != crcRecv) {
-        D(printf("ERROR: crc \r\n"));
+        LOG(LEVEL_ERROR, "isCrcOk bad crc \r\n");
     }
     for (u8 i = 0; i < sizeof(u32); i++) {
         pData[len + i] = 0xFF;  //! clear crc32
@@ -143,7 +143,7 @@ void updSpiFlash(CircularBuffer* cbuf) {
     spiFlashWriteNextPg(cbuf->buf, cbuf->readAvailable, 0);
     cBufReset(cbuf);
 
-    D(printf("updSpiFlash()\r\n"));
+    LOG_FLASH(LEVEL_INFO, "updSpiFlash()\r\n");
 }
 
 u8 waitGoodCsq(u32 timeout) {
@@ -158,9 +158,9 @@ u8 waitGoodCsq(u32 timeout) {
             cntNOCsq = 0;
             return 0;
         }
-        D(printf("ER: CSQ %d\r\n", csq));
+        LOG_SIM(LEVEL_DEBUG, "ER: CSQ %d\r\n", csq);
     }
-    D(printf("OK: CSQ %d\r\n", csq));
+    LOG_SIM(LEVEL_INFO, "OK: CSQ %d\r\n", csq);
     return 1;
 }
 

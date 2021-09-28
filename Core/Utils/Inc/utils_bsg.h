@@ -79,6 +79,8 @@ typedef struct {
     u32 gpsInvaligCount;
     u32 gpsParseFailCount;
 
+    u32 tabloErrCnt;
+
     u32 pageWrCount;
     u32 pageRdCount;
     u32 pageBadCount;
@@ -151,6 +153,8 @@ typedef __packed struct {
     u8  perc_good;
     u8  perc_normal;
     u8  perc_bad;
+    u8  perc_no_rssi;
+    u32 sum;
 } PckgPercRSSI_127;
 
 typedef enum {
@@ -202,7 +206,7 @@ typedef enum {
     TEL_CD_127_BKT_FW = 1,
     TEL_CD_127_PPRU_FW,
     TEL_CD_127_DOORS,
-    TEL_CD_HW_PPRU_RSSI
+    TEL_CD_127_PPRU_RSSI
 } TELEMETRY_CODE_127;
 
 typedef enum {
@@ -214,7 +218,9 @@ typedef enum {
     TEL_CD_127_MU_ERR_REQ,
     TEL_CD_127_MU_MISS_DOOR,
     TEL_CD_127_MU_EMPTY = 8,
-    TEL_CD_127_MU_RSSI_STAT
+    TEL_CD_127_MU_PARSE_ERR,
+    TEL_CD_127_MU_RSSI_STAT,
+    TEL_CD_127_IU_ERR
 } TELEMETRY_CODE_127_STAT;
 
 typedef enum {

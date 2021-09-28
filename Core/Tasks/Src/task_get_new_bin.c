@@ -34,7 +34,7 @@ void taskGetNewBin(void const* argument) {
     FLASH_Erase_Sector(FLASH_SECTOR_1, VOLTAGE_RANGE_3);
 
     vTaskSuspend(getNewBinHandle);
-    D(printf("taskGetNewBin\r\n"));
+    LOG(LEVEL_MAIN, "taskGetNewBin\r\n");
 
     lockAllTasks();
     isRxNewFirmware = 1;
@@ -126,9 +126,9 @@ void big_update_func() {
                 }
 
                 curSzSoft += szPartSoft;
-                D(printf("OK: DOWNLOAD %d BYTES\r\n", (int)curSzSoft));
+                LOG(LEVEL_MAIN, "DOWNLOAD %d BYTES\r\n", (int)curSzSoft);
             } else {
-                D(printf("ERROR: httpPost() DOWNLOAD\r\n"));
+                LOG(LEVEL_ERROR, "httpPost() DOWNLOAD\r\n");
                 cntFailTCPReq++;
                 if (cntFailTCPReq > 10) {
                     cntFailTCPReq = 0;
@@ -140,9 +140,9 @@ void big_update_func() {
                 while (openTcp() != TCP_OK) {}
             }
             if (sendMsgFWUpdated() != SUCCESS) {
-                D(printf("ERROR: Send FW UPDATED\r\n"));
+                LOG(LEVEL_ERROR, "Send FW UPDATED\r\n");
             }
-            D(printf("DOWNLOAD COMPLETE\r\n"));
+            LOG(LEVEL_MAIN, "DOWNLOAD COMPLETE\r\n");
 
             if (bsg.updTarget == UPD_TARGET_TABLO) {
                 res = 0;
@@ -166,18 +166,18 @@ void big_update_func() {
 
 void updBootInfo() {
     szSoft = szSoft % 4 == 0 ? szSoft : ((szSoft / 4) + 1) * 4;
-    while (HAL_FLASH_Unlock() != HAL_OK) D(printf("ERROR: HAL_FLASH_Unlock()\r\n"));
+    while (HAL_FLASH_Unlock() != HAL_OK) LOG_FLASH(LEVEL_ERROR, "HAL_FLASH_Unlock()\r\n");
     FLASH_Erase_Sector(FLASH_SECTOR_1, VOLTAGE_RANGE_3);
-    // D(printf("FLASH_Erase_Sector\r\n"));
+    LOG_FLASH(LEVEL_MAIN, "FLASH_Erase_Sector\r\n");
     while (HAL_FLASH_Program(TYPEPROGRAM_WORD, FLASH_ADDR_ID_BOOT, BSG_ID_BOOT))
-        D(printf("ERROR: HAL_FLASH_Program(BOOT_ADDR_ID_LOADER)\r\n"));
+        LOG_FLASH(LEVEL_ERROR, "HAL_FLASH_Program(BOOT_ADDR_ID_LOADER)\r\n");
     while (HAL_FLASH_Program(TYPEPROGRAM_WORD, FLASH_ADDR_IS_NEW_FIRWARE, (u32)1))
-        D(printf("ERROR: HAL_FLASH_Program(BOOT_ADDR_IS_NEW_FIRWARE)\r\n"));
+        LOG_FLASH(LEVEL_ERROR, "HAL_FLASH_Program(BOOT_ADDR_IS_NEW_FIRWARE)\r\n");
     while (HAL_FLASH_Program(TYPEPROGRAM_WORD, FLASH_ADDR_SZ_NEW_FIRMWARE, (u32)(szSoft)))
-        D(printf("ERROR: HAL_FLASH_Program(FLASH_ADDR_SZ_NEW_FIRMWARE)\r\n"));
-    while (HAL_FLASH_Lock() != HAL_OK) D(printf("ERROR: HAL_FLASH_Lock()\r\n"));
-    D(printf("BOOT_ID: %d\r\n", (int)getFlashData(FLASH_ADDR_ID_BOOT)));
-    D(printf("IS_NEW_FIRMARE: %d\r\n", (int)getFlashData(FLASH_ADDR_IS_NEW_FIRWARE)));
+        LOG_FLASH(LEVEL_ERROR, "HAL_FLASH_Program(FLASH_ADDR_SZ_NEW_FIRMWARE)\r\n");
+    while (HAL_FLASH_Lock() != HAL_OK) LOG_FLASH(LEVEL_ERROR, "HAL_FLASH_Lock()\r\n");
+    LOG_FLASH(LEVEL_MAIN, "BOOT_ID: %d\r\n", (int)getFlashData(FLASH_ADDR_ID_BOOT));
+    LOG_FLASH(LEVEL_MAIN, "IS_NEW_FIRMARE: %d\r\n", (int)getFlashData(FLASH_ADDR_IS_NEW_FIRWARE));
 }
 
 void lockAllTasks() {
@@ -210,11 +210,11 @@ u32 getSzFirmware() {
     }
 
     if (generateWebPckgReq(CMD_REQUEST_SZ_FIRMWARE, NULL, 0, SZ_REQUEST_GET_SZ_FIRMWARE, bufSzFirmware, 4, idMCU) == ERROR) {
-        D(printf("ERROR: sz firmware\r\n"));
+        LOG(LEVEL_ERROR, "sz firmware\r\n");
         return 0;
     } else {
         u32 numFirmware = bufSzFirmware[0] << 24 | bufSzFirmware[1] << 16 | bufSzFirmware[2] << 8 | bufSzFirmware[3];
-        D(printf("OK: sz firmware %d\r\n", numFirmware));
+        LOG(LEVEL_INFO, "OK: sz firmware %d\r\n", numFirmware);
         return numFirmware;
     }
 }
@@ -235,7 +235,7 @@ ErrorStatus getPartFirmware(u8* reqData, u8* answBuf, u16 szAnsw, u8 szReq) {
     curPckg = createWebPckgReq(CMD_REQUEST_PART_FIRMWARE, reqData, szReq, SZ_REQUEST_GET_PART_FIRMWARE, idMCU);
     osMutexWait(mutexWebHandle, osWaitForever);
     if (sendTcp(curPckg->buf, curPckg->shift) != TCP_OK) {
-        D(printf("ERROR: part Firmware\r\n"));
+        LOG(LEVEL_ERROR, "part Firmware\r\n");
         ret = ERROR;
     } else {
         waitIdleCnt("wait IDLE part firmware", &(uInfoSim.irqFlags), szAnsw / SZ_TCP_PCKG, 100, 10000);

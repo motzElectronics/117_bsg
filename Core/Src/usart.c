@@ -404,7 +404,7 @@ void uartIdleHandler(UART_HandleTypeDef* huart) {
     u16 pkt_len;
 
     if (huart->Instance == USART6) {
-        // D(printf("uartIdleHandler Tablo\r\n"));
+        LOG_USART(LEVEL_DEBUG, "uartIdleHandler Tablo\r\n");
         uInfoTablo.irqFlags.isIrqIdle = 1;
 
         pkt_len = uInfoTablo.szRxBuf - huart->hdmarx->Instance->NDTR;
@@ -446,10 +446,10 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef* huart) {
 void HAL_UART_ErrorCallback(UART_HandleTypeDef* huart) {
     u32 error = HAL_UART_GetError(huart);
     if (huart->Instance == USART1) {
-        D(printf("ErrorCallback() sim800 ERROR_CODE: %d\r\n", (int)error));
+        LOG_USART(LEVEL_ERROR, "ErrorCallback() sim800 ERROR_CODE: %d\r\n", (int)error);
         uartRxDma(&uInfoSim);
     } else if (huart->Instance == USART2) {
-        D(printf("ErrorCallback() gnss ERROR_CODE: %d\r\n", (int)error));
+        LOG_USART(LEVEL_ERROR, "ErrorCallback() gnss ERROR_CODE: %d\r\n", (int)error);
         uartRxDma(&uInfoGnss);
     } else if (huart->Instance == USART6) {
         // uartClearInfo(&uInfoTablo);
@@ -457,7 +457,7 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef* huart) {
         __HAL_DMA_SET_COUNTER(uInfoTablo.pHuart->hdmarx, uInfoTablo.szRxBuf);
         __HAL_DMA_ENABLE(uInfoTablo.pHuart->hdmarx);
         uartRxDma(&uInfoTablo);
-        D(printf("ErrorCallback() tablo ERROR_CODE: %d\r\n", (int)error));
+        LOG_USART(LEVEL_ERROR, "ErrorCallback() tablo ERROR_CODE: %d\r\n", (int)error);
     }
 }
 

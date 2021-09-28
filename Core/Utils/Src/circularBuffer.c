@@ -16,7 +16,7 @@ void cBufInit(CircularBuffer* cbuf, u8* buf, u16 szBuf, CircTypeBuf type) {
     cbuf->max = szBuf;
     cbuf->type = type;
     cBufReset(cbuf);
-    D(printf("cBufInit()\r\n"));
+    LOG_CBUF(LEVEL_MAIN, "cBufInit()\r\n");
 }
 
 void cBufReset(CircularBuffer* cbuf) {
@@ -61,10 +61,10 @@ void cBufWriteToBuf(CBufHandle cbuf, u8* data, u8 sz) {
     } else {
         switch (cbuf->type) {
             case CIRC_TYPE_PCKG_GNSS_RMC:
-                D(printf("%s: CIRC_TYPE_PCKG_GNSS_RMC\r\n", CIRC_MSG_FULL));
+                LOG_CBUF(LEVEL_INFO, "%s: CIRC_TYPE_PCKG_GNSS_RMC\r\n", CIRC_MSG_FULL);
                 break;
             case CIRC_TYPE_GNSS:
-                D(printf("%s: CIRC_TYPE_GNSS\r\n", CIRC_MSG_FULL));
+                LOG_CBUF(LEVEL_INFO, "%s: CIRC_TYPE_GNSS\r\n", CIRC_MSG_FULL);
                 break;
         }
     }
