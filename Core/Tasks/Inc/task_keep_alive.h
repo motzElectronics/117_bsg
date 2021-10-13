@@ -11,7 +11,9 @@ void pwrOffBsg();
 void updRTC();
 void generateMsgKeepAlive();
 void generateMsgDevOff();
+void generateMsgTabloFW();
 
+ErrorStatus sendMsgTabloFW();
 ErrorStatus sendMsgFWUpdated();
 ErrorStatus sendMsgFWUpdateBegin();
 ErrorStatus sendMsgDevOff();

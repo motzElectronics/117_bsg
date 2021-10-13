@@ -81,6 +81,61 @@ void generateMsgDevOff() {
     saveTelemetry(&pckgTel, &circBufAllPckgs);
 }
 
+void generateMsgTabloFW() {
+    PckgTelemetry pckgTel;
+
+    pckgTel.group = TEL_GR_PROJECT_127;
+    pckgTel.code = TEL_CD_127_TABLO_FW;
+    pckgTel.data = bsg.tablo.info.idFirmware;
+    saveTelemetry(&pckgTel, &circBufAllPckgs);
+
+    pckgTel.code = TEL_CD_127_TABLO_BOOT_FW;
+    pckgTel.data = bsg.tablo.info.idBoot;
+    saveTelemetry(&pckgTel, &circBufAllPckgs);
+
+    pckgTel.code = TEL_CD_127_TABLO_BOOT_ERR;
+    pckgTel.data = bsg.tablo.info.bootErr;
+    saveTelemetry(&pckgTel, &circBufAllPckgs);
+}
+
+ErrorStatus sendMsgTabloFW() {
+    ErrorStatus   ret = SUCCESS;
+    PckgTelemetry pckgTel;
+    u8*           idMCU;
+
+    idMCU = (u8*)&bsg.tablo.info.idMCU;
+
+    LOG(LEVEL_MAIN, "sendMsgTabloFW\r\n");
+
+    memset(bufTxData, 0, 128);
+    pckgTel.group = TEL_GR_HARDWARE_STATUS;
+    pckgTel.code = TEL_CD_HW_UPDATED;
+    pckgTel.data = bsg.idNewFirmware;
+    pckgTel.unixTimeStamp = getUnixTimeStamp();
+    copyTelemetry(bufTxData, &pckgTel);
+
+    pckgTel.code = TEL_CD_HW_BSG;
+    pckgTel.data = 0;
+    copyTelemetry(&bufTxData[SZ_CMD_TELEMETRY], &pckgTel);
+
+    pckgTel.group = TEL_GR_PROJECT_127;
+    pckgTel.code = TEL_CD_127_TABLO_FW;
+    pckgTel.data = bsg.tablo.info.idFirmware;
+    saveTelemetry(&pckgTel, &circBufAllPckgs);
+
+    pckgTel.code = TEL_CD_127_TABLO_BOOT_FW;
+    pckgTel.data = bsg.tablo.info.idBoot;
+    saveTelemetry(&pckgTel, &circBufAllPckgs);
+
+    pckgTel.code = TEL_CD_127_TABLO_BOOT_ERR;
+    pckgTel.data = bsg.tablo.info.bootErr;
+    saveTelemetry(&pckgTel, &circBufAllPckgs);
+
+    ret = sendWebPckgData(CMD_DATA_TELEMETRY, bufTxData, SZ_CMD_TELEMETRY * 2, 2, idMCU);
+
+    return ret;
+}
+
 ErrorStatus sendMsgFWUpdated() {
     ErrorStatus   ret = SUCCESS;
     PckgTelemetry pckgTel;

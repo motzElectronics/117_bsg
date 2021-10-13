@@ -2,6 +2,7 @@
 
 #include "../Tasks/Inc/task_iwdg.h"
 #include "../Tasks/Inc/task_keep_alive.h"
+#include "../Utils/Inc/utils_flash.h"
 #include "tim.h"
 
 extern u16 iwdgTaskReg;
@@ -105,12 +106,8 @@ void generateInitTelemetry() {
     saveTelemetry(&pckgTel, &circBufAllPckgs);
 
     pckgTel.code = TEL_CD_GENINF_NUM_BOOT;
-    pckgTel.data = BSG_ID_BOOT;
+    pckgTel.data = bsg.info.idBoot;
     saveTelemetry(&pckgTel, &circBufAllPckgs);
-
-    // pckgTel.code = TEL_CD_GENINF_NUM_PCB;
-    // pckgTel.data = BSG_ID_PCB;
-    // saveTelemetry(&pckgTel, &circBufAllPckgs);
 
     phoneNum = simGetPhoneNum();
     if (phoneNum > 0) {
@@ -123,6 +120,12 @@ void generateInitTelemetry() {
     pckgTel.group = TEL_GR_HARDWARE_STATUS;
     pckgTel.code = TEL_CD_HW_BSG;
     pckgTel.data = 1;
+    saveTelemetry(&pckgTel, &circBufAllPckgs);
+
+    pckgTel.code = TEL_CD_HW_UPDATE_ERR;
+    tmp = getFlashData(FLASH_ADDR_ERR_NEW_FIRMWARE);
+    if (tmp > 10) tmp = 0;
+    pckgTel.data = tmp;
     saveTelemetry(&pckgTel, &circBufAllPckgs);
 
     updSpiFlash(&circBufAllPckgs);

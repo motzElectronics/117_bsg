@@ -452,7 +452,6 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef* huart) {
         LOG_USART(LEVEL_ERROR, "ErrorCallback() gnss ERROR_CODE: %d\r\n", (int)error);
         uartRxDma(&uInfoGnss);
     } else if (huart->Instance == USART6) {
-        // uartClearInfo(&uInfoTablo);
         __HAL_DMA_DISABLE(uInfoTablo.pHuart->hdmarx);
         __HAL_DMA_SET_COUNTER(uInfoTablo.pHuart->hdmarx, uInfoTablo.szRxBuf);
         __HAL_DMA_ENABLE(uInfoTablo.pHuart->hdmarx);

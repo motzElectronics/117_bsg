@@ -1,6 +1,7 @@
 #include "../Tasks/Inc/task_get_train_data.h"
 
 #include "../Tasks/Inc/task_iwdg.h"
+#include "../Tasks/Inc/task_keep_alive.h"
 #include "../Utils/Inc/circularBuffer.h"
 #include "../Utils/Inc/utils_bsg.h"
 #include "../Utils/Inc/utils_crc.h"
@@ -30,6 +31,7 @@ void taskGetTrainData(void const* argument) {
     while (!tablo_send_request(CMD_GET_INFO, NULL, 0) || bsg.tablo.info.idFirmware == 0 || bsg.tablo.info.idMCU[0] == 0) {
         osDelay(500);
     }
+    generateMsgTabloFW();
 
     for (;;) {
         iwdgTaskReg |= IWDG_TASK_REG_TABLO;
@@ -53,6 +55,7 @@ u8 tablo_send_request(u8 cmd, u8* data, u8 len) {
     u8  res = 0;
     req_len = tablo_create_request(uInfoTablo.pTxBuf, cmd, data, len);
 
+    osSemaphoreWait(uart6RXSemHandle, 0);
     tablo_send_pack(&uInfoTablo, req_len);
     if (osSemaphoreWait(uart6RXSemHandle, 5000) == osOK) {
         __HAL_DMA_DISABLE(uInfoTablo.pHuart->hdmarx);
@@ -182,9 +185,8 @@ void parse_tablo_iu_info(u8* data_all, u16 len_all) {
     iu_info_t* info = (iu_info_t*)data_all;
 
     memcpy(&bsg.tablo.info, data_all, sizeof(iu_info_t));
-    LOG(LEVEL_INFO, "Returned Tablo UID: ");
-    printf("%08x%08x%08x\r\n", (uint)info->idMCU[0], (uint)info->idMCU[1], (uint)info->idMCU[2]);
-    LOG(LEVEL_INFO, "Returned Tablo FW Num: %d\r\n", info->idFirmware);
+    LOG(LEVEL_INFO, "Returned Tablo UID: %08x%08x%08x\r\n", (uint)info->idMCU[0], (uint)info->idMCU[1], (uint)info->idMCU[2]);
+    LOG(LEVEL_INFO, "Returned Tablo FW Num: %d, boot %d, err %d\r\n", info->idFirmware, info->idBoot, info->bootErr);
 }
 
 void parse_tablo_fw_num(u8* data_all, u16 len_all) {

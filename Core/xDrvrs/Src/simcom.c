@@ -117,7 +117,7 @@ void copyStr(char* dist, char* source, u16 distSz) {
 }
 
 char* simDownloadData(char* data, u16 sz) {
-    return simTxATCmd(data, sz, 50000);
+    return simTxATCmd(data, sz, 40000);
 }
 
 u8 simCheckCSQ() {
@@ -258,7 +258,7 @@ u8 simTCPSend(u8* data, u16 sz) {
     ttt = HAL_GetTick() - ttt;
 
     if (strcmp((const char*)token, (const char*)"SEND OK") == 0) {
-        LOG_SIM(LEVEL_INFO, "simTCPSend() time %d\r\n", ttt);
+        LOG_SIM(LEVEL_INFO, "Send OK: time %d\r\n", ttt);
         return SIM_SUCCESS;
     } else if (strcmp((const char*)token, (const char*)"SEND FAIL") == 0) {
         LOG_SIM(LEVEL_ERROR, "simDownloadData() %s time %d\r\n", token, ttt);

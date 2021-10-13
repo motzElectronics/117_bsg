@@ -3,6 +3,7 @@
 #include "../Tasks/Inc/task_get_train_data.h"
 #include "../Tasks/Inc/task_iwdg.h"
 #include "../Tasks/Inc/task_keep_alive.h"
+#include "../Utils/Inc/utils_crc.h"
 #include "../Utils/Inc/utils_pckgs_manager.h"
 
 extern u16 iwdgTaskReg;
@@ -27,11 +28,12 @@ static PckgUpdFirmware pckgInfoFirmware;
 static u8              partFirmware[SZ_PART_FIRMW + 1];
 static u32             flashAddrFirmware = FLASH_ADDR_BUF_NEW_FIRMWARE;
 static u32             szSoft = 0;
+static u32             crcNewFW;
 
 void big_update_func();
 
 void taskGetNewBin(void const* argument) {
-    FLASH_Erase_Sector(FLASH_SECTOR_1, VOLTAGE_RANGE_3);
+    FLASH_Erase_Sector(FLASH_SECTOR_2, VOLTAGE_RANGE_3);
 
     vTaskSuspend(getNewBinHandle);
     LOG(LEVEL_MAIN, "taskGetNewBin\r\n");
@@ -63,6 +65,8 @@ void big_update_func() {
     flashClearPage(FLASH_SECTOR_6);
     flashClearPage(FLASH_SECTOR_7);
     clearAllWebPckgs();
+
+    crcNewFW = 0xffffffff;
 
     if (bsg.updTarget == UPD_TARGET_TABLO) {
         res = 0;
@@ -108,7 +112,7 @@ void big_update_func() {
             osDelay(100);
             if (getPartFirmware(bufNumBytesFirmware, partFirmware, szPartSoft + 4, 8) == SUCCESS &&
                 isCrcOk(partFirmware, szPartSoft)) {
-                // HAL_GPIO_TogglePin(LED4G_GPIO_Port, LED4G_Pin);
+                crc32_chank(&crcNewFW, partFirmware, szPartSoft);
                 cntFailTCPReq = 0;
 
                 if (bsg.updTarget == UPD_TARGET_TABLO) {
@@ -126,7 +130,7 @@ void big_update_func() {
                 }
 
                 curSzSoft += szPartSoft;
-                LOG(LEVEL_MAIN, "DOWNLOAD %d BYTES\r\n", (int)curSzSoft);
+                LOG(LEVEL_MAIN, "DOWNLOAD %d BYTES addr 0x%08x\r\n", (int)curSzSoft, flashAddrFirmware);
             } else {
                 LOG(LEVEL_ERROR, "httpPost() DOWNLOAD\r\n");
                 cntFailTCPReq++;
@@ -139,16 +143,30 @@ void big_update_func() {
             if (!bsg.isTCPOpen) {
                 while (openTcp() != TCP_OK) {}
             }
-            if (sendMsgFWUpdated() != SUCCESS) {
-                LOG(LEVEL_ERROR, "Send FW UPDATED\r\n");
+            if (bsg.updTarget == UPD_TARGET_TABLO) {
+                if (sendMsgTabloFW() != SUCCESS) {
+                    LOG(LEVEL_ERROR, "Send TABLO FW UPDATED\r\n");
+                }
+            } else if (bsg.updTarget == UPD_TARGET_BSG) {
+                if (sendMsgFWUpdated() != SUCCESS) {
+                    LOG(LEVEL_ERROR, "Send FW UPDATED\r\n");
+                }
             }
             LOG(LEVEL_MAIN, "DOWNLOAD COMPLETE\r\n");
+            u8 diff = 4 - (szSoft % 4);
+            if (diff > 0 && diff < 4) {
+                memset(partFirmware, 0xFF, diff);
+                crc32_chank(&crcNewFW, partFirmware, diff);
+                // szNewFW += diff;
+            }
+            crcNewFW ^= 0xffffffff;
+            LOG(LEVEL_MAIN, "crcNewFW 0x%08x\r\n", crcNewFW);
 
             if (bsg.updTarget == UPD_TARGET_TABLO) {
                 res = 0;
                 cntFailTablo = 0;
                 while (!res) {
-                    res = tablo_send_request(CMD_FW_END, NULL, 0);
+                    res = tablo_send_request(CMD_FW_END, (u8*)&crcNewFW, sizeof(u32));
                     cntFailTablo++;
                     if (cntFailTablo > 5) {
                         return;
@@ -167,17 +185,22 @@ void big_update_func() {
 void updBootInfo() {
     szSoft = szSoft % 4 == 0 ? szSoft : ((szSoft / 4) + 1) * 4;
     while (HAL_FLASH_Unlock() != HAL_OK) LOG_FLASH(LEVEL_ERROR, "HAL_FLASH_Unlock()\r\n");
-    FLASH_Erase_Sector(FLASH_SECTOR_1, VOLTAGE_RANGE_3);
+    FLASH_Erase_Sector(FLASH_SECTOR_2, VOLTAGE_RANGE_3);
     LOG_FLASH(LEVEL_MAIN, "FLASH_Erase_Sector\r\n");
     while (HAL_FLASH_Program(TYPEPROGRAM_WORD, FLASH_ADDR_ID_BOOT, BSG_ID_BOOT))
         LOG_FLASH(LEVEL_ERROR, "HAL_FLASH_Program(BOOT_ADDR_ID_LOADER)\r\n");
-    while (HAL_FLASH_Program(TYPEPROGRAM_WORD, FLASH_ADDR_IS_NEW_FIRWARE, (u32)1))
+    while (HAL_FLASH_Program(TYPEPROGRAM_WORD, FLASH_ADDR_IS_NEW_FIRMWARE, (u32)1))
         LOG_FLASH(LEVEL_ERROR, "HAL_FLASH_Program(BOOT_ADDR_IS_NEW_FIRWARE)\r\n");
     while (HAL_FLASH_Program(TYPEPROGRAM_WORD, FLASH_ADDR_SZ_NEW_FIRMWARE, (u32)(szSoft)))
         LOG_FLASH(LEVEL_ERROR, "HAL_FLASH_Program(FLASH_ADDR_SZ_NEW_FIRMWARE)\r\n");
+    while (HAL_FLASH_Program(TYPEPROGRAM_WORD, FLASH_ADDR_CRC_NEW_FIRMWARE, (u32)(crcNewFW)))
+        LOG_FLASH(LEVEL_ERROR, "HAL_FLASH_Program(FLASH_ADDR_CRC_NEW_FIRMWARE)\r\n");
+
     while (HAL_FLASH_Lock() != HAL_OK) LOG_FLASH(LEVEL_ERROR, "HAL_FLASH_Lock()\r\n");
     LOG_FLASH(LEVEL_MAIN, "BOOT_ID: %d\r\n", (int)getFlashData(FLASH_ADDR_ID_BOOT));
-    LOG_FLASH(LEVEL_MAIN, "IS_NEW_FIRMARE: %d\r\n", (int)getFlashData(FLASH_ADDR_IS_NEW_FIRWARE));
+    LOG_FLASH(LEVEL_MAIN, "IS_NEW_FIRMARE: %d\r\n", (int)getFlashData(FLASH_ADDR_IS_NEW_FIRMWARE));
+    LOG_FLASH(LEVEL_MAIN, "SZ_NEW_FIRMWARE: %d\r\n", (int)getFlashData(FLASH_ADDR_SZ_NEW_FIRMWARE));
+    LOG_FLASH(LEVEL_MAIN, "CRC_NEW_FIRMARE: 0x%08x\r\n", (int)getFlashData(FLASH_ADDR_CRC_NEW_FIRMWARE));
 }
 
 void lockAllTasks() {

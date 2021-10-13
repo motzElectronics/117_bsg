@@ -54,6 +54,7 @@
 /* USER CODE BEGIN PV */
 #include "../Utils/Inc/circularBuffer.h"
 #include "../Utils/Inc/utils_bsg.h"
+#include "../Utils/Inc/utils_flash.h"
 #include "../Utils/Inc/utils_gps.h"
 
 BSG  bsg;
@@ -117,9 +118,13 @@ int main(void) {
     volatile FIRMWARE_INFO info = {.header = 0x1122334455667788,
                                    .numFirmware = BSG_ID_FIRMWARE,
                                    .verFirmware = BSG_VER_BETA_FIRMWARE,
-                                   .numTrainCar = BSG_ID_TRAINCAR};
+                                   .numTrainCar = BSG_ID_TRAINCAR,
+                                   .idBoot = BSG_ID_BOOT};
 
-    LOG(LEVEL_MAIN, "firmware: %d\r\n\r\n", info.numFirmware);
+    info.idBoot = (u8)getFlashData(FLASH_ADDR_ID_BOOT);
+    memcpy(&bsg.info, &info, sizeof(FIRMWARE_INFO));
+
+    LOG(LEVEL_MAIN, "Firmware: %d.%d\r\n\r\n", info.numFirmware, info.idBoot);
     uartInitInfo();
     bsgInit();
     urlsInit();

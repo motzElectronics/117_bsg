@@ -152,6 +152,7 @@ typedef struct {
     u8   numFirmware;
     char verFirmware;
     u8   numTrainCar;
+    u8   idBoot;
 } FIRMWARE_INFO;
 
 typedef struct {

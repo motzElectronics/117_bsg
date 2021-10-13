@@ -65,7 +65,7 @@ void taskCreateWebPckg(void const *argument) {
             }
             szAllPages = getSzAllPages();
             if (szAllPages) {
-                LOG_WEB(LEVEL_INFO, "Create package\r\n");
+                LOG_WEB(LEVEL_DEBUG, "Create package\r\n");
                 initWebPckg(curPckg, szAllPages, 0, &bsg.idMCU);
                 addPagesToWebPckg(curPckg);
                 osMessagePut(queueWebPckgHandle, (u32)curPckg, osWaitForever);

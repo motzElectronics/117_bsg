@@ -26,7 +26,7 @@
 
 #define BSG_MSG_NO_GPS (char*)"0000.000000,N,00000.000000,E,+0000,000,000"
 
-#define BSG_ID_FIRMWARE         8
+#define BSG_ID_FIRMWARE         1
 #define BSG_ID_BOOT             2
 #define BSG_ID_TRAINCAR         0
 #define BSG_ID_TRAIN            1706
@@ -113,10 +113,11 @@ typedef struct {
     u8  csq;
     u8  isSpiFlashReady;
 
-    statistics_t stat;
-    TabloInfo    tablo;
-    SleepTimer   sleepTimer;
-    gps_state_t  cur_gps;
+    FIRMWARE_INFO info;
+    statistics_t  stat;
+    TabloInfo     tablo;
+    SleepTimer    sleepTimer;
+    gps_state_t   cur_gps;
 } BSG;
 
 typedef struct {
@@ -206,7 +207,10 @@ typedef enum {
     TEL_CD_127_BKT_FW = 1,
     TEL_CD_127_PPRU_FW,
     TEL_CD_127_DOORS,
-    TEL_CD_127_PPRU_RSSI
+    TEL_CD_127_PPRU_RSSI,
+    TEL_CD_127_TABLO_FW,
+    TEL_CD_127_TABLO_BOOT_FW,
+    TEL_CD_127_TABLO_BOOT_ERR
 } TELEMETRY_CODE_127;
 
 typedef enum {

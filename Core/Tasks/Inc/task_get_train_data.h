@@ -19,6 +19,7 @@ typedef __packed struct {
     u32 idMCU[3];
     u8  idFirmware;
     u8  idBoot;
+    u8  bootErr;
 } iu_info_t;
 
 typedef struct {

@@ -160,7 +160,7 @@ u8 waitGoodCsq(u32 timeout) {
         }
         LOG_SIM(LEVEL_DEBUG, "ER: CSQ %d\r\n", csq);
     }
-    LOG_SIM(LEVEL_INFO, "OK: CSQ %d\r\n", csq);
+    LOG_SIM(LEVEL_DEBUG, "OK: CSQ %d\r\n", csq);
     return 1;
 }
 
