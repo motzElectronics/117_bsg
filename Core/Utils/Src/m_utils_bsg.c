@@ -76,12 +76,14 @@ void getServerTime() {
             tmpDate.Month = pTm->tm_mon + 1;
             tmpDate.Year = pTm->tm_year - 100;
 
+            osMutexWait(mutexRTCHandle, osWaitForever);
             if (tmpDate.Year < 30 &&
                 tmpDate.Year > 19) {  // sometimes timestamp is wrong and has
                                       // value like 2066 year
                 HAL_RTC_SetTime(&hrtc, &tmpTime, RTC_FORMAT_BIN);
                 HAL_RTC_SetDate(&hrtc, &tmpDate, RTC_FORMAT_BIN);
             }
+            osMutexRelease(mutexRTCHandle);
         }
     }
 }
@@ -96,6 +98,7 @@ void getBsgNumFw() {
         if (numFirmware != BSG_ID_FIRMWARE && numFirmware > 0 && numFirmware < 10) {
             LOG_WEB(LEVEL_MAIN, "New FIRMWARE v.:%d\r\n", (int)numFirmware);
             bsg.updTarget = UPD_TARGET_BSG;
+            bsg.idNewFirmware = (u8)numFirmware;
             vTaskResume(getNewBinHandle);
         }
     }
@@ -115,6 +118,7 @@ void getTabloNumFw() {
         if (numFirmware != bsg.tablo.info.idFirmware && numFirmware > 10 && numFirmware < 20 && bsg.tablo.info.idFirmware > 0) {
             LOG_WEB(LEVEL_MAIN, "New FIRMWARE v.:%d\r\n", (int)numFirmware);
             bsg.updTarget = UPD_TARGET_TABLO;
+            bsg.idNewFirmware = (u8)numFirmware;
             vTaskResume(getNewBinHandle);
         }
     }

@@ -9,6 +9,13 @@
 #define CMD_CRC_SIZE sizeof(uint16_t)
 
 typedef enum {
+    IU_INIT_NONE = 0,
+    IU_INIT_TIMESYNC = 1,
+    IU_INIT_GET_INFO,
+    IU_INIT_COMPLETE
+} InitStep;
+
+typedef enum {
     UPD_NONE = 0,
     UPD_START = 1,
     UPD_DOWNLOAD,
@@ -24,6 +31,7 @@ typedef __packed struct {
 
 typedef struct {
     iu_info_t  info;
+    InitStep   initStep;
     UpdateStep updStep;
     u32        fwCurSize;
     u32        fwSize;
@@ -45,7 +53,8 @@ typedef enum {
 
 typedef enum {
     ERROR_CAPACITY = 1,
-    ERROR_NO_DATA
+    ERROR_NO_DATA,
+    ERROR_NO_SYNC
 } cmd_err_type_t;
 
 typedef __packed struct {

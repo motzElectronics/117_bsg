@@ -1,22 +1,22 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file           : main.h
-  * @brief          : Header for main.c file.
-  *                   This file contains the common defines of the application.
-  ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; Copyright (c) 2020 STMicroelectronics.
-  * All rights reserved.</center></h2>
-  *
-  * This software component is licensed by ST under Ultimate Liberty license
-  * SLA0044, the "License"; You may not use this file except in compliance with
-  * the License. You may obtain a copy of the License at:
-  *                             www.st.com/SLA0044
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file           : main.h
+ * @brief          : Header for main.c file.
+ *                   This file contains the common defines of the application.
+ ******************************************************************************
+ * @attention
+ *
+ * <h2><center>&copy; Copyright (c) 2020 STMicroelectronics.
+ * All rights reserved.</center></h2>
+ *
+ * This software component is licensed by ST under Ultimate Liberty license
+ * SLA0044, the "License"; You may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at:
+ *                             www.st.com/SLA0044
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
@@ -97,15 +97,14 @@ void Error_Handler(void);
 #define BSG_SZ_UART_MSG 132
 #define BSG_SZ_TEMP_MSG 4
 
-#define SZ_CMD_ENERGY              12
-#define SZ_CMD_VOLTAMPER           8
-#define SZ_CMD_TEMP                8
-#define SZ_CMD_GRMC                20
-#define SZ_CMD_TELEMETRY           10
-#define SZ_CMD_ENERGY_127          13
-#define SZ_CMD_VOLTAMPER_127       9
-#define SZ_CMD_PERCRSSI_127        15
-#define SZ_CMD_TELEMETRY_PHONE_NUM 14
+#define SZ_CMD_ENERGY        12
+#define SZ_CMD_VOLTAMPER     8
+#define SZ_CMD_TEMP          8
+#define SZ_CMD_GRMC          20
+#define SZ_CMD_TELEMETRY     10
+#define SZ_CMD_ENERGY_127    13
+#define SZ_CMD_VOLTAMPER_127 9
+#define SZ_CMD_PERCRSSI_127  15
 
 #define SZ_PAGE                  255
 #define SZ_BUF_ENERGY_FROM_UART1 500

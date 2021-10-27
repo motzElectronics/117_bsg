@@ -21,7 +21,7 @@ static Page     pgVoltAmper = {.type = CMD_DATA_VOLTAMPER_127, .szType = SZ_CMD_
 static Page     pgGrmc = {.type = CMD_DATA_GRMC, .szType = SZ_CMD_GRMC};
 static Page     pgTelemetry = {.type = CMD_DATA_TELEMETRY, .szType = SZ_CMD_TELEMETRY};
 static Page     pgPercRSSI = {.type = CMD_DATA_PERCRSSI_127, .szType = SZ_CMD_PERCRSSI_127};
-static Page *   allPages[] = {&pgVoltAmper, &pgEnergy, &pgTemp, &pgGrmc, &pgTelemetry, &pgPercRSSI};
+static Page    *allPages[] = {&pgVoltAmper, &pgEnergy, &pgTemp, &pgGrmc, &pgTelemetry, &pgPercRSSI};
 static WebPckg *curPckg;
 
 void taskCreateWebPckg(void const *argument) {
@@ -40,7 +40,7 @@ void taskCreateWebPckg(void const *argument) {
     for (;;) {
         iwdgTaskReg |= IWDG_TASK_REG_WEB_PCKG;
         delayPages = getDelayPages();
-        while (delayPages > BSG_THRESHOLD_CNT_PAGES || (osSemaphoreWait(semCreateWebPckgHandle, 1) == osOK)) {
+        while (delayPages >= BSG_THRESHOLD_CNT_PAGES || (osSemaphoreWait(semCreateWebPckgHandle, 1) == osOK)) {
             curPckg = getFreePckg();
             if (curPckg == NULL) {
                 break;

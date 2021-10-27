@@ -24,29 +24,58 @@ u8   tablo_parse_responce(UartInfo* pUInf);
 
 void taskGetTrainData(void const* argument) {
     u16 iter = 0;
+    u8  res;
+    u32 timeStamp;
     osSemaphoreWait(uart6RXSemHandle, osWaitForever);
 
     vTaskSuspend(getTrainDataHandle);
-
-    while (!tablo_send_request(CMD_GET_INFO, NULL, 0) || bsg.tablo.info.idFirmware == 0 || bsg.tablo.info.idMCU[0] == 0) {
-        osDelay(500);
-    }
-    generateMsgTabloFW();
+    bsg.tablo.initStep = IU_INIT_NONE;
 
     for (;;) {
         iwdgTaskReg |= IWDG_TASK_REG_TABLO;
-        if (iter % 500 == 6) {
-            u32 timeStamp = getUnixTimeStamp();
-            tablo_send_request(CMD_SYNC, (u8*)&timeStamp, sizeof(timeStamp));
-        } else if (iter % 500 == 7) {
-            tablo_send_request(CMD_GNSS, (u8*)&bsg.cur_gps, sizeof(gps_state_t));
-        } else if (iter % 4000 == 5) {
-            tablo_send_request(CMD_GET_INFO, NULL, 0);
+
+        switch (bsg.tablo.initStep) {
+            case IU_INIT_NONE:
+                LOG(LEVEL_MAIN, "IU_INIT_NONE\r\n");
+                if (tablo_send_request(CMD_GNSS, (u8*)&bsg.cur_gps, sizeof(gps_state_t))) {
+                    bsg.tablo.initStep = IU_INIT_TIMESYNC;
+                }
+                break;
+            case IU_INIT_TIMESYNC:
+                LOG(LEVEL_MAIN, "IU_INIT_TIMESYNC\r\n");
+                timeStamp = getUnixTimeStamp();
+                if (tablo_send_request(CMD_SYNC, (u8*)&timeStamp, sizeof(timeStamp))) {
+                    bsg.tablo.initStep = IU_INIT_GET_INFO;
+                }
+                break;
+            case IU_INIT_GET_INFO:
+                LOG(LEVEL_MAIN, "IU_INIT_GET_INFO\r\n");
+                bsg.tablo.info.idFirmware = 0;
+                res = tablo_send_request(CMD_GET_INFO, NULL, 0);
+                if (res && bsg.tablo.info.idFirmware != 0 && bsg.tablo.info.idMCU[0] != 0) {
+                    bsg.tablo.initStep = IU_INIT_COMPLETE;
+                }
+
+                generateMsgTabloFW();
+                break;
+            case IU_INIT_COMPLETE:
+                if (iter % 5000 == 300) {
+                    timeStamp = getUnixTimeStamp();
+                    tablo_send_request(CMD_SYNC, (u8*)&timeStamp, sizeof(timeStamp));
+                } else if (iter % 500 == 307) {
+                    tablo_send_request(CMD_GNSS, (u8*)&bsg.cur_gps, sizeof(gps_state_t));
+                } else if (iter % 4000 == 3013) {
+                    tablo_send_request(CMD_GET_INFO, NULL, 0);
+                }
+                osDelay(100);
+                tablo_send_request(CMD_DATA, (u8*)&uInfoTablo.szRxBuf, sizeof(uInfoTablo.szRxBuf));
+                osDelay(100);
+                iter++;
+                break;
+            default:
+                bsg.tablo.initStep = IU_INIT_NONE;
+                break;
         }
-        osDelay(100);
-        tablo_send_request(CMD_DATA, (u8*)&uInfoTablo.szRxBuf, sizeof(uInfoTablo.szRxBuf));
-        osDelay(100);
-        iter++;
     }
 }
 
@@ -169,11 +198,13 @@ void parse_tablo_gnss(u8* data_all, u16 len_all) {
 void parse_tablo_error(u8* data_all, u16 len_all) {
     u8 error_type = data_all[0];
 
-    if (error_type == 2) {
-        LOG(LEVEL_DEBUG, "Returned error type %d\r\n", error_type);
-    } else {
+    if (error_type == ERROR_CAPACITY) {
         bsg.stat.tabloErrCnt++;
         LOG(LEVEL_ERROR, "Returned error type %d\r\n", error_type);
+    } else if (error_type == ERROR_NO_DATA) {
+        LOG(LEVEL_DEBUG, "Returned error type %d\r\n", error_type);
+    } else if (error_type == ERROR_NO_SYNC) {
+        bsg.tablo.initStep = IU_INIT_TIMESYNC;
     }
 }
 

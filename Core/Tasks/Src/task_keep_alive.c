@@ -101,6 +101,7 @@ void generateMsgTabloFW() {
 ErrorStatus sendMsgTabloFW() {
     ErrorStatus   ret = SUCCESS;
     PckgTelemetry pckgTel;
+    u8            ptr = 0;
     u8*           idMCU;
 
     idMCU = (u8*)&bsg.tablo.info.idMCU;
@@ -112,26 +113,26 @@ ErrorStatus sendMsgTabloFW() {
     pckgTel.code = TEL_CD_HW_UPDATED;
     pckgTel.data = bsg.idNewFirmware;
     pckgTel.unixTimeStamp = getUnixTimeStamp();
-    copyTelemetry(bufTxData, &pckgTel);
+    copyTelemetry(&bufTxData[SZ_CMD_TELEMETRY * ptr++], &pckgTel);
 
     pckgTel.code = TEL_CD_HW_BSG;
     pckgTel.data = 0;
-    copyTelemetry(&bufTxData[SZ_CMD_TELEMETRY], &pckgTel);
+    copyTelemetry(&bufTxData[SZ_CMD_TELEMETRY * ptr++], &pckgTel);
 
     pckgTel.group = TEL_GR_PROJECT_127;
     pckgTel.code = TEL_CD_127_TABLO_FW;
     pckgTel.data = bsg.tablo.info.idFirmware;
-    saveTelemetry(&pckgTel, &circBufAllPckgs);
+    copyTelemetry(&bufTxData[SZ_CMD_TELEMETRY * ptr++], &pckgTel);
 
     pckgTel.code = TEL_CD_127_TABLO_BOOT_FW;
     pckgTel.data = bsg.tablo.info.idBoot;
-    saveTelemetry(&pckgTel, &circBufAllPckgs);
+    copyTelemetry(&bufTxData[SZ_CMD_TELEMETRY * ptr++], &pckgTel);
 
     pckgTel.code = TEL_CD_127_TABLO_BOOT_ERR;
     pckgTel.data = bsg.tablo.info.bootErr;
-    saveTelemetry(&pckgTel, &circBufAllPckgs);
+    copyTelemetry(&bufTxData[SZ_CMD_TELEMETRY * ptr++], &pckgTel);
 
-    ret = sendWebPckgData(CMD_DATA_TELEMETRY, bufTxData, SZ_CMD_TELEMETRY * 2, 2, idMCU);
+    ret = sendWebPckgData(CMD_DATA_TELEMETRY, bufTxData, SZ_CMD_TELEMETRY * ptr, ptr, idMCU);
 
     return ret;
 }
