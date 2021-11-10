@@ -59,12 +59,12 @@ void taskGetTrainData(void const* argument) {
                 generateMsgTabloFW();
                 break;
             case IU_INIT_COMPLETE:
-                if (iter % 5000 == 300) {
+                if (iter % 10000 == 300) {
                     timeStamp = getUnixTimeStamp();
                     tablo_send_request(CMD_SYNC, (u8*)&timeStamp, sizeof(timeStamp));
-                } else if (iter % 500 == 307) {
+                } else if (iter % 200 == 107) {
                     tablo_send_request(CMD_GNSS, (u8*)&bsg.cur_gps, sizeof(gps_state_t));
-                } else if (iter % 4000 == 3013) {
+                } else if (iter % 5000 == 3013) {
                     tablo_send_request(CMD_GET_INFO, NULL, 0);
                 }
                 osDelay(100);

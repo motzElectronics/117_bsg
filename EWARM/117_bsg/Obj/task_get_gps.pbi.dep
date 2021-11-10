@@ -1,6 +1,7 @@
 task_get_gps.pbi: \
   C:\MyProjects\БКТЭ-117\117_bsg\Core\Tasks\Src\task_get_gps.c \
   C:\MyProjects\БКТЭ-117\117_bsg\EWARM/../Core/Inc\../Tasks/Inc/task_get_gps.h \
+  C:\MyProjects\БКТЭ-117\117_bsg\EWARM/../Core/Inc\../Utils/Inc/circularBuffer.h \
   C:\MyProjects\БКТЭ-117\117_bsg\EWARM/../Core/Inc\main.h \
   C:\MyProjects\БКТЭ-117\117_bsg\EWARM/../Drivers/STM32F4xx_HAL_Driver/Inc\stm32f4xx_hal.h \
   C:\MyProjects\БКТЭ-117\117_bsg\EWARM/../Core/Inc\stm32f4xx_hal_conf.h \
@@ -71,7 +72,6 @@ task_get_gps.pbi: \
   C:\MyProjects\БКТЭ-117\117_bsg\EWARM/../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h \
   C:\MyProjects\БКТЭ-117\117_bsg\EWARM/../Middlewares/Third_Party/FreeRTOS/Source/include\event_groups.h \
   C:\MyProjects\БКТЭ-117\117_bsg\EWARM/../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h \
-  C:\MyProjects\БКТЭ-117\117_bsg\EWARM/../Core/Inc\../Utils/Inc/circularBuffer.h \
   C:\MyProjects\БКТЭ-117\117_bsg\EWARM/../Core/Inc\../Utils/Inc/utils_gps.h \
   C:\MyProjects\БКТЭ-117\117_bsg\EWARM/../Core/Inc\../Utils/Inc/utils_bsg.h \
   C:\MyProjects\БКТЭ-117\117_bsg\EWARM/../Core/Inc\../Tasks/Inc/task_get_train_data.h \

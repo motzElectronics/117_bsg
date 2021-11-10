@@ -20,6 +20,7 @@ extern osSemaphoreId semCreateWebPckgHandle;
 static char     bufGnss[200];
 static PckgGnss pckgGnss;
 static u8       bufPckgGnss[SZ_CMD_GRMC];
+static u32      stopTime;
 CircularBuffer  circBufGnss = {.buf = NULL, .max = 0};
 
 extern CircularBuffer rxUart1CircBuf;
@@ -36,36 +37,53 @@ void taskGetGPS(void const *argument) {
     simInit();
     getServerTime();
 
+    // generateTestPackage();
     generateInitTelemetry();
+
     unLockTasks();
 
     for (;;) {
         iwdgTaskReg |= IWDG_TASK_REG_GPS;
-        waitRx("", &uInfoGnss.irqFlags, 10, 10000);
-        if (uInfoGnss.irqFlags.isIrqRx) {
-            uInfoGnss.irqFlags.isIrqRx = 0;
-            while (cBufRead(&circBufGnss, (u8 *)bufGnss, CIRC_TYPE_GNSS, 0)) {
-                LOG_GPS(LEVEL_DEBUG, "GPS : %s", bufGnss);
-                if (bsg.sleepTimer.flagOn) {
-                    memset(bufGnss, '\0', sizeof(bufGnss));
-                    continue;
-                }
-                ret = fillGprmc(bufGnss, &pckgGnss);
-                if (ret == GPS_OK) {
-                    updateCurCoords(&pckgGnss);
-                    if (!numIteration) {
+        waitIdle("", &uInfoGnss.irqFlags, 1, 10000);
+        if (uInfoGnss.irqFlags.isIrqIdle) {
+            uInfoGnss.irqFlags.isIrqIdle = 0;
+            // while (cBufRead(&circBufGnss, (u8 *)bufGnss, CIRC_TYPE_GNSS, 0)) {
+            memcpy(bufGnss, uInfoGnss.pRxBuf, 200);
+            // LOG_GPS(LEVEL_INFO, "GPS : %s", bufGnss);
+            if (bsg.sleepTimer.flagOn) {
+                memset(bufGnss, '\0', sizeof(bufGnss));
+                break;
+                // continue;
+            }
+            ret = fillGprmc(bufGnss, &pckgGnss);
+            if (ret == GPS_OK) {
+                updateCurCoords(&pckgGnss);
+                if (checkStopTrain(&pckgGnss) == TRAIN_MOVE) {
+                    if (!(numIteration % 2)) {
+                        // LOG_GPS(LEVEL_INFO, "Move save\r\n");
                         serializePckgGnss(bufPckgGnss, &pckgGnss);
                         saveData((u8 *)&bufPckgGnss, SZ_CMD_GRMC, CMD_DATA_GRMC, &circBufAllPckgs);
                     }
-                    numIteration = (numIteration + 1) % 120;
-                } else if (ret == GPS_GPRMC_ERR_INVALID_DATA_STATUS) {
-                    bsg.cur_gps.valid = 0;
-                    bsg.stat.gpsInvaligCount++;
                 } else {
-                    bsg.stat.gpsParseFailCount++;
+                    if (!numIteration) {
+                        // LOG_GPS(LEVEL_INFO, "Stop save\r\n");
+                        serializePckgGnss(bufPckgGnss, &pckgGnss);
+                        saveData((u8 *)&bufPckgGnss, SZ_CMD_GRMC, CMD_DATA_GRMC, &circBufAllPckgs);
+                    }
                 }
-                memset(bufGnss, '\0', sizeof(bufGnss));
+                numIteration = (numIteration + 1) % 60;
+            } else if (ret == GPS_GPRMC_ERR_INVALID_DATA_STATUS) {
+                bsg.cur_gps.valid = 0;
+                bsg.stat.gpsInvaligCount++;
+            } else {
+                bsg.stat.gpsParseFailCount++;
             }
+            memset(bufGnss, '\0', sizeof(bufGnss));
+            // }
+            uartClearInfo(&uInfoGnss);
+            __HAL_DMA_DISABLE(uInfoGnss.pHuart->hdmarx);
+            __HAL_DMA_SET_COUNTER(uInfoGnss.pHuart->hdmarx, uInfoGnss.szRxBuf);
+            __HAL_DMA_ENABLE(uInfoGnss.pHuart->hdmarx);
         } else {
             LOG_GPS(LEVEL_ERROR, "ERROR: NOT WORKING GPS\r\n");
         }
@@ -81,19 +99,18 @@ void unLockTasks() {
     vTaskResume(getTrainDataHandle);
 }
 
-void checkStopTrain(PckgGnss *pckg) {
+u8 checkStopTrain(PckgGnss *pckg) {
     static u8 cntr = 0;
     if (pckg->coords.speed < (5 * 10)) {
-        cntr++;
-        if (cntr == 5) {
-            cntr = 0;
-            bsg.sleepTimer.flagOn = 1;
-            HAL_TIM_Base_Start_IT(&htim10);
-        }
+        stopTime++;
     } else {
-        cntr = 0;
-        bsg.sleepTimer.flagOn = 0;
+        stopTime = 0;
     }
+
+    if (stopTime > 10) {
+        return TRAIN_STOP;
+    }
+    return TRAIN_MOVE;
 }
 
 void generateInitTelemetry() {
@@ -127,6 +144,57 @@ void generateInitTelemetry() {
     if (tmp > 10) tmp = 0;
     pckgTel.data = tmp;
     saveTelemetry(&pckgTel, &circBufAllPckgs);
+
+    updSpiFlash(&circBufAllPckgs);
+    xSemaphoreGive(semCreateWebPckgHandle);
+}
+
+void generateTestPackage() {
+    PckgTelemetry pckgTel;
+    PckgTemp      pckgTemp;
+
+    LOG_WEB(LEVEL_MAIN, "Generate TEST package\r\n");
+
+    pckgTel.group = 0x10;
+    pckgTel.code = 0x01;
+    pckgTel.data = 4;
+    saveTelemetry(&pckgTel, &circBufAllPckgs);
+
+    pckgTel.group = 0x10;
+    pckgTel.code = 0x02;
+    pckgTel.data = 3;
+    saveTelemetry(&pckgTel, &circBufAllPckgs);
+
+    pckgTel.group = 0x10;
+    pckgTel.code = 0x03;
+    pckgTel.data = 3;
+    saveTelemetry(&pckgTel, &circBufAllPckgs);
+
+    pckgTel.group = 0x10;
+    pckgTel.code = 0x04;
+    pckgTel.data = (3 << 16) | 7;
+    saveTelemetry(&pckgTel, &circBufAllPckgs);
+
+    pckgTel.group = 0x10;
+    pckgTel.code = 0x05;
+    pckgTel.data = (3 << 16) | 8;
+    saveTelemetry(&pckgTel, &circBufAllPckgs);
+
+    pckgTemp.unixTimeStamp = getUnixTimeStamp();
+    pckgTemp.temp[0] = 102;
+    pckgTemp.temp[1] = 0;
+    pckgTemp.temp[2] = 3;
+    pckgTemp.temp[3] = 16;
+    saveData((u8 *)&pckgTemp, SZ_CMD_TEMP, CMD_DATA_TEMP, &circBufAllPckgs);
+    pckgTemp.temp[2] = 4;
+    pckgTemp.temp[3] = 17;
+    saveData((u8 *)&pckgTemp, SZ_CMD_TEMP, CMD_DATA_TEMP, &circBufAllPckgs);
+    pckgTemp.temp[2] = 5;
+    pckgTemp.temp[3] = 16;
+    saveData((u8 *)&pckgTemp, SZ_CMD_TEMP, CMD_DATA_TEMP, &circBufAllPckgs);
+    pckgTemp.temp[2] = 6;
+    pckgTemp.temp[3] = 15;
+    saveData((u8 *)&pckgTemp, SZ_CMD_TEMP, CMD_DATA_TEMP, &circBufAllPckgs);
 
     updSpiFlash(&circBufAllPckgs);
     xSemaphoreGive(semCreateWebPckgHandle);

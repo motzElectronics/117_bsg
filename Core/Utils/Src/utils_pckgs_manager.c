@@ -45,9 +45,9 @@ void addInfoToWebPckg(WebPckg* pPckg, u8* src, u16 sz, u8 cnt, u8 cmdData) {
 
 void showWebPckg(WebPckg* pPckg) {
     // for (u16 i = 0; i < pPckg->shift; i++) {
-    //     LOG_WEB(LEVEL_INFO, "%02x", pPckg->buf[i]);
+    //     printf("%02x", pPckg->buf[i]);
     // }
-    // LOG_WEB(LEVEL_INFO, "\r\n");
+    // printf("\r\n");
 }
 
 void closeWebPckg(WebPckg* pPckg) {
