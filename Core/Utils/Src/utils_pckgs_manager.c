@@ -182,6 +182,7 @@ ErrorStatus generateWebPckgReq(u8 CMD_REQ, u8* data, u8 sz, u8 szReq, u8* answ, 
             memcpy(answ, &uInfoSim.pRxBuf[11], szAnsw);
         }
         clearWebPckg(curPckg);
+        closeTcp();
         osMutexRelease(mutexWebHandle);
     } else {
         ret = ERROR;

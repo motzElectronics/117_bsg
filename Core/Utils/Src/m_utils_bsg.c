@@ -142,10 +142,14 @@ u8 isCrcOk(char* pData, int len) {
 void updSpiFlash(CircularBuffer* cbuf) {
     u16 bufEnd[2] = {0, BSG_PREAMBLE};
 
+    osMutexWait(mutexGPSBufHandle, osWaitForever);
+
     bufEnd[0] = calcCrc16(cbuf->buf, cbuf->readAvailable);
     cBufWriteToBuf(cbuf, (u8*)bufEnd, 4);
     spiFlashWriteNextPg(cbuf->buf, cbuf->readAvailable, 0);
     cBufReset(cbuf);
+
+    osMutexRelease(mutexGPSBufHandle);
 
     LOG_FLASH(LEVEL_INFO, "updSpiFlash()\r\n");
 }

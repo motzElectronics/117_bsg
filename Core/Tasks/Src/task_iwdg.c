@@ -6,12 +6,16 @@ extern IWDG_HandleTypeDef hiwdg;
 
 extern u8 isRxNewFirmware;
 
+extern osSemaphoreId semCreateWebPckgHandle;
+extern osSemaphoreId semSendWebPckgHandle;
+
 u16 iwdgTaskReg;
 u32 iwdgErrCount;
 
 void taskManageIWDG(void const* argument) {
     iwdgTaskReg = 0;
     iwdgErrCount = 0;
+    u32 timeout = 0;
 
     for (;;) {
         if ((isRxNewFirmware && (iwdgTaskReg & IWDG_TASK_REG_NEW_BIN) == IWDG_TASK_REG_NEW_BIN) ||
@@ -27,7 +31,12 @@ void taskManageIWDG(void const* argument) {
             NVIC_SystemReset();
         }
 
+        if (!(timeout % 15)) {
+            osSemaphoreRelease(semCreateWebPckgHandle);
+        }
+
         HAL_IWDG_Refresh(&hiwdg);
         osDelay(3000);
+        timeout += 3;
     }
 }

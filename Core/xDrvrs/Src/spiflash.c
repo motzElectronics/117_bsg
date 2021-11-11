@@ -309,7 +309,7 @@ void spiFlashLoadInfo(u8 *buf) {
     spiFlashRdPg(buf, 256, addr);
 
     tmp = buf[0] | buf[1] << 8 | buf[2] << 16 | buf[3] << 24;
-    spiFlash64.headNumPg = tmp;
+    spiFlash64.headNumPg = 0;
     spiFlash64.tailNumPg = spiFlash64.headNumPg;
     LOG_FLASH(LEVEL_MAIN, "Read headNumPg: %d\r\n", spiFlash64.headNumPg);
     LOG_FLASH(LEVEL_MAIN, "Read tailNumPg: %d\r\n", spiFlash64.tailNumPg);

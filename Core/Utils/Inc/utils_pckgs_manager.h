@@ -2,7 +2,7 @@
 #define INC_UTILS_PCKG_MANAGER_H_
 #include "main.h"
 
-#define CNT_WEBPCKGS 3
+#define CNT_WEBPCKGS 5
 
 #define SZ_REQUEST_GET_SERVER_TIME   2
 #define SZ_REQUEST_GET_NUM_FIRMWARE  2

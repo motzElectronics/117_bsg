@@ -11,9 +11,11 @@ extern osThreadId    createWebPckgHandle;
 extern osMutexId     mutexWebHandle;
 extern osMessageQId  queueWebPckgHandle;
 extern osSemaphoreId semCreateWebPckgHandle;
+extern osSemaphoreId semSendWebPckgHandle;
 
-extern u8   SZ_PCKGENERGY;
-static char tmpBufPage[256];
+extern u8             SZ_PCKGENERGY;
+static char           tmpBufPage[256];
+extern CircularBuffer circBufAllPckgs;
 
 static Page     pgEnergy = {.type = CMD_DATA_ENERGY_127, .szType = SZ_CMD_ENERGY_127};
 static Page     pgTemp = {.type = CMD_DATA_TEMP, .szType = SZ_CMD_TEMP};
@@ -30,19 +32,34 @@ void taskCreateWebPckg(void const *argument) {
     u16 delayPages;
     u16 szAllPages = 0;
     u8  amntPages;
-    u8  len;
+    u8  len, flush = 0;
 
-    xSemaphoreTake(semCreateWebPckgHandle, 1);
+    osSemaphoreWait(semCreateWebPckgHandle, 1);
 
     vTaskSuspend(createWebPckgHandle);
 
     LOG_WEB(LEVEL_MAIN, "taskCreateWebPckg\r\n");
     for (;;) {
         iwdgTaskReg |= IWDG_TASK_REG_WEB_PCKG;
+        flush = 0;
         delayPages = getDelayPages();
-        while (delayPages >= BSG_THRESHOLD_CNT_PAGES || (osSemaphoreWait(semCreateWebPckgHandle, 1) == osOK)) {
+        if (osSemaphoreWait(semCreateWebPckgHandle, 1) == osOK) {
+            flush = 1;
+            LOG_WEB(LEVEL_INFO, "FLUSH STARTED\r\n");
+            // if (circBufAllPckgs.readAvailable > 0) {
+            //     flush = 1;
+            //     // updSpiFlash(&circBufAllPckgs);
+            //     LOG_WEB(LEVEL_INFO, "FLUSH STARTED\r\n");
+            // }
+        }
+        while (flush == 1) {
+            if (delayPages == 0) {
+                flush = 0;
+                break;
+            }
             curPckg = getFreePckg();
             if (curPckg == NULL) {
+                flush = 0;
                 break;
             }
             clearAllPages();
@@ -65,14 +82,22 @@ void taskCreateWebPckg(void const *argument) {
             }
             szAllPages = getSzAllPages();
             if (szAllPages) {
-                LOG_WEB(LEVEL_DEBUG, "Create package\r\n");
+                LOG_WEB(LEVEL_INFO, "Create package\r\n");
                 initWebPckg(curPckg, szAllPages, 0, &bsg.idMCU);
                 addPagesToWebPckg(curPckg);
                 osMessagePut(queueWebPckgHandle, (u32)curPckg, osWaitForever);
+                flush = 2;
             } else {
                 freeWebPckg(curPckg);
+                flush = 0;
             }
             delayPages = getDelayPages();
+        }
+
+        if (flush == 2) {
+            flush = 0;
+            LOG_WEB(LEVEL_INFO, "FLUSH CONTINUED 1\r\n");
+            osSemaphoreRelease(semSendWebPckgHandle);
         }
 
         if (!delayPages) {

@@ -169,11 +169,18 @@ u8 simTCPCheckStatus(const char* stat, u16 timeout, u16 delay) {
         if (strcmp((const char*)token, stat) != 0) {
             LOG_SIM(LEVEL_ERROR, "%s instead %s\r\n", token, stat);
         } else {
-            LOG_SIM(LEVEL_INFO, "%s\r\n", token);
+            // LOG_SIM(LEVEL_INFO, "%s\r\n", token);
             return SIM_SUCCESS;
         }
     }
     return SIM_FAIL;
+}
+
+u8 simTCPclose() {
+    if (simCmd(SIM_CIPSHUT, NULL, 3, SIM_OK_CIPSHUT) != SIM_SUCCESS) {
+        return SIM_FAIL;
+    }
+    return SIM_SUCCESS;
 }
 
 u8 simTCPinit() {
@@ -231,6 +238,7 @@ u8 simTCPOpen() {
     if (simTCPCheckStatus(SIM_CIPSTAT_CON_OK, 7000, 200) != SIM_SUCCESS) {
         return SIM_FAIL;
     }
+    LOG_SIM(LEVEL_INFO, "TCP CONNECTED\r\n");
     return SIM_SUCCESS;
 }
 
@@ -290,8 +298,8 @@ u8 procReturnStatus(u8 ret) {
 
     if (ret == TCP_SEND_ER) {
         LOG_SIM(LEVEL_ERROR, "TCP_SEND_ER %d!\r\n\r\n", notSend);
-        //if (notSend == 5) {
-        //LOG_SIM(LEVEL_ERROR, "UNABLE TO SEND 5!\r\n");
+        // if (notSend == 5) {
+        // LOG_SIM(LEVEL_ERROR, "UNABLE TO SEND 5!\r\n");
         simReset();
         ret = TCP_SEND_ER_LOST_PCKG;
         notSend = 0;
@@ -329,6 +337,17 @@ u8 openTcp() {
         bsg.isTCPOpen = 1;
         bsg.stat.simOpenCnt++;
     }
+    return procReturnStatus(ret);
+}
+
+u8 closeTcp() {
+    u8 ret = TCP_OK;
+    if (ret == TCP_OK && simTCPclose() != SIM_SUCCESS) {
+        LOG_SIM(LEVEL_ERROR, "simTCPinit\r\n");
+        ret = TCP_CLOSE_ER;
+    }
+    bsg.isTCPOpen = 0;
+    LOG_SIM(LEVEL_INFO, "TCP CLOSED\r\n");
     return procReturnStatus(ret);
 }
 
