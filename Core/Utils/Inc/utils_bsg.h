@@ -67,11 +67,16 @@ typedef __packed struct {
 typedef __packed struct {
     u8           valid;
     gps_coords_t coords;
+    u32          stopTime;
+    u8           timeSync;
 } gps_state_t;
 
 typedef __packed struct {
     u32          unixTimeStamp;
     gps_coords_t coords;
+    int32_t      altitude;
+    u16          sattelites;
+    u16          hdop;
     DateTime     dateTime;
 } PckgGnss;
 
@@ -116,7 +121,6 @@ typedef struct {
     FIRMWARE_INFO info;
     statistics_t  stat;
     TabloInfo     tablo;
-    SleepTimer    sleepTimer;
     gps_state_t   cur_gps;
 } BSG;
 

@@ -8,6 +8,8 @@
         "circularbuffer.h": "c",
         "main.h": "c",
         "simcom.h": "c",
-        "task_create_webpckg.h": "c"
+        "task_create_webpckg.h": "c",
+        "utils_flash.h": "c",
+        "cmsis_os.h": "c"
     }
 }

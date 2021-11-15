@@ -375,14 +375,14 @@ void uartTx(char* data, u16 sz, UartInfo* pUInf) {
     __HAL_DMA_SET_COUNTER(pUInf->pHuart->hdmarx, pUInf->szRxBuf);
     __HAL_DMA_ENABLE(pUInf->pHuart->hdmarx);
 
-    waitRx("", &(pUInf->irqFlags), 10, USART_TIMEOUT);
+    waitRx("", &(pUInf->irqFlags), 2, USART_TIMEOUT);
     __HAL_UART_DISABLE_IT(pUInf->pHuart, UART_IT_IDLE);
     osDelay(100);
     pUInf->irqFlags.regIrq = 0;
 
     HAL_UART_Transmit_DMA(pUInf->pHuart, (u8*)data, sz);
 
-    waitTx("", &(pUInf->irqFlags), 50, USART_TIMEOUT);
+    waitTx("", &(pUInf->irqFlags), 2, USART_TIMEOUT);
 }
 
 void uart6Tx(char* data, u16 sz, UartInfo* pUInf) {

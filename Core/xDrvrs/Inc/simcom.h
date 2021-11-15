@@ -30,6 +30,8 @@
 #define SIM_SZ_CMD_AT           4
 #define SIM_CMD_CNUM            (char*)"AT+CNUM\r\n"
 #define SIM_SZ_CMD_CNUM         9
+#define SIM_CMD_SIMEI           (char*)"AT+SIMEI?\r\n"
+#define SIM_SZ_CMD_SIMEI        11
 
 #define SIM_SUCCESS               0
 #define SIM_FAIL                  1
@@ -125,6 +127,7 @@ u8        simTCPCheckStatus(const char* stat, u16 timeout, u16 delay);
 u8        simCmd(char* cmdCode, char* params, u8 retriesCnt, char* SUCCESS_RET);
 char*     simTxATCmd(char* command, u16 sz, u32 timeout);
 long long simGetPhoneNum();
+void      simGetIMEI();
 
 u8 sendTcp(u8* data, u16 sz);
 u8 openTcp();

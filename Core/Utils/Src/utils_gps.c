@@ -12,20 +12,61 @@ void setTime(DateTime* dt, char* gpsUbloxTime) {
 void setDate(DateTime* dt, char* gpsUbloxDate) {
     u32 date = atoi(gpsUbloxDate);
     dt->year = date % 100;
-    dt->month = (date / 100) % 100 - 1;
+    dt->month = (date / 100) % 100;
     dt->day = (date / 10000) % 100;
 }
 
+// $GNGGA,132948.303,,,,,0,0,,,M,,M,,*53
+// $GNRMC,132948.303,V,,,,,0.00,0.00,111121,,,N*55
 u8 fillGprmc(char* pData, PckgGnss* pckg) {
     u8    ret = GPS_OK;
     char* token;
 
+    token = strsep(&pData, ",");  // $GPGGA
+    if (*token != '$') {
+        return GPS_GPRMC_ERR_PARS;
+    }
+    token = strsep(&pData, ",");  // time
+    token = strsep(&pData, ",");  // latitude
+    token = strsep(&pData, ",");  // N/S
+    token = strsep(&pData, ",");  // longtitude
+    token = strsep(&pData, ",");  // W/E
+    token = strsep(&pData, ",");  // pos fix indicator
+
+    token = strsep(&pData, ",");  // sattelites
+    if (*token != '\0') {
+        pckg->sattelites = atoi(token);
+    } else {
+        return GPS_GPGGA_ERR_PARS_SAT;
+    }
+
+    token = strsep(&pData, ",");  // hdop
+    if (*token != '\0') {
+        pckg->hdop = (int)(atof(token) * 100);
+    } else {
+        return GPS_GPGGA_ERR_PARS_HDOP;
+    }
+
+    token = strsep(&pData, ",");  // altitude
+    if (*token != '\0') {
+        pckg->altitude = (int)(atof(token) * 100);
+    } else {
+        return GPS_GPGGA_ERR_PARS_ALT;
+    }
+
+    token = strsep(&pData, "\n");
+
     token = strsep(&pData, ",");
+    if (*token != '$') {
+        return GPS_GPRMC_ERR_PARS;
+    }
+
     token = strsep(&pData, ",");  // hhmmss.ss
-    if (*token != '\0')
+    if (*token != '\0') {
         setTime(&pckg->dateTime, token);
-    else
+    } else {
         return GPS_GPRMC_ERR_PARS_TIME;
+    }
     token = strsep(&pData, ",");  // validity - A-ok, V-invalid
     if (*token == 'A') {
         if ((ret = setCoords(&pData, &pckg->coords.latitude)) != GPS_OK) return ret;
@@ -46,10 +87,11 @@ u8 fillGprmc(char* pData, PckgGnss* pckg) {
         }
 
         token = strsep(&pData, ",");
-        if (*token != '\0')
+        if (*token != '\0') {
             setDate(&pckg->dateTime, token);
-        else
+        } else {
             return GPS_GPRMC_ERR_PARS_DATE;
+        }
 
     } else if (*token == 'V') {
         return GPS_GPRMC_ERR_INVALID_DATA_STATUS;
@@ -102,6 +144,8 @@ u8 setCoords(char** pData, Coord* coord) {
 
 void serializePckgGnss(u8* dest, PckgGnss* pckg) {
     pckg->unixTimeStamp = getUnixTimeStamp();
+
+    LOG_GPS(LEVEL_INFO, "Sat: %d, HDOP: %d, Alt: %d\r\n", pckg->sattelites, pckg->hdop, pckg->altitude);
 
     memcpy(dest, pckg, SZ_CMD_GRMC);
 }

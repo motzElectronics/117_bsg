@@ -16,6 +16,9 @@
 #define GPS_GPRMC_ERR_7                   7
 #define GPS_GPRMC_ERR_8                   8
 #define GPS_GPRMC_ERR_PARS                9
+#define GPS_GPGGA_ERR_PARS_SAT            10
+#define GPS_GPGGA_ERR_PARS_HDOP           11
+#define GPS_GPGGA_ERR_PARS_ALT            12
 
 u8    fillGprmc(char* pData, PckgGnss* pckg);
 void  clearGprmc();

@@ -28,8 +28,8 @@ void bsgInit() {
     bsg.idDev = BSG_ID_DEV_BSG;
     bsg.idFirmware = BSG_ID_FIRMWARE;
     bsg.idBoot = BSG_ID_BOOT;
-    bsg.sleepTimer.flagOn = 0;
     memset(&bsg.stat, 0, sizeof(statistics_t));
+    memset(&bsg.cur_gps, 0, sizeof(gps_state_t));
 }
 
 void updateCurCoords(PckgGnss* pckgGnss) {

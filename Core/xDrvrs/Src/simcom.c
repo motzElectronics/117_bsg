@@ -169,7 +169,7 @@ u8 simTCPCheckStatus(const char* stat, u16 timeout, u16 delay) {
         if (strcmp((const char*)token, stat) != 0) {
             LOG_SIM(LEVEL_ERROR, "%s instead %s\r\n", token, stat);
         } else {
-            // LOG_SIM(LEVEL_INFO, "%s\r\n", token);
+            LOG_SIM(LEVEL_DEBUG, "%s\r\n", token);
             return SIM_SUCCESS;
         }
     }
@@ -222,6 +222,7 @@ u8 simTCPinit() {
 
 u8 simTCPOpen() {
     static char params[40];
+    char*       retMsg;
     char*       token;
     memset(params, '\0', 40);
     sprintf(params, "\"%s\",\"%s\",%d", (char*)"TCP", urls.tcpAddr,
@@ -229,10 +230,11 @@ u8 simTCPOpen() {
     if (simCmd(SIM_CIPSTART, params, 3, SIM_OK_TEXT) == SIM_FAIL) {
         return SIM_FAIL;
     }
-    osDelay(1500);
-    token = strtok((char*)uInfoSim.pRxBuf + 6, SIM_SEPARATOR_TEXT);
+    retMsg = simGetStatusAnsw(7000);  // waiting for "CONNECT OK"
+    token = strtok((char*)retMsg + 6, SIM_SEPARATOR_TEXT);
     if (token == NULL || token[0] == '\0') token = SIM_NO_RESPONSE_TEXT;
     if (strcmp((const char*)token, (const char*)"CONNECT OK") != 0) {
+        LOG_SIM(LEVEL_INFO, "TCP OPEN FAILED: %s\r\n", retMsg);
         return SIM_FAIL;
     }
     if (simTCPCheckStatus(SIM_CIPSTAT_CON_OK, 7000, 200) != SIM_SUCCESS) {
@@ -284,8 +286,18 @@ long long simGetPhoneNum() {
     if (retMsg[0] != '\0') {
         printf("Num is %s\r\n", retMsg);
         return atoll(retMsg + 15);
-    } else
-        return 0;
+    }
+    return 0;
+}
+
+void simGetIMEI() {
+    char* retMsg;
+    retMsg = simTxATCmd(SIM_CMD_SIMEI, SIM_SZ_CMD_SIMEI, 2000);
+    if (retMsg[0] != '\0') {
+        printf("IMEI is %s\r\n", retMsg);
+        // return atoll(retMsg + 15);
+    }
+    return;
 }
 
 u8 procReturnStatus(u8 ret) {
@@ -386,11 +398,18 @@ u8 sendTcp(u8* data, u16 sz) {
 }
 
 void gnssInit() {
+    // u16 sum;
+    // u8  str[] = "PMTK314,0,2,0,2,0,0,0,0,0,0,0,0,0,0";
+    // sum = str[0];
+    // for (u8 i = 1; i < strlen(str); i++) {
+    //     sum ^= str[i];
+    // }
+
     LOG_SIM(LEVEL_MAIN, "gnssInit()\r\n");
     HAL_GPIO_WritePin(GNSS_EN_GPIO_Port, GNSS_EN_Pin, GPIO_PIN_SET);
     osDelay(3000);
-    HAL_UART_Transmit(uInfoGnss.pHuart, (u8*)"$PMTK314,0,1,0,0,0,0,0,0,0,0,0,0,0,0*35\r\n",
-                      sizeof("$PMTK314,0,1,0,0,0,0,0,0,0,0,0,0,0,0*35\r\n"), 1000);
+    HAL_UART_Transmit(uInfoGnss.pHuart, (u8*)"$PMTK314,0,2,0,2,0,0,0,0,0,0,0,0,0,0*34\r\n",
+                      sizeof("$PMTK314,0,2,0,2,0,0,0,0,0,0,0,0,0,0*34\r\n"), 1000);
 
     uartRxDma(&uInfoGnss);
 }

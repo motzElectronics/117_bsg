@@ -81,6 +81,7 @@ void rxUart(UartInfo* pUInf);
 void uart6Tx(char* data, u16 sz, UartInfo* pUInf);
 void rxUart1_IT();
 void uartRxDma(UartInfo* pUInf);
+void uartClearInfo(UartInfo* pUinf);
 void uartInitInfo();
 void uartIdleHandler(UART_HandleTypeDef* huart);
 

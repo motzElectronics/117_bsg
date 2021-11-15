@@ -3,11 +3,14 @@
 #include "../Tasks/Inc/task_iwdg.h"
 #include "../Tasks/Inc/task_keep_alive.h"
 #include "../Utils/Inc/utils_flash.h"
+#include "rtc.h"
 #include "tim.h"
+#include "usart.h"
 
 extern u16 iwdgTaskReg;
 
 extern osMutexId mutexGPSBufHandle;
+extern osMutexId mutexRTCHandle;
 
 extern osThreadId webExchangeHandle;
 extern osThreadId keepAliveHandle;
@@ -17,69 +20,91 @@ extern osThreadId getTrainDataHandle;
 
 extern osSemaphoreId semCreateWebPckgHandle;
 
-static char     bufGnss[200];
+static char     bufGnss[300];
 static PckgGnss pckgGnss;
 static u8       bufPckgGnss[SZ_CMD_GRMC];
-static u32      stopTime;
 CircularBuffer  circBufGnss = {.buf = NULL, .max = 0};
 
 extern CircularBuffer rxUart1CircBuf;
 extern CircularBuffer circBufAllPckgs;
 
+static RTC_TimeTypeDef stmTime;
+static RTC_DateTypeDef stmDate;
+
+u8 setGPSUnixTime(DateTime *dt);
+
 void taskGetGPS(void const *argument) {
-    u8 ret;
-    u8 numIteration = 0;
+    u8  ret;
+    u32 numIteration = 0;
+    u8  gps_step = GPS_STEP_NONE;
     cBufInit(&circBufGnss, uInfoGnss.pRxBuf, uInfoGnss.szRxBuf, CIRC_TYPE_GNSS);
 
     spiFlashInit(circBufAllPckgs.buf);
     cBufReset(&circBufAllPckgs);
 
     simInit();
-    getServerTime();
-
-    // generateTestPackage();
-    generateInitTelemetry();
-
-    unLockTasks();
+    simGetIMEI();
+    // getServerTime();
+    // while (1) {
+    //     openTcp();
+    //     osDelay(2000);
+    //     closeTcp();
+    // }
 
     for (;;) {
         iwdgTaskReg |= IWDG_TASK_REG_GPS;
         waitIdle("", &uInfoGnss.irqFlags, 1, 10000);
         if (uInfoGnss.irqFlags.isIrqIdle) {
             uInfoGnss.irqFlags.isIrqIdle = 0;
-            // while (cBufRead(&circBufGnss, (u8 *)bufGnss, CIRC_TYPE_GNSS, 0)) {
-            memcpy(bufGnss, uInfoGnss.pRxBuf, 200);
-            // LOG_GPS(LEVEL_INFO, "GPS : %s", bufGnss);
-            if (bsg.sleepTimer.flagOn) {
-                memset(bufGnss, '\0', sizeof(bufGnss));
-                break;
-                // continue;
-            }
+            memcpy(bufGnss, uInfoGnss.pRxBuf, 300);
+            // LOG_GPS(LEVEL_INFO, "%s", bufGnss);
             ret = fillGprmc(bufGnss, &pckgGnss);
-            if (ret == GPS_OK) {
-                updateCurCoords(&pckgGnss);
-                if (checkStopTrain(&pckgGnss) == TRAIN_MOVE) {
-                    if (!(numIteration % 2)) {
-                        // LOG_GPS(LEVEL_INFO, "Move save\r\n");
-                        serializePckgGnss(bufPckgGnss, &pckgGnss);
-                        saveData((u8 *)&bufPckgGnss, SZ_CMD_GRMC, CMD_DATA_GRMC, &circBufAllPckgs);
+            switch (gps_step) {
+                case GPS_STEP_NONE:
+                    gps_step = GPS_STEP_TIMESYNC;
+                    break;
+                case GPS_STEP_TIMESYNC:
+                    bsg.cur_gps.timeSync = 0;
+                    if (ret == GPS_OK) {
+                        if (!setGPSUnixTime(&pckgGnss.dateTime)) {
+                            break;
+                        }
+                        // generateTestPackage();
+                        generateInitTelemetry();
+                        unLockTasks();
+
+                        bsg.cur_gps.timeSync = 1;
+                        gps_step = GPS_STEP_WORK;
                     }
-                } else {
-                    if (!numIteration) {
-                        // LOG_GPS(LEVEL_INFO, "Stop save\r\n");
-                        serializePckgGnss(bufPckgGnss, &pckgGnss);
-                        saveData((u8 *)&bufPckgGnss, SZ_CMD_GRMC, CMD_DATA_GRMC, &circBufAllPckgs);
+                    break;
+                case GPS_STEP_WORK:
+                    if (ret == GPS_OK) {
+                        updateCurCoords(&pckgGnss);
+                        if (checkStopTrain(&pckgGnss) == TRAIN_MOVE) {
+                            LOG_GPS(LEVEL_INFO, "Move save\r\n");
+                            serializePckgGnss(bufPckgGnss, &pckgGnss);
+                            saveData((u8 *)&bufPckgGnss, SZ_CMD_GRMC, CMD_DATA_GRMC, &circBufAllPckgs);
+                        } else {
+                            if (!(numIteration % 30)) {
+                                LOG_GPS(LEVEL_INFO, "Stop save\r\n");
+                                serializePckgGnss(bufPckgGnss, &pckgGnss);
+                                saveData((u8 *)&bufPckgGnss, SZ_CMD_GRMC, CMD_DATA_GRMC, &circBufAllPckgs);
+                            }
+                        }
+                        if (!(numIteration % 1800)) {
+                            setGPSUnixTime(&pckgGnss.dateTime);
+                        }
+                        numIteration++;
+                    } else if (ret == GPS_GPRMC_ERR_INVALID_DATA_STATUS) {
+                        bsg.cur_gps.valid = 0;
+                        bsg.stat.gpsInvaligCount++;
+                    } else {
+                        bsg.cur_gps.valid = 0;
+                        bsg.stat.gpsParseFailCount++;
                     }
-                }
-                numIteration = (numIteration + 1) % 60;
-            } else if (ret == GPS_GPRMC_ERR_INVALID_DATA_STATUS) {
-                bsg.cur_gps.valid = 0;
-                bsg.stat.gpsInvaligCount++;
-            } else {
-                bsg.stat.gpsParseFailCount++;
+                    break;
             }
             memset(bufGnss, '\0', sizeof(bufGnss));
-            // }
             uartClearInfo(&uInfoGnss);
             __HAL_DMA_DISABLE(uInfoGnss.pHuart->hdmarx);
             __HAL_DMA_SET_COUNTER(uInfoGnss.pHuart->hdmarx, uInfoGnss.szRxBuf);
@@ -102,15 +127,40 @@ void unLockTasks() {
 u8 checkStopTrain(PckgGnss *pckg) {
     static u8 cntr = 0;
     if (pckg->coords.speed < (5 * 10)) {
-        stopTime++;
+        bsg.cur_gps.stopTime++;
     } else {
-        stopTime = 0;
+        bsg.cur_gps.stopTime = 0;
     }
 
-    if (stopTime > 10) {
+    if (bsg.cur_gps.stopTime > 10) {
         return TRAIN_STOP;
     }
     return TRAIN_MOVE;
+}
+
+u8 setGPSUnixTime(DateTime *dt) {
+    u8 ret = 0;
+    if (dt != NULL) {
+        stmTime.Hours = dt->hour;
+        stmTime.Minutes = dt->min;
+        stmTime.Seconds = dt->sec;
+
+        stmDate.Date = dt->day;
+        stmDate.Month = dt->month;
+        stmDate.Year = dt->year;
+
+        osMutexWait(mutexRTCHandle, osWaitForever);
+        if (stmDate.Year < 36 &&
+            stmDate.Year > 19) {  // sometimes timestamp is wrong and has
+                                  // value like 2066 year
+            HAL_RTC_SetTime(&hrtc, &stmTime, RTC_FORMAT_BIN);
+            HAL_RTC_SetDate(&hrtc, &stmDate, RTC_FORMAT_BIN);
+            HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR0, 0x32F2);  // lock it in with the backup registers
+            ret = 1;
+        }
+        osMutexRelease(mutexRTCHandle);
+    }
+    return ret;
 }
 
 void generateInitTelemetry() {
