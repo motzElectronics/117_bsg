@@ -20,10 +20,11 @@ extern CircularBuffer circBufAllPckgs;
 static Page     pgEnergy = {.type = CMD_DATA_ENERGY_127, .szType = SZ_CMD_ENERGY_127};
 static Page     pgTemp = {.type = CMD_DATA_TEMP, .szType = SZ_CMD_TEMP};
 static Page     pgVoltAmper = {.type = CMD_DATA_VOLTAMPER_127, .szType = SZ_CMD_VOLTAMPER_127};
-static Page     pgGrmc = {.type = CMD_DATA_GRMC, .szType = SZ_CMD_GRMC};
 static Page     pgTelemetry = {.type = CMD_DATA_TELEMETRY, .szType = SZ_CMD_TELEMETRY};
 static Page     pgPercRSSI = {.type = CMD_DATA_PERCRSSI_127, .szType = SZ_CMD_PERCRSSI_127};
-static Page    *allPages[] = {&pgVoltAmper, &pgEnergy, &pgTemp, &pgGrmc, &pgTelemetry, &pgPercRSSI};
+static Page     pgDoors = {.type = CMD_DATA_DOORS, .szType = SZ_CMD_DOORS};
+static Page     pgGeoPlus = {.type = CMD_DATA_GEO_PLUS, .szType = SZ_CMD_GEO_PLUS};
+static Page    *allPages[] = {&pgVoltAmper, &pgEnergy, &pgTemp, &pgGeoPlus, &pgTelemetry, &pgPercRSSI, &pgDoors};
 static WebPckg *curPckg;
 
 void taskCreateWebPckg(void const *argument) {
@@ -45,7 +46,6 @@ void taskCreateWebPckg(void const *argument) {
         delayPages = getDelayPages();
         if (osSemaphoreWait(semCreateWebPckgHandle, 1) == osOK) {
             flush = 1;
-            LOG_WEB(LEVEL_INFO, "FLUSH STARTED\r\n");
             // if (circBufAllPckgs.readAvailable > 0) {
             //     flush = 1;
             //     // updSpiFlash(&circBufAllPckgs);
@@ -96,7 +96,7 @@ void taskCreateWebPckg(void const *argument) {
 
         if (flush == 2) {
             flush = 0;
-            LOG_WEB(LEVEL_INFO, "FLUSH CONTINUED 1\r\n");
+            // LOG_WEB(LEVEL_INFO, "FLUSH CONTINUED 1\r\n");
             osSemaphoreRelease(semSendWebPckgHandle);
         }
 
@@ -134,13 +134,17 @@ void parseData(u8 *tmpBufPage, u8 len) {
                 addToPage(&pgTelemetry, &tmpBufPage[i + 1], SZ_CMD_TELEMETRY);
                 i += (SZ_CMD_TELEMETRY + 1);
                 break;
-            case CMD_DATA_GRMC:
-                addToPage(&pgGrmc, &tmpBufPage[i + 1], SZ_CMD_GRMC);
-                i += (SZ_CMD_GRMC + 1);
-                break;
             case CMD_DATA_PERCRSSI_127:
                 addToPage(&pgPercRSSI, &tmpBufPage[i + 1], SZ_CMD_PERCRSSI_127);
                 i += (SZ_CMD_PERCRSSI_127 + 1);
+                break;
+            case CMD_DATA_GEO_PLUS:
+                addToPage(&pgGeoPlus, &tmpBufPage[i + 1], SZ_CMD_GEO_PLUS);
+                i += (SZ_CMD_GEO_PLUS + 1);
+                break;
+            case CMD_DATA_DOORS:
+                addToPage(&pgDoors, &tmpBufPage[i + 1], SZ_CMD_DOORS);
+                i += (SZ_CMD_DOORS + 1);
                 break;
             default:
                 LOG_WEB(LEVEL_ERROR, "ER: CMD_DATA_X is wrong\r\n");

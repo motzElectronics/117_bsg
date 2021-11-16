@@ -70,7 +70,7 @@ void taskWebExchange(void const* argument) {
             if (osSemaphoreWait(semSendWebPckgHandle, 20000) != osOK) {
                 continue;
             }
-            LOG_WEB(LEVEL_INFO, "FLUSH CONTINUED 2\r\n");
+            // LOG_WEB(LEVEL_INFO, "FLUSH CONTINUED 2\r\n");
             osMutexWait(mutexWebHandle, osWaitForever);
             openTcp();
             osMutexRelease(mutexWebHandle);
@@ -85,7 +85,7 @@ void taskWebExchange(void const* argument) {
                 if (evt.status == osEventMessage) {
                     curPckg = (WebPckg*)evt.value.p;
                 } else {
-                    LOG_WEB(LEVEL_INFO, "FLUSH FINISHED\r\n");
+                    // LOG_WEB(LEVEL_INFO, "FLUSH FINISHED\r\n");
                     closeTcp();
                     continue;
                 }

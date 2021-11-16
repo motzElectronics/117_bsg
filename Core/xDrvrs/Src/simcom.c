@@ -184,9 +184,9 @@ u8 simTCPclose() {
 }
 
 u8 simTCPinit() {
-    if (simCmd(SIM_CIPSHUT, NULL, 3, SIM_OK_CIPSHUT) != SIM_SUCCESS) {
-        return SIM_FAIL;
-    }
+    // if (simCmd(SIM_CIPSHUT, NULL, 3, SIM_OK_CIPSHUT) != SIM_SUCCESS) {
+    //     return SIM_FAIL;
+    // }
 
     if (simCmd(SIM_CGATT, "1", 3, SIM_OK_TEXT) != SIM_SUCCESS) {
         return SIM_FAIL;
@@ -266,6 +266,7 @@ u8 simTCPSend(u8* data, u16 sz) {
     if (token == NULL || token[0] == '\0') token = SIM_NO_RESPONSE_TEXT;
 
     ttt = HAL_GetTick() - ttt;
+    bsg.timers.tcp_send_time += ttt;
 
     if (strcmp((const char*)token, (const char*)"SEND OK") == 0) {
         LOG_SIM(LEVEL_INFO, "Send OK: time %d\r\n", ttt);
@@ -337,6 +338,11 @@ u8 openTcp() {
         ret = TCP_CSQ_ER;
         bsg.stat.simBadCsqCnt++;
     }
+    if (bsg.isTCPOpen) {
+        simTCPclose();
+    }
+
+    u32 ttt = HAL_GetTick();
     if (ret == TCP_OK && simTCPinit() != SIM_SUCCESS) {
         LOG_SIM(LEVEL_ERROR, "simTCPinit\r\n");
         ret = TCP_INIT_ER;
@@ -349,17 +355,27 @@ u8 openTcp() {
         bsg.isTCPOpen = 1;
         bsg.stat.simOpenCnt++;
     }
+
+    ttt = HAL_GetTick() - ttt;
+    bsg.timers.tcp_open_time += ttt;
+
     return procReturnStatus(ret);
 }
 
 u8 closeTcp() {
     u8 ret = TCP_OK;
+
+    u32 ttt = HAL_GetTick();
     if (ret == TCP_OK && simTCPclose() != SIM_SUCCESS) {
         LOG_SIM(LEVEL_ERROR, "simTCPinit\r\n");
         ret = TCP_CLOSE_ER;
     }
     bsg.isTCPOpen = 0;
     LOG_SIM(LEVEL_INFO, "TCP CLOSED\r\n");
+
+    ttt = HAL_GetTick() - ttt;
+    bsg.timers.tcp_close_time += ttt;
+
     return procReturnStatus(ret);
 }
 

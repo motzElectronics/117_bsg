@@ -26,7 +26,7 @@
 
 #define BSG_MSG_NO_GPS (char*)"0000.000000,N,00000.000000,E,+0000,000,000"
 
-#define BSG_ID_FIRMWARE         4
+#define BSG_ID_FIRMWARE         5
 #define BSG_ID_BOOT             2
 #define BSG_ID_TRAINCAR         0
 #define BSG_ID_TRAIN            1706
@@ -60,23 +60,22 @@ typedef __packed struct {
 typedef __packed struct {
     Coord latitude;
     Coord longitude;
+    s32   altitude;
     u16   course;
     u16   speed;
+    u16   sattelites;
+    u16   hdop;
 } gps_coords_t;
 
 typedef __packed struct {
     u8           valid;
-    gps_coords_t coords;
     u32          stopTime;
-    u8           timeSync;
+    gps_coords_t coords;
 } gps_state_t;
 
 typedef __packed struct {
     u32          unixTimeStamp;
     gps_coords_t coords;
-    int32_t      altitude;
-    u16          sattelites;
-    u16          hdop;
     DateTime     dateTime;
 } PckgGnss;
 
@@ -102,6 +101,13 @@ typedef struct {
 } statistics_t;
 
 typedef struct {
+    u32 tcp_open_time;
+    u32 tcp_close_time;
+    u32 tcp_send_time;
+    u32 tcp_all_time;
+} time_stat_t;
+
+typedef struct {
     u32 idMCU[3];
     u16 idTrain;
     u8  idTrainCar;
@@ -119,6 +125,7 @@ typedef struct {
     u8  isSpiFlashReady;
 
     FIRMWARE_INFO info;
+    time_stat_t   timers;
     statistics_t  stat;
     TabloInfo     tablo;
     gps_state_t   cur_gps;
@@ -167,6 +174,12 @@ typedef __packed struct {
     u32 sum;
 } PckgPercRSSI_127;
 
+typedef struct {
+    u32 unixTimeStamp;
+    u8  number;
+    u8  state;
+} PckgDoors;
+
 typedef enum {
     CMD_DATA_VOLTAMPER = 1,
     CMD_DATA_ENERGY,
@@ -175,7 +188,9 @@ typedef enum {
     CMD_DATA_TELEMETRY = 5,
     CMD_DATA_VOLTAMPER_127,
     CMD_DATA_ENERGY_127,
-    CMD_DATA_PERCRSSI_127
+    CMD_DATA_PERCRSSI_127,
+    CMD_DATA_DOORS,
+    CMD_DATA_GEO_PLUS
 } CMD_DATA_TYPE;
 
 typedef enum {
@@ -260,7 +275,11 @@ typedef enum {
     TEL_CD_127_SIM_BAD_CSQ,
     TEL_CD_127_SIM_LOW_CSQ,
     TEL_CD_127_SIM_GOOD_CSQ,
-    TEL_CD_127_SIM_HIGH_CSQ
+    TEL_CD_127_SIM_HIGH_CSQ,
+    TEL_CD_SIM_TIME_OPEN,
+    TEL_CD_SIM_TIME_CLOSE,
+    TEL_CD_SIM_TIME_SEND,
+    TEL_CD_SIM_TIME_ALL
 } TELEMETRY_CODE_SIMCOM;
 
 typedef enum {

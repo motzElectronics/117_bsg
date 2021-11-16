@@ -107,11 +107,13 @@ void Error_Handler(void);
 #define SZ_CMD_ENERGY_127    13
 #define SZ_CMD_VOLTAMPER_127 9
 #define SZ_CMD_PERCRSSI_127  15
+#define SZ_CMD_DOORS         6
+#define SZ_CMD_GEO_PLUS      28
 
 #define SZ_PAGE                  255
 #define SZ_BUF_ENERGY_FROM_UART1 500
-#define AMOUNT_MAX_PAGES         6
-#define SZ_PAGES                 1530  // SZ_PAGE * AMOUNT_MAX_PAGES
+#define AMOUNT_MAX_PAGES         7
+#define SZ_PAGES                 1275  // SZ_PAGE * AMOUNT_MAX_PAGES
 
 #define BSG_PREAMBLE     0xABCD
 #define BSG_PREAMBLE_LSB 0xAB

@@ -35,21 +35,21 @@ u8 fillGprmc(char* pData, PckgGnss* pckg) {
 
     token = strsep(&pData, ",");  // sattelites
     if (*token != '\0') {
-        pckg->sattelites = atoi(token);
+        pckg->coords.sattelites = atoi(token);
     } else {
         return GPS_GPGGA_ERR_PARS_SAT;
     }
 
     token = strsep(&pData, ",");  // hdop
     if (*token != '\0') {
-        pckg->hdop = (int)(atof(token) * 100);
+        pckg->coords.hdop = (int)(atof(token) * 100);
     } else {
         return GPS_GPGGA_ERR_PARS_HDOP;
     }
 
     token = strsep(&pData, ",");  // altitude
     if (*token != '\0') {
-        pckg->altitude = (int)(atof(token) * 100);
+        pckg->coords.altitude = (int)(atof(token) * 100);
     } else {
         return GPS_GPGGA_ERR_PARS_ALT;
     }
@@ -145,11 +145,11 @@ u8 setCoords(char** pData, Coord* coord) {
 void serializePckgGnss(u8* dest, PckgGnss* pckg) {
     pckg->unixTimeStamp = getUnixTimeStamp();
 
-    LOG_GPS(LEVEL_INFO, "Sat: %d, HDOP: %d, Alt: %d\r\n", pckg->sattelites, pckg->hdop, pckg->altitude);
+    // LOG_GPS(LEVEL_INFO, "Sat: %d, HDOP: %d, Alt: %d\r\n", pckg->coords.sattelites, pckg->coords.hdop, pckg->coords.altitude);
 
-    memcpy(dest, pckg, SZ_CMD_GRMC);
+    memcpy(dest, pckg, SZ_CMD_GEO_PLUS);
 }
 
 void deserializePckgGnss(PckgGnss* pckg, u8* source) {
-    memcpy(pckg, source, SZ_CMD_GRMC);
+    memcpy(pckg, source, SZ_CMD_GEO_PLUS);
 }

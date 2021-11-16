@@ -44,10 +44,10 @@ void addInfoToWebPckg(WebPckg* pPckg, u8* src, u16 sz, u8 cnt, u8 cmdData) {
 }
 
 void showWebPckg(WebPckg* pPckg) {
-    // for (u16 i = 0; i < pPckg->shift; i++) {
-    //     printf("%02x", pPckg->buf[i]);
-    // }
-    // printf("\r\n");
+    for (u16 i = 0; i < pPckg->shift; i++) {
+        printf("%02x", pPckg->buf[i]);
+    }
+    printf("\r\n");
 }
 
 void closeWebPckg(WebPckg* pPckg) {

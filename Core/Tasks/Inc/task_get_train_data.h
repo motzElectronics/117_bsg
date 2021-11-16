@@ -29,6 +29,12 @@ typedef __packed struct {
     u8  bootErr;
 } iu_info_t;
 
+typedef __packed struct {
+    u8  valid;
+    u16 speed;
+    u32 stopTime;
+} gps_body_t;
+
 typedef struct {
     iu_info_t  info;
     InitStep   initStep;
@@ -44,6 +50,7 @@ typedef enum {
     CMD_SYNC,
     CMD_GNSS,
     CMD_ERROR,
+    CMD_GNSS_SHORT,
     CMD_NEW_FW = 16,
     CMD_GET_INFO,
     CMD_FW_LEN,

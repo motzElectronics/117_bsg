@@ -30,6 +30,8 @@ void bsgInit() {
     bsg.idBoot = BSG_ID_BOOT;
     memset(&bsg.stat, 0, sizeof(statistics_t));
     memset(&bsg.cur_gps, 0, sizeof(gps_state_t));
+    memset(&bsg.timers, 0, sizeof(time_stat_t));
+    bsg.cur_gps.stopTime = 100;
 }
 
 void updateCurCoords(PckgGnss* pckgGnss) {

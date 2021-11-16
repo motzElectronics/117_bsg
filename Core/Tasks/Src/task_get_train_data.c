@@ -23,9 +23,10 @@ u16  tablo_create_request(u8* request, u8 cmd, u8* data, u8 len);
 u8   tablo_parse_responce(UartInfo* pUInf);
 
 void taskGetTrainData(void const* argument) {
-    u16 iter = 0;
-    u8  res;
-    u32 timeStamp;
+    u16        iter = 0;
+    u8         res;
+    u32        timeStamp;
+    gps_body_t gps_body;
     osSemaphoreWait(uart6RXSemHandle, osWaitForever);
 
     vTaskSuspend(getTrainDataHandle);
@@ -37,8 +38,14 @@ void taskGetTrainData(void const* argument) {
         switch (bsg.tablo.initStep) {
             case IU_INIT_NONE:
                 LOG(LEVEL_MAIN, "IU_INIT_NONE\r\n");
-                if (tablo_send_request(CMD_GNSS, (u8*)&bsg.cur_gps, sizeof(gps_state_t))) {
+                gps_body.valid = bsg.cur_gps.valid;
+                gps_body.speed = bsg.cur_gps.coords.speed;
+                gps_body.stopTime = bsg.cur_gps.stopTime;
+
+                if (tablo_send_request(CMD_GNSS_SHORT, (u8*)&gps_body, sizeof(gps_body_t))) {
                     bsg.tablo.initStep = IU_INIT_TIMESYNC;
+                } else {
+                    osDelay(1000);
                 }
                 break;
             case IU_INIT_TIMESYNC:
@@ -46,6 +53,8 @@ void taskGetTrainData(void const* argument) {
                 timeStamp = getUnixTimeStamp();
                 if (tablo_send_request(CMD_SYNC, (u8*)&timeStamp, sizeof(timeStamp))) {
                     bsg.tablo.initStep = IU_INIT_GET_INFO;
+                } else {
+                    osDelay(1000);
                 }
                 break;
             case IU_INIT_GET_INFO:
@@ -62,20 +71,23 @@ void taskGetTrainData(void const* argument) {
                 if (iter % 10000 == 300) {
                     timeStamp = getUnixTimeStamp();
                     tablo_send_request(CMD_SYNC, (u8*)&timeStamp, sizeof(timeStamp));
-                } else if (iter % 100 == 50) {
-                    tablo_send_request(CMD_GNSS, (u8*)&bsg.cur_gps, sizeof(gps_state_t));
+                } else if (iter % 50 == 40) {
+                    gps_body.valid = bsg.cur_gps.valid;
+                    gps_body.speed = bsg.cur_gps.coords.speed;
+                    gps_body.stopTime = bsg.cur_gps.stopTime;
+                    tablo_send_request(CMD_GNSS_SHORT, (u8*)&gps_body, sizeof(gps_body_t));
                 } else if (iter % 5000 == 3013) {
                     tablo_send_request(CMD_GET_INFO, NULL, 0);
                 }
                 osDelay(100);
                 tablo_send_request(CMD_DATA, (u8*)&uInfoTablo.szRxBuf, sizeof(uInfoTablo.szRxBuf));
-                osDelay(100);
                 iter++;
                 break;
             default:
                 bsg.tablo.initStep = IU_INIT_NONE;
                 break;
         }
+        osDelay(100);
     }
 }
 
@@ -208,16 +220,20 @@ void parse_tablo_error(u8* data_all, u16 len_all) {
     }
 }
 
-void parse_tablo_new_fw(u8* data_all, u16 len_all) {
-    LOG(LEVEL_INFO, "FW download sterted\r\n");
-}
-
 void parse_tablo_iu_info(u8* data_all, u16 len_all) {
     iu_info_t* info = (iu_info_t*)data_all;
 
     memcpy(&bsg.tablo.info, data_all, sizeof(iu_info_t));
     LOG(LEVEL_INFO, "Returned Tablo UID: %08x%08x%08x\r\n", (uint)info->idMCU[0], (uint)info->idMCU[1], (uint)info->idMCU[2]);
     LOG(LEVEL_INFO, "Returned Tablo FW Num: %d, boot %d, err %d\r\n", info->idFirmware, info->idBoot, info->bootErr);
+}
+
+void parse_tablo_gnss_short(u8* data_all, u16 len_all) {
+    // LOG(LEVEL_INFO, "Short GEO sended\r\n");
+}
+
+void parse_tablo_new_fw(u8* data_all, u16 len_all) {
+    LOG(LEVEL_INFO, "FW download sterted\r\n");
 }
 
 void parse_tablo_fw_num(u8* data_all, u16 len_all) {
@@ -286,6 +302,9 @@ u8 tablo_parse_responce(UartInfo* pUInf) {
         case CMD_ERROR:
             parse_tablo_error(data, hdr->length);
             return 0;
+            break;
+        case CMD_GNSS_SHORT:
+            parse_tablo_gnss_short(data, hdr->length);
             break;
         case CMD_NEW_FW:
             parse_tablo_new_fw(data, hdr->length);

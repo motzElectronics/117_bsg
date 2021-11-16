@@ -22,7 +22,7 @@ extern osSemaphoreId semCreateWebPckgHandle;
 
 static char     bufGnss[300];
 static PckgGnss pckgGnss;
-static u8       bufPckgGnss[SZ_CMD_GRMC];
+static u8       bufPckgGnss[SZ_CMD_GEO_PLUS];
 CircularBuffer  circBufGnss = {.buf = NULL, .max = 0};
 
 extern CircularBuffer rxUart1CircBuf;
@@ -45,11 +45,6 @@ void taskGetGPS(void const *argument) {
     simInit();
     simGetIMEI();
     // getServerTime();
-    // while (1) {
-    //     openTcp();
-    //     osDelay(2000);
-    //     closeTcp();
-    // }
 
     for (;;) {
         iwdgTaskReg |= IWDG_TASK_REG_GPS;
@@ -64,7 +59,6 @@ void taskGetGPS(void const *argument) {
                     gps_step = GPS_STEP_TIMESYNC;
                     break;
                 case GPS_STEP_TIMESYNC:
-                    bsg.cur_gps.timeSync = 0;
                     if (ret == GPS_OK) {
                         if (!setGPSUnixTime(&pckgGnss.dateTime)) {
                             break;
@@ -73,7 +67,6 @@ void taskGetGPS(void const *argument) {
                         generateInitTelemetry();
                         unLockTasks();
 
-                        bsg.cur_gps.timeSync = 1;
                         gps_step = GPS_STEP_WORK;
                     }
                     break;
@@ -81,14 +74,14 @@ void taskGetGPS(void const *argument) {
                     if (ret == GPS_OK) {
                         updateCurCoords(&pckgGnss);
                         if (checkStopTrain(&pckgGnss) == TRAIN_MOVE) {
-                            LOG_GPS(LEVEL_INFO, "Move save\r\n");
+                            // LOG_GPS(LEVEL_INFO, "Move save\r\n");
                             serializePckgGnss(bufPckgGnss, &pckgGnss);
-                            saveData((u8 *)&bufPckgGnss, SZ_CMD_GRMC, CMD_DATA_GRMC, &circBufAllPckgs);
+                            saveData((u8 *)&bufPckgGnss, SZ_CMD_GEO_PLUS, CMD_DATA_GEO_PLUS, &circBufAllPckgs);
                         } else {
                             if (!(numIteration % 30)) {
-                                LOG_GPS(LEVEL_INFO, "Stop save\r\n");
+                                // LOG_GPS(LEVEL_INFO, "Stop save\r\n");
                                 serializePckgGnss(bufPckgGnss, &pckgGnss);
-                                saveData((u8 *)&bufPckgGnss, SZ_CMD_GRMC, CMD_DATA_GRMC, &circBufAllPckgs);
+                                saveData((u8 *)&bufPckgGnss, SZ_CMD_GEO_PLUS, CMD_DATA_GEO_PLUS, &circBufAllPckgs);
                             }
                         }
                         if (!(numIteration % 1800)) {
@@ -202,6 +195,8 @@ void generateInitTelemetry() {
 void generateTestPackage() {
     PckgTelemetry pckgTel;
     PckgTemp      pckgTemp;
+    PckgGnss      pckgGnss;
+    PckgDoors     pckgDoors;
 
     LOG_WEB(LEVEL_MAIN, "Generate TEST package\r\n");
 
@@ -245,6 +240,33 @@ void generateTestPackage() {
     pckgTemp.temp[2] = 6;
     pckgTemp.temp[3] = 15;
     saveData((u8 *)&pckgTemp, SZ_CMD_TEMP, CMD_DATA_TEMP, &circBufAllPckgs);
+
+    pckgGnss.unixTimeStamp = getUnixTimeStamp();
+    pckgGnss.coords.latitude.fst = 6002;
+    pckgGnss.coords.latitude.sec = 797666;
+    pckgGnss.coords.longitude.fst = 3020;
+    pckgGnss.coords.longitude.sec = 346243;
+    pckgGnss.coords.altitude = 4454;
+    pckgGnss.coords.course = 2968;
+    pckgGnss.coords.speed = 9;
+    pckgGnss.coords.sattelites = 12;
+    pckgGnss.coords.hdop = 88;
+    serializePckgGnss(bufPckgGnss, &pckgGnss);
+    saveData((u8 *)&bufPckgGnss, SZ_CMD_GEO_PLUS, CMD_DATA_GEO_PLUS, &circBufAllPckgs);
+
+    pckgDoors.unixTimeStamp = getUnixTimeStamp();
+    pckgDoors.number = 1;
+    pckgDoors.state = 7;
+    saveData((u8 *)&pckgDoors, SZ_CMD_DOORS, CMD_DATA_DOORS, &circBufAllPckgs);
+    pckgDoors.number = 1;
+    pckgDoors.state = 6;
+    saveData((u8 *)&pckgDoors, SZ_CMD_DOORS, CMD_DATA_DOORS, &circBufAllPckgs);
+    pckgDoors.number = 1;
+    pckgDoors.state = 4;
+    saveData((u8 *)&pckgDoors, SZ_CMD_DOORS, CMD_DATA_DOORS, &circBufAllPckgs);
+    pckgDoors.number = 1;
+    pckgDoors.state = 0;
+    saveData((u8 *)&pckgDoors, SZ_CMD_DOORS, CMD_DATA_DOORS, &circBufAllPckgs);
 
     updSpiFlash(&circBufAllPckgs);
     xSemaphoreGive(semCreateWebPckgHandle);

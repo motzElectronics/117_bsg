@@ -285,5 +285,26 @@ ErrorStatus sendMsgStatistics() {
     pckgTel.data = bsg.stat.simHighCsqCnt;
     saveTelemetry(&pckgTel, &circBufAllPckgs);
 
+    pckgTel.code = TEL_CD_SIM_TIME_OPEN;
+    pckgTel.data = bsg.timers.tcp_open_time / 1000;
+    bsg.timers.tcp_open_time = 0;
+    saveTelemetry(&pckgTel, &circBufAllPckgs);
+
+    pckgTel.code = TEL_CD_SIM_TIME_CLOSE;
+    pckgTel.data = bsg.timers.tcp_close_time / 1000;
+    bsg.timers.tcp_close_time = 0;
+    saveTelemetry(&pckgTel, &circBufAllPckgs);
+
+    pckgTel.code = TEL_CD_SIM_TIME_SEND;
+    pckgTel.data = bsg.timers.tcp_send_time / 1000;
+    bsg.timers.tcp_send_time = 0;
+    saveTelemetry(&pckgTel, &circBufAllPckgs);
+
+    pckgTel.code = TEL_CD_SIM_TIME_ALL;
+    bsg.timers.tcp_all_time = HAL_GetTick() - bsg.timers.tcp_all_time;
+    pckgTel.data = bsg.timers.tcp_all_time / 1000;
+    bsg.timers.tcp_all_time = HAL_GetTick();
+    saveTelemetry(&pckgTel, &circBufAllPckgs);
+
     return ret;
 }
