@@ -22,9 +22,9 @@ static WebPckg* curPckg = NULL;
         iwdgTaskReg |= IWDG_TASK_REG_WEB_EXCH;
         if (bsg.isTCPOpen == 0) {
             osMutexWait(mutexWebHandle, osWaitForever);
-            openTcp();
+            openTcp(SERVER_DATA);
             osMutexRelease(mutexWebHandle);
-        } else if (bsg.isTCPOpen == 1) {
+        } else if (bsg.isTCPOpen == SERVER_DATA) {
             // if (statSend == TCP_OK || statSend == TCP_SEND_ER_LOST_PCKG) {
             if (statSend == TCP_OK) {
                 if (curPckg != NULL) {
@@ -43,7 +43,7 @@ static WebPckg* curPckg = NULL;
             memcpy(&order_num, &curPckg->buf[2], 4);
             // LOG_WEB(LEVEL_INFO, "TCP Send: sz %d, num %d, addr 0x%08x\r\n", curPckg->shift, order_num, curPckg);
             LOG_WEB(LEVEL_INFO, "TCP Send: sz %d, num %d\r\n", curPckg->shift, order_num);
-            statSend = sendTcp(curPckg->buf, curPckg->shift);
+            statSend = sendTcp(SERVER_DATA, curPckg->buf, curPckg->shift);
             if (statSend == TCP_OK) {
                 clearWebPckg(curPckg);
                 curPckg = NULL;
@@ -72,9 +72,9 @@ void taskWebExchange(void const* argument) {
             }
             // LOG_WEB(LEVEL_INFO, "FLUSH CONTINUED 2\r\n");
             osMutexWait(mutexWebHandle, osWaitForever);
-            openTcp();
+            openTcp(SERVER_TELEMETRY);
             osMutexRelease(mutexWebHandle);
-        } else if (bsg.isTCPOpen == 1) {
+        } else if (bsg.isTCPOpen == SERVER_TELEMETRY) {
             // if (statSend == TCP_OK || statSend == TCP_SEND_ER_LOST_PCKG) {
             if (statSend == TCP_OK) {
                 if (curPckg != NULL) {
@@ -86,7 +86,9 @@ void taskWebExchange(void const* argument) {
                     curPckg = (WebPckg*)evt.value.p;
                 } else {
                     // LOG_WEB(LEVEL_INFO, "FLUSH FINISHED\r\n");
+                    osMutexWait(mutexWebHandle, osWaitForever);
                     closeTcp();
+                    osMutexRelease(mutexWebHandle);
                     continue;
                 }
             }
@@ -95,7 +97,7 @@ void taskWebExchange(void const* argument) {
             memcpy(&order_num, &curPckg->buf[2], 4);
             // LOG_WEB(LEVEL_INFO, "TCP Send: sz %d, num %d, addr 0x%08x\r\n", curPckg->shift, order_num, curPckg);
             LOG_WEB(LEVEL_INFO, "TCP Send: sz %d, num %d\r\n", curPckg->shift, order_num);
-            statSend = sendTcp(curPckg->buf, curPckg->shift);
+            statSend = sendTcp(SERVER_TELEMETRY, curPckg->buf, curPckg->shift);
             if (statSend == TCP_OK) {
                 clearWebPckg(curPckg);
                 curPckg = NULL;

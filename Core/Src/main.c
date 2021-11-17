@@ -238,8 +238,10 @@ u8 waitIdleCnt(char* waitStr, IrqFlags* pFlags, u8 cnt, u16 pause,
 }
 
 void urlsInit() {
-    urls.tcpAddr = URL_TCP_ADDR;
-    urls.tcpPort = URL_TCP_PORT;
+    urls.ourTcpAddr = URL_TCP_ADDR;
+    urls.ourTcpPort = URL_TCP_PORT;
+    urls.niacTcpAddr = URL_NIAC_TCP_ADDR;
+    urls.niacTcpPort = URL_NIAC_TCP_PORT;
 }
 /* USER CODE END 4 */
 

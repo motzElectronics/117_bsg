@@ -44,7 +44,12 @@ void taskGetGPS(void const *argument) {
 
     simInit();
     simGetIMEI();
-    // getServerTime();
+
+    // TODO: time should be syncronized by GPS
+    getServerTime();
+    generateInitTelemetry();
+    unLockTasks();
+    gps_step = GPS_STEP_WORK;
 
     for (;;) {
         iwdgTaskReg |= IWDG_TASK_REG_GPS;
@@ -95,6 +100,9 @@ void taskGetGPS(void const *argument) {
                         bsg.cur_gps.valid = 0;
                         bsg.stat.gpsParseFailCount++;
                     }
+                    break;
+                default:
+                    gps_step = GPS_STEP_NONE;
                     break;
             }
             memset(bufGnss, '\0', sizeof(bufGnss));

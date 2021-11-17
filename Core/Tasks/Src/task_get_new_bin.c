@@ -57,9 +57,9 @@ void big_update_func() {
     u8  cntFailTablo = 0;
     u8  res;
 
-    bsg.isTCPOpen = 0;
-    while (openTcp() != TCP_OK) {}
-
+    osMutexWait(mutexWebHandle, osWaitForever);
+    closeTcp();
+    osMutexRelease(mutexWebHandle);
     while (!(szSoft = getSzFirmware())) {}
 
     flashClearPage(FLASH_SECTOR_6);
@@ -104,10 +104,12 @@ void big_update_func() {
             memcpy(bufNumBytesFirmware + 4, &pckgInfoFirmware.toByte, 4);
             memset(partFirmware, 0xFF, SZ_PART_FIRMW + 1);
 
+            osMutexWait(mutexWebHandle, osWaitForever);
             if (!bsg.isTCPOpen) {
-                while (openTcp() != TCP_OK) {}
+                while (openTcp(SERVER_TELEMETRY) != TCP_OK) {}
                 cntFailTCPReq = 0;
             }
+            osMutexRelease(mutexWebHandle);
 
             osDelay(100);
             if (getPartFirmware(bufNumBytesFirmware, partFirmware, szPartSoft + 4, 8) == SUCCESS &&
@@ -140,9 +142,11 @@ void big_update_func() {
                 }
             }
         } else {
+            osMutexWait(mutexWebHandle, osWaitForever);
             if (!bsg.isTCPOpen) {
-                while (openTcp() != TCP_OK) {}
+                while (openTcp(SERVER_TELEMETRY) != TCP_OK) {}
             }
+            osMutexRelease(mutexWebHandle);
             if (bsg.updTarget == UPD_TARGET_TABLO) {
                 if (sendMsgTabloFW() != SUCCESS) {
                     LOG(LEVEL_ERROR, "Send TABLO FW UPDATED\r\n");
@@ -153,6 +157,9 @@ void big_update_func() {
                 }
             }
             LOG(LEVEL_MAIN, "DOWNLOAD COMPLETE\r\n");
+            osMutexWait(mutexWebHandle, osWaitForever);
+            closeTcp();
+            osMutexRelease(mutexWebHandle);
             u8 diff = 4 - (szSoft % 4);
             if (diff > 0 && diff < 4) {
                 memset(partFirmware, 0xFF, diff);
@@ -257,7 +264,7 @@ ErrorStatus getPartFirmware(u8* reqData, u8* answBuf, u16 szAnsw, u8 szReq) {
 
     curPckg = createWebPckgReq(CMD_REQUEST_PART_FIRMWARE, reqData, szReq, SZ_REQUEST_GET_PART_FIRMWARE, idMCU);
     osMutexWait(mutexWebHandle, osWaitForever);
-    if (sendTcp(curPckg->buf, curPckg->shift) != TCP_OK) {
+    if (sendTcp(SERVER_TELEMETRY, curPckg->buf, curPckg->shift) != TCP_OK) {
         LOG(LEVEL_ERROR, "part Firmware\r\n");
         ret = ERROR;
     } else {

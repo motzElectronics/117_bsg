@@ -135,8 +135,12 @@ ErrorStatus sendWebPckgData(u8 CMD_DATA, u8* data, u8 sz, u8 szReq, u8* idMCU) {
     closeWebPckg(curPckg);
     // showWebPckg(curPckg);
 
+    // while (bsg.isTCPOpen == SERVER_DATA) {
+    //     osDelay(500);
+    // }
+
     osMutexWait(mutexWebHandle, osWaitForever);
-    if (sendTcp(curPckg->buf, curPckg->shift) != TCP_OK) {
+    if (sendTcp(SERVER_TELEMETRY, curPckg->buf, curPckg->shift) != TCP_OK) {
         LOG_WEB(LEVEL_ERROR, "send data failed\r\n");
         ret = ERROR;
     }
@@ -162,9 +166,13 @@ ErrorStatus generateWebPckgReq(u8 CMD_REQ, u8* data, u8 sz, u8 szReq, u8* answ, 
         closeWebPckg(curPckg);
         // showWebPckg(curPckg);
 
+        // while (bsg.isTCPOpen == SERVER_DATA) {
+        //     osDelay(500);
+        // }
+
         osMutexWait(mutexWebHandle, osWaitForever);
-        bsg.isTCPOpen = 0;
-        statSend = sendTcp(curPckg->buf, curPckg->shift);
+        closeTcp();
+        statSend = sendTcp(SERVER_TELEMETRY, curPckg->buf, curPckg->shift);
         if (statSend != TCP_OK)
             ret = ERROR;
         else if (uInfoSim.pRxBuf[11] == '\0' && uInfoSim.pRxBuf[12] == '\0' &&
@@ -175,7 +183,6 @@ ErrorStatus generateWebPckgReq(u8 CMD_REQ, u8* data, u8 sz, u8 szReq, u8* answ, 
             } else {
                 LOG_WEB(LEVEL_ERROR, "NO ANSW REQ\r\n");
                 ret = ERROR;
-                bsg.isTCPOpen = 0;
             }
         } else {
             osDelay(10);

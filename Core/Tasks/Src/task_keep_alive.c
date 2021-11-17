@@ -26,11 +26,11 @@ void taskKeepAlive(void const* argument) {
     vTaskSuspend(keepAliveHandle);
 
     for (;;) {
-        if ((timeout % 300 == 10) && !isRxNewFirmware) {
+        if ((timeout % 360 == 100) && !isRxNewFirmware) {
             LOG(LEVEL_MAIN, "getBsgNumFw\r\n\r\n");
             getBsgNumFw();
         }
-        if ((timeout % 300 == 20) && !isRxNewFirmware) {
+        if ((timeout % 360 == 200) && !isRxNewFirmware) {
             LOG(LEVEL_MAIN, "getTabloNumFw\r\n\r\n");
             getTabloNumFw();
         }
@@ -104,7 +104,8 @@ ErrorStatus sendMsgTabloFW() {
     u8            ptr = 0;
     u8*           idMCU;
 
-    idMCU = (u8*)&bsg.tablo.info.idMCU;
+    // idMCU = (u8*)&bsg.tablo.info.idMCU;
+    idMCU = (u8*)&bsg.idMCU;
 
     LOG(LEVEL_MAIN, "sendMsgTabloFW\r\n");
 
@@ -142,13 +143,14 @@ ErrorStatus sendMsgFWUpdated() {
     PckgTelemetry pckgTel;
     u8*           idMCU;
 
-    if (bsg.updTarget == UPD_TARGET_TABLO) {
-        idMCU = (u8*)&bsg.tablo.info.idMCU;
-    } else if (bsg.updTarget == UPD_TARGET_BSG) {
-        idMCU = (u8*)&bsg.idMCU;
-    } else {
-        return ERROR;
-    }
+    // if (bsg.updTarget == UPD_TARGET_TABLO) {
+    //     idMCU = (u8*)&bsg.tablo.info.idMCU;
+    // } else if (bsg.updTarget == UPD_TARGET_BSG) {
+    //     idMCU = (u8*)&bsg.idMCU;
+    // } else {
+    //     return ERROR;
+    // }
+    idMCU = (u8*)&bsg.idMCU;
 
     LOG(LEVEL_MAIN, "sendMsgFWUpdated\r\n");
 
@@ -174,13 +176,14 @@ ErrorStatus sendMsgFWUpdateBegin() {
     u8            ptr = 0;
     u8*           idMCU;
 
-    if (bsg.updTarget == UPD_TARGET_TABLO) {
-        idMCU = (u8*)&bsg.tablo.info.idMCU;
-    } else if (bsg.updTarget == UPD_TARGET_BSG) {
-        idMCU = (u8*)&bsg.idMCU;
-    } else {
-        return ERROR;
-    }
+    // if (bsg.updTarget == UPD_TARGET_TABLO) {
+    //     idMCU = (u8*)&bsg.tablo.info.idMCU;
+    // } else if (bsg.updTarget == UPD_TARGET_BSG) {
+    //     idMCU = (u8*)&bsg.idMCU;
+    // } else {
+    //     return ERROR;
+    // }
+    idMCU = (u8*)&bsg.idMCU;
 
     LOG(LEVEL_MAIN, "sendMsgFWUpdated\r\n");
 

@@ -220,13 +220,18 @@ u8 simTCPinit() {
     return SIM_SUCCESS;
 }
 
-u8 simTCPOpen() {
+u8 simTCPOpen(u8 server) {
     static char params[40];
     char*       retMsg;
     char*       token;
     memset(params, '\0', 40);
-    sprintf(params, "\"%s\",\"%s\",%d", (char*)"TCP", urls.tcpAddr,
-            urls.tcpPort);
+    if (server == SERVER_TELEMETRY) {
+        sprintf(params, "\"%s\",\"%s\",%d", (char*)"TCP", urls.ourTcpAddr, urls.ourTcpPort);
+    } else if (server == SERVER_DATA) {
+        sprintf(params, "\"%s\",\"%s\",%d", (char*)"TCP", urls.niacTcpAddr, urls.niacTcpPort);
+    } else {
+        return SIM_FAIL;
+    }
     if (simCmd(SIM_CIPSTART, params, 3, SIM_OK_TEXT) == SIM_FAIL) {
         return SIM_FAIL;
     }
@@ -320,7 +325,10 @@ u8 procReturnStatus(u8 ret) {
     } else if (ret == TCP_CONNECT_ER) {
         LOG_SIM(LEVEL_ERROR, "CONNECT ERROR - TOTAL RESET!\r\n");
         osDelay(1000);
-        NVIC_SystemReset();
+        simReset();
+        ret = TCP_SEND_ER_LOST_PCKG;
+        notSend = 0;
+        // NVIC_SystemReset();
     } else if (ret != TCP_OK) {
         LOG_SIM(LEVEL_ERROR, "UNABLE TO SEND!\r\n");
         simReset();
@@ -331,7 +339,7 @@ u8 procReturnStatus(u8 ret) {
     return ret;
 }
 
-u8 openTcp() {
+u8 openTcp(u8 server) {
     u8 ret = TCP_OK;
     if (!waitGoodCsq(5400)) {
         LOG_SIM(LEVEL_ERROR, "waitGoodCsq\r\n");
@@ -339,7 +347,7 @@ u8 openTcp() {
         bsg.stat.simBadCsqCnt++;
     }
     if (bsg.isTCPOpen) {
-        simTCPclose();
+        closeTcp();
     }
 
     u32 ttt = HAL_GetTick();
@@ -347,12 +355,12 @@ u8 openTcp() {
         LOG_SIM(LEVEL_ERROR, "simTCPinit\r\n");
         ret = TCP_INIT_ER;
     }
-    if (ret == TCP_OK && simTCPOpen() != SIM_SUCCESS) {
+    if (ret == TCP_OK && simTCPOpen(server) != SIM_SUCCESS) {
         LOG_SIM(LEVEL_ERROR, "simTCPOpen\r\n");
         ret = TCP_OPEN_ER;
     }
     if (ret == TCP_OK) {
-        bsg.isTCPOpen = 1;
+        bsg.isTCPOpen = server;
         bsg.stat.simOpenCnt++;
     }
 
@@ -379,16 +387,16 @@ u8 closeTcp() {
     return procReturnStatus(ret);
 }
 
-u8 sendTcp(u8* data, u16 sz) {
+u8 sendTcp(u8 server, u8* data, u16 sz) {
     u8 ret = TCP_OK;
     u8 cnt = 0;
-    while (!bsg.isTCPOpen) {
+    while (bsg.isTCPOpen != server) {
         if (cnt == 15) {
             ret = TCP_CONNECT_ER;
             break;
         }
         cnt++;
-        ret = openTcp();
+        ret = openTcp(server);
     }
     if (ret == TCP_OK && !waitGoodCsq(90)) {
         LOG_SIM(LEVEL_ERROR, "waitGoodCsq\r\n");

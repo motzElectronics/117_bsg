@@ -26,7 +26,7 @@
 
 #define BSG_MSG_NO_GPS (char*)"0000.000000,N,00000.000000,E,+0000,000,000"
 
-#define BSG_ID_FIRMWARE         5
+#define BSG_ID_FIRMWARE         8
 #define BSG_ID_BOOT             2
 #define BSG_ID_TRAINCAR         0
 #define BSG_ID_TRAIN            1706
@@ -98,6 +98,8 @@ typedef struct {
     u32 simLowCsqCnt;
     u32 simGoodCsqCnt;
     u32 simHighCsqCnt;
+
+    u32 queueErrCount;
 } statistics_t;
 
 typedef struct {

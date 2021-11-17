@@ -91,10 +91,12 @@ void Error_Handler(void);
 #define WAIT_TIMEOUT 15000
 #define DUMMY_BYTE   0xFF
 
-#define URL_TCP_ADDR (char*)"188.242.176.25"
-#define URL_TCP_PORT 8086
-// #define URL_TCP_ADDR (char*)"gis.ru.net"
-// #define URL_TCP_PORT 9878
+#define SERVER_TELEMETRY  1
+#define SERVER_DATA       2
+#define URL_TCP_ADDR      (char*)"188.242.176.25"
+#define URL_TCP_PORT      8086
+#define URL_NIAC_TCP_ADDR (char*)"188.242.176.25"
+#define URL_NIAC_TCP_PORT 8086
 
 #define BSG_SZ_UART_MSG 132
 #define BSG_SZ_TEMP_MSG 4
@@ -159,8 +161,10 @@ typedef struct {
 } FIRMWARE_INFO;
 
 typedef struct {
-    char* tcpAddr;
-    u32   tcpPort;
+    char* ourTcpAddr;
+    u32   ourTcpPort;
+    char* niacTcpAddr;
+    u32   niacTcpPort;
 } Urls;
 
 extern Urls urls;

@@ -52,14 +52,14 @@ void taskCreateWebPckg(void const *argument) {
             //     LOG_WEB(LEVEL_INFO, "FLUSH STARTED\r\n");
             // }
         }
-        while (flush == 1) {
+        while (flush == 1 || delayPages >= 2) {
             if (delayPages == 0) {
                 flush = 0;
                 break;
             }
             curPckg = getFreePckg();
             if (curPckg == NULL) {
-                flush = 0;
+                flush = 2;
                 break;
             }
             clearAllPages();
@@ -85,8 +85,11 @@ void taskCreateWebPckg(void const *argument) {
                 LOG_WEB(LEVEL_INFO, "Create package\r\n");
                 initWebPckg(curPckg, szAllPages, 0, &bsg.idMCU);
                 addPagesToWebPckg(curPckg);
-                osMessagePut(queueWebPckgHandle, (u32)curPckg, osWaitForever);
-                flush = 2;
+                if (osMessagePut(queueWebPckgHandle, (u32)curPckg, 180000) != osOK) {
+                    bsg.stat.queueErrCount++;
+                    flush = 2;
+                }
+                if (flush == 1) flush = 2;
             } else {
                 freeWebPckg(curPckg);
                 flush = 0;
@@ -104,7 +107,7 @@ void taskCreateWebPckg(void const *argument) {
             LOG_WEB(LEVEL_DEBUG, "no pckg in spiflash\r\n");
             bsg.isSentData = 1;
         }
-        osDelay(1000);
+        osDelay(500);
     }
 }
 

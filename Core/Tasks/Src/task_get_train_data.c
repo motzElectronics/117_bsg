@@ -47,6 +47,7 @@ void taskGetTrainData(void const* argument) {
                 } else {
                     osDelay(1000);
                 }
+                bsg.tablo.initStep = IU_INIT_TIMESYNC;
                 break;
             case IU_INIT_TIMESYNC:
                 LOG(LEVEL_MAIN, "IU_INIT_TIMESYNC\r\n");

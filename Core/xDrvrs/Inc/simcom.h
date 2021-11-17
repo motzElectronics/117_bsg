@@ -121,7 +121,7 @@ void simOn();
 void simHardwareReset();
 
 u8        simTCPTest();
-u8        simTCPOpen();
+u8        simTCPOpen(u8 server);
 u8        simTCPSend(u8* data, u16 sz);
 u8        simTCPCheckStatus(const char* stat, u16 timeout, u16 delay);
 u8        simCmd(char* cmdCode, char* params, u8 retriesCnt, char* SUCCESS_RET);
@@ -129,8 +129,8 @@ char*     simTxATCmd(char* command, u16 sz, u32 timeout);
 long long simGetPhoneNum();
 void      simGetIMEI();
 
-u8 sendTcp(u8* data, u16 sz);
-u8 openTcp();
+u8 sendTcp(u8 server, u8* data, u16 sz);
+u8 openTcp(u8 server);
 u8 closeTcp();
 
 void gnssInit();
