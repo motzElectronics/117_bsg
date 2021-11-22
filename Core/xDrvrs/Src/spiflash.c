@@ -302,13 +302,13 @@ void spiFlashSaveInfo() {
 
 void spiFlashLoadInfo(u8 *buf) {
     u8  isMapInFlash;
-    u32 tmp;
+    // u32 tmp;
     u32 addr;
 
     addr = (BSG_SAVE_NUM_PAGE * spiFlash64.pgSz);
     spiFlashRdPg(buf, 256, addr);
 
-    tmp = buf[0] | buf[1] << 8 | buf[2] << 16 | buf[3] << 24;
+    // tmp = buf[0] | buf[1] << 8 | buf[2] << 16 | buf[3] << 24;
     spiFlash64.headNumPg = 0;
     spiFlash64.tailNumPg = spiFlash64.headNumPg;
     LOG_FLASH(LEVEL_MAIN, "Read headNumPg: %d\r\n", spiFlash64.headNumPg);

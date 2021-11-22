@@ -58,14 +58,18 @@ osThreadId    manageIWDGHandle;
 osThreadId    createWebPckgHandle;
 osThreadId    webExchangeHandle;
 osThreadId    getTrainDataHandle;
+osThreadId    sendTelemetryHandle;
 osMessageQId  queueWebPckgHandle;
+osMessageQId  queueTelPckgHandle;
 osMutexId     mutexGPSBufHandle;
 osMutexId     mutexWebHandle;
 osMutexId     mutexRTCHandle;
 osMutexId     mutexSpiFlashHandle;
+osMutexId     mutexSessionHandle;
 osSemaphoreId semCreateWebPckgHandle;
 osSemaphoreId uart6RXSemHandle;
 osSemaphoreId semSendWebPckgHandle;
+osSemaphoreId semSendTelPckgHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -79,6 +83,7 @@ void taskManageIWDG(void const *argument);
 void taskCreateWebPckg(void const *argument);
 void taskWebExchange(void const *argument);
 void taskGetTrainData(void const *argument);
+void taskSendTelemetry(void const *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -123,6 +128,10 @@ void MX_FREERTOS_Init(void) {
     osMutexDef(mutexSpiFlash);
     mutexSpiFlashHandle = osMutexCreate(osMutex(mutexSpiFlash));
 
+    /* definition and creation of mutexSession */
+    osMutexDef(mutexSession);
+    mutexSessionHandle = osMutexCreate(osMutex(mutexSession));
+
     /* USER CODE BEGIN RTOS_MUTEX */
     /* add mutexes, ... */
     /* USER CODE END RTOS_MUTEX */
@@ -140,6 +149,10 @@ void MX_FREERTOS_Init(void) {
     osSemaphoreDef(semSendWebPckg);
     semSendWebPckgHandle = osSemaphoreCreate(osSemaphore(semSendWebPckg), 1);
 
+    /* definition and creation of semSendTelPckg */
+    osSemaphoreDef(semSendTelPckg);
+    semSendTelPckgHandle = osSemaphoreCreate(osSemaphore(semSendTelPckg), 1);
+
     /* USER CODE BEGIN RTOS_SEMAPHORES */
     /* add semaphores, ... */
     /* USER CODE END RTOS_SEMAPHORES */
@@ -152,6 +165,10 @@ void MX_FREERTOS_Init(void) {
     /* definition and creation of queueWebPckg */
     osMessageQDef(queueWebPckg, 8, WebPckg *);
     queueWebPckgHandle = osMessageCreate(osMessageQ(queueWebPckg), NULL);
+
+    /* definition and creation of queueTelPckg */
+    osMessageQDef(queueTelPckg, 8, WebPckg *);
+    queueTelPckgHandle = osMessageCreate(osMessageQ(queueTelPckg), NULL);
 
     /* USER CODE BEGIN RTOS_QUEUES */
     /* add queues, ... */
@@ -185,6 +202,10 @@ void MX_FREERTOS_Init(void) {
     /* definition and creation of getTrainData */
     osThreadDef(getTrainData, taskGetTrainData, osPriorityNormal, 0, 256);
     getTrainDataHandle = osThreadCreate(osThread(getTrainData), NULL);
+
+    /* definition and creation of sendTelemetry */
+    osThreadDef(sendTelemetry, taskSendTelemetry, osPriorityNormal, 0, 256);
+    sendTelemetryHandle = osThreadCreate(osThread(sendTelemetry), NULL);
 
     /* USER CODE BEGIN RTOS_THREADS */
     /* add threads, ... */
@@ -301,6 +322,22 @@ __weak void taskGetTrainData(void const *argument) {
         osDelay(1);
     }
     /* USER CODE END taskGetTrainData */
+}
+
+/* USER CODE BEGIN Header_taskSendTelemetry */
+/**
+ * @brief Function implementing the sendTelemetry thread.
+ * @param argument: Not used
+ * @retval None
+ */
+/* USER CODE END Header_taskSendTelemetry */
+__weak void taskSendTelemetry(void const *argument) {
+    /* USER CODE BEGIN taskSendTelemetry */
+    /* Infinite loop */
+    for (;;) {
+        osDelay(1);
+    }
+    /* USER CODE END taskSendTelemetry */
 }
 
 /* Private application code --------------------------------------------------*/

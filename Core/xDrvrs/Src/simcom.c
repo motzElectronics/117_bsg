@@ -280,7 +280,7 @@ u8 simTCPSend(u8* data, u16 sz) {
     bsg.timers.tcp_send_time += ttt;
 
     if (strcmp((const char*)token, (const char*)"SEND OK") == 0) {
-        LOG_SIM(LEVEL_INFO, "Send OK: time %d\r\n", ttt);
+        // LOG_SIM(LEVEL_INFO, "Send OK: time %d\r\n", ttt);
         return SIM_SUCCESS;
     } else if (strcmp((const char*)token, (const char*)"SEND FAIL") == 0) {
         LOG_SIM(LEVEL_ERROR, "simDownloadData() %s time %d\r\n", token, ttt);
@@ -361,7 +361,7 @@ u8 openTcp(u8 server) {
     if (ret == TCP_OK) {
         bsg.isTCPOpen = server;
         bsg.stat.simOpenCnt++;
-        LOG_SIM(LEVEL_INFO, "TCP CONNECTED\r\n");
+        // LOG_SIM(LEVEL_INFO, "TCP CONNECTED\r\n");
     }
 
     ttt = HAL_GetTick() - ttt;
@@ -375,7 +375,7 @@ u8 closeTcp() {
 
     u32 ttt = HAL_GetTick();
     if (ret == TCP_OK && simTCPclose() != SIM_SUCCESS) {
-        LOG_SIM(LEVEL_ERROR, "simTCPclose\r\n");
+        LOG_SIM(LEVEL_ERROR, "TCP NOT CLOSED!!!!!\r\n");
         ret = TCP_CLOSE_ER;
     }
     if (ret == TCP_OK) {
@@ -392,6 +392,7 @@ u8 closeTcp() {
 u8 sendTcp(u8 server, u8* data, u16 sz) {
     u8 ret = TCP_OK;
     u8 cnt = 0;
+    // static u32 count = 0;
     while (bsg.isTCPOpen != server) {
         if (cnt == 15) {
             ret = TCP_CONNECT_ER;
@@ -408,6 +409,10 @@ u8 sendTcp(u8 server, u8* data, u16 sz) {
         LOG_SIM(LEVEL_ERROR, "simTCPSend\r\n");
         ret = TCP_SEND_ER;
     }
+    // count++;
+    // if (!(count % 7)) {
+    //     ret = TCP_SEND_ER;
+    // }
     if (ret == TCP_OK) {
         bsg.stat.simSendCnt++;
     } else {

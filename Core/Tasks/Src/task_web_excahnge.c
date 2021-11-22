@@ -7,6 +7,7 @@ extern osThreadId    webExchangeHandle;
 extern osThreadId    createWebPckgHandle;
 extern osThreadId    createWebPckgHandle;
 extern osMutexId     mutexWebHandle;
+extern osMutexId     mutexSessionHandle;
 extern osMessageQId  queueWebPckgHandle;
 extern osSemaphoreId semSendWebPckgHandle;
 
@@ -27,22 +28,26 @@ void taskWebExchange(void const* argument) {
     for (;;) {
         iwdgTaskReg |= IWDG_TASK_REG_WEB_EXCH;
 
-        if (!bsg.isTCPOpen) {
-            sessionStep = SESSION_OPENING;
-        }
+        // if (bsg.isTCPOpen != bsg.server) {
+        //     sessionStep = SESSION_OPENING;
+        // }
 
         switch (sessionStep) {
             case SESSION_OPENING:
-                if (bsg.isTCPOpen) {
+                if (bsg.isTCPOpen == bsg.server) {
                     sessionStep = SESSION_AUTHORIZE;
                     continue;
                 }
                 if (osSemaphoreWait(semSendWebPckgHandle, 30000) != osOK) {
                     continue;
                 }
-                // LOG_WEB(LEVEL_INFO, "FLUSH CONTINUED 2\r\n");
+                osMutexWait(mutexSessionHandle, osWaitForever);
+                LOG_WEB(LEVEL_INFO, "{--- Start sending DATA\r\n");
+
                 osMutexWait(mutexWebHandle, osWaitForever);
-                openTcp(bsg.server);
+                if (openTcp(bsg.server) != TCP_OK) {
+                    osMutexRelease(mutexSessionHandle);
+                }
                 osMutexRelease(mutexWebHandle);
                 break;
             case SESSION_AUTHORIZE:
@@ -53,7 +58,7 @@ void taskWebExchange(void const* argument) {
                 if (sendAuthorizePckg() == SUCCESS) {
                     sessionStep = SESSION_SENDING;
                 } else {
-                    osDelay(1000);
+                    sessionStep = SESSION_TCP_CLOSING;
                 }
                 break;
             case SESSION_SENDING:
@@ -77,12 +82,16 @@ void taskWebExchange(void const* argument) {
                 } else {
                     memcpy(&order_num, &curPckg->buf[1], 4);
                 }
-                // LOG_WEB(LEVEL_INFO, "TCP Send: sz %d, num %d, addr 0x%08x\r\n", curPckg->shift, order_num, curPckg);
-                LOG_WEB(LEVEL_INFO, "TCP Send: sz %d, num %d\r\n", curPckg->shift, order_num);
+                u32 ttt = HAL_GetTick();
                 statSend = sendTcp(bsg.server, curPckg->buf, curPckg->shift);
+                ttt = HAL_GetTick() - ttt;
                 if (statSend == TCP_OK) {
+                    LOG_WEB(LEVEL_INFO, "TCP Send: num %d, sz %d, time %d\r\n", order_num, curPckg->shift, ttt);
                     clearWebPckg(curPckg);
                     curPckg = NULL;
+                } else {
+                    sessionStep = SESSION_TCP_CLOSING;
+                    LOG_WEB(LEVEL_ERROR, "TCP Send: num %d, sz %d, time %d Failed\r\n", order_num, curPckg->shift, ttt);
                 }
                 osMutexRelease(mutexWebHandle);
                 break;
@@ -94,17 +103,20 @@ void taskWebExchange(void const* argument) {
                 if (sendEndSessionPckg() == SUCCESS) {
                     sessionStep = SESSION_TCP_CLOSING;
                 } else {
-                    osDelay(1000);
+                    sessionStep = SESSION_TCP_CLOSING;
                 }
                 break;
             case SESSION_TCP_CLOSING:
                 if (!bsg.isTCPOpen) {
                     sessionStep = SESSION_OPENING;
-                    continue;
+                    LOG_WEB(LEVEL_INFO, "---} Finish sending DATA\r\n");
+                } else {
+                    osMutexWait(mutexWebHandle, osWaitForever);
+                    closeTcp();
+                    osMutexRelease(mutexWebHandle);
                 }
-                osMutexWait(mutexWebHandle, osWaitForever);
-                closeTcp();
-                osMutexRelease(mutexWebHandle);
+
+                osMutexRelease(mutexSessionHandle);
                 break;
 
             default:
@@ -128,8 +140,10 @@ ErrorStatus sendAuthorizePckg() {
     makeAuthorizePckg(pckg, bsg.server);
 
     osMutexWait(mutexWebHandle, osWaitForever);
-    LOG_WEB(LEVEL_INFO, "TCP Send: authorize\r\n");
+    u32 ttt = HAL_GetTick();
     statSend = sendTcp(bsg.server, pckg->buf, pckg->shift);
+    ttt = HAL_GetTick() - ttt;
+    LOG_WEB(LEVEL_INFO, "TCP Send: authorize, time %d\r\n", ttt);
     if (statSend != TCP_OK) ret = ERROR;
 
     clearWebPckg(pckg);
@@ -154,8 +168,10 @@ ErrorStatus sendEndSessionPckg() {
     makeEndSessionPckg(pckg, bsg.server);
 
     osMutexWait(mutexWebHandle, osWaitForever);
-    LOG_WEB(LEVEL_INFO, "TCP Send: end session\r\n");
+    u32 ttt = HAL_GetTick();
     statSend = sendTcp(bsg.server, pckg->buf, pckg->shift);
+    ttt = HAL_GetTick() - ttt;
+    LOG_WEB(LEVEL_INFO, "TCP Send: end session, time %d\r\n", ttt);
     if (statSend != TCP_OK) ret = ERROR;
 
     clearWebPckg(pckg);

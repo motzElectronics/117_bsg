@@ -2,7 +2,8 @@
 #define INC_UTILS_PCKG_MANAGER_H_
 #include "main.h"
 
-#define CNT_WEBPCKGS 5
+#define CNT_WEBPCKGS     5
+#define CNT_WEBPCKGS_TEL 3
 
 #define SZ_REQUEST_GET_SERVER_TIME   2
 #define SZ_REQUEST_GET_NUM_FIRMWARE  2
@@ -23,6 +24,12 @@ void addInfoToWebPckg(WebPckg* pckg, u8* src, u16 sz, u8 cnt, u8 cmdData);
 void showWebPckg(WebPckg* pckg);
 void closeWebPckg(WebPckg* pckg, u8 server);
 void clearAllWebPckgs();
+
+#if SEND_TEL_TO_MOTZ
+void     clearAllWebPckgsTel();
+WebPckg* getFreePckgTel();
+u8       getCntFreePckgTel();
+#endif
 
 u8          isNotFullPckg();
 WebPckg*    getFreePckg();

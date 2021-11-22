@@ -10,22 +10,28 @@ extern osThreadId    getNewBinHandle;
 extern osThreadId    createWebPckgHandle;
 extern osMutexId     mutexWebHandle;
 extern osMessageQId  queueWebPckgHandle;
+extern osMessageQId  queueTelPckgHandle;
 extern osSemaphoreId semCreateWebPckgHandle;
 extern osSemaphoreId semSendWebPckgHandle;
+extern osSemaphoreId semSendTelPckgHandle;
 
 extern u8             SZ_PCKGENERGY;
 static char           tmpBufPage[256];
 extern CircularBuffer circBufAllPckgs;
 
-static Page     pgEnergy = {.type = CMD_DATA_ENERGY_127, .szType = SZ_CMD_ENERGY_127};
 static Page     pgTemp = {.type = CMD_DATA_TEMP, .szType = SZ_CMD_TEMP};
 static Page     pgVoltAmper = {.type = CMD_DATA_VOLTAMPER_127, .szType = SZ_CMD_VOLTAMPER_127};
-static Page     pgTelemetry = {.type = CMD_DATA_TELEMETRY, .szType = SZ_CMD_TELEMETRY};
+static Page     pgEnergy = {.type = CMD_DATA_ENERGY_127, .szType = SZ_CMD_ENERGY_127};
 static Page     pgPercRSSI = {.type = CMD_DATA_PERCRSSI_127, .szType = SZ_CMD_PERCRSSI_127};
 static Page     pgDoors = {.type = CMD_DATA_DOORS, .szType = SZ_CMD_DOORS};
 static Page     pgGeoPlus = {.type = CMD_DATA_GEO_PLUS, .szType = SZ_CMD_GEO_PLUS};
-static Page    *allPages[] = {&pgVoltAmper, &pgEnergy, &pgTemp, &pgGeoPlus, &pgTelemetry, &pgPercRSSI, &pgDoors};
+static Page     pgTelemetry = {.type = CMD_DATA_TELEMETRY, .szType = SZ_CMD_TELEMETRY};
+static Page    *allPages[] = {&pgTemp, &pgVoltAmper, &pgEnergy, &pgPercRSSI, &pgDoors, &pgGeoPlus, &pgTelemetry};
 static WebPckg *curPckg;
+
+#if SEND_TEL_TO_MOTZ
+void checkTelemetry();
+#endif
 
 void taskCreateWebPckg(void const *argument) {
     // vTaskSuspend(webExchangeHandle);
@@ -85,7 +91,7 @@ void taskCreateWebPckg(void const *argument) {
             }
             szAllPages = getSzAllPages();
             if (szAllPages) {
-                LOG_WEB(LEVEL_INFO, "Create package\r\n");
+                // LOG_WEB(LEVEL_INFO, "Create package\r\n");
                 initWebPckg(curPckg, szAllPages, 0, &bsg.idMCU, bsg.server);
                 addPagesToWebPckg(curPckg);
                 if (osMessagePut(queueWebPckgHandle, (u32)curPckg, 180000) != osOK) {
@@ -139,6 +145,10 @@ void parseData(u8 *tmpBufPage, u8 len) {
             case CMD_DATA_TELEMETRY:
                 addToPage(&pgTelemetry, &tmpBufPage[i + 1], SZ_CMD_TELEMETRY);
                 i += (SZ_CMD_TELEMETRY + 1);
+
+#if SEND_TEL_TO_MOTZ
+                // checkTelemetry();
+#endif
                 break;
             case CMD_DATA_PERCRSSI_127:
                 addToPage(&pgPercRSSI, &tmpBufPage[i + 1], SZ_CMD_PERCRSSI_127);
@@ -191,3 +201,34 @@ void addPagesToWebPckg(WebPckg *pckg) {
     closeWebPckg(pckg, bsg.server);
     // showWebPckg(pckg);
 }
+
+#if SEND_TEL_TO_MOTZ
+void checkTelemetry() {
+    WebPckg  *pckg;
+    static u8 cnt = 0;
+    cnt++;
+    if (pgTelemetry.iter < (SZ_PAGES - 600 - SZ_CMD_TELEMETRY)) {
+        return;
+    }
+
+    pckg = getFreePckgTel();
+    if (pckg != NULL) {
+        initWebPckg(pckg, (pgTelemetry.iter + 2), 0, &bsg.idMCU, SERVER_MOTZ);
+        addInfoToWebPckg(pckg, pgTelemetry.buf, pgTelemetry.iter, pgTelemetry.iter / pgTelemetry.szType, pgTelemetry.type);
+        closeWebPckg(pckg, SERVER_MOTZ);
+
+        if (osMessagePut(queueTelPckgHandle, (u32)pckg, 10) != osOK) {
+            LOG_WEB(LEVEL_ERROR, "TEL queue add\r\n");
+        } else {
+            // LOG_WEB(LEVEL_INFO, "TEL pckg created\r\n");
+        }
+        if (getCntFreePckgTel() < 2) {
+            osSemaphoreRelease(semSendTelPckgHandle);
+        }
+    } else {
+        osSemaphoreRelease(semSendTelPckgHandle);
+        LOG_WEB(LEVEL_ERROR, "NO free tel packages\r\n");
+    }
+    clearPage(&pgTelemetry);
+}
+#endif

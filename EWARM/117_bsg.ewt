@@ -1267,6 +1267,9 @@
                     <name>$PROJ_DIR$\..\Core\Tasks\Src\task_keep_alive.c</name>
                 </file>
                 <file>
+                    <name>$PROJ_DIR$\..\Core\Tasks\Src\task_send_telemetry.c</name>
+                </file>
+                <file>
                     <name>$PROJ_DIR$\..\Core\Tasks\Src\task_web_excahnge.c</name>
                 </file>
             </group>

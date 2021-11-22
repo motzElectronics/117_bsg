@@ -2,13 +2,18 @@
 
 #include "../Utils/Inc/utils_bsg.h"
 
-WebPckg             webPckgs[CNT_WEBPCKGS + 1];
-static u16          motzPream = BSG_PREAMBLE;
-static u8           niacPream[] = {0xa1, 0xa2, 0xa3};
-static u8           endBytes[] = {0x0D, 0x0A};  // reverse order
-static u8           endSessionByte = 0xE2;
+WebPckg webPckgs[CNT_WEBPCKGS + 1];
+#if SEND_TEL_TO_MOTZ
+WebPckg webPckgsTel[CNT_WEBPCKGS_TEL];
+#endif
+static u16 motzPream = BSG_PREAMBLE;
+static u8  niacPream[] = {0xa1, 0xa2, 0xa3};
+static u8  endBytes[] = {0x0D, 0x0A};  // reverse order
+static u8  endSessionByte = 0xE2;
+
 extern osMessageQId queueWebPckgHandle;
 extern osMutexId    mutexWebHandle;
+extern osMutexId    mutexSessionHandle;
 
 void addInfo(WebPckg* pPckg, u8* src, u16 sz) {
     memcpy(&pPckg->buf[pPckg->shift], src, sz);
@@ -26,6 +31,14 @@ void clearAllWebPckgs() {
         clearWebPckg(&webPckgs[i]);
     }
 }
+
+#if SEND_TEL_TO_MOTZ
+void clearAllTelPckgs() {
+    for (u8 i = 0; i < CNT_WEBPCKGS_TEL; i++) {
+        clearWebPckg(&webPckgsTel[i]);
+    }
+}
+#endif
 
 void initWebPckg(WebPckg* pPckg, u16 len, u8 isReq, u8* idMCU, u8 server) {
     static u32 numMotz = 0;
@@ -86,6 +99,19 @@ WebPckg* getFreePckg() {
     return NULL;
 }
 
+#if SEND_TEL_TO_MOTZ
+WebPckg* getFreePckgTel() {
+    for (u8 i = 0; i < CNT_WEBPCKGS_TEL; i++) {
+        if (!webPckgsTel[i].isFull) {
+            webPckgsTel[i].isFull = 1;
+            return &webPckgsTel[i];
+        }
+    }
+    // LOG_WEB(LEVEL_INFO, "ER: NO FREEPCKG\r\n"));
+    return NULL;
+}
+#endif
+
 WebPckg* getFreePckgReq() {
     if (!webPckgs[CNT_WEBPCKGS].isFull) {
         webPckgs[CNT_WEBPCKGS].isFull = 1;
@@ -103,6 +129,16 @@ u8 getCntFreePckg() {
     }
     return ret;
 }
+
+#if SEND_TEL_TO_MOTZ
+u8 getCntFreePckgTel() {
+    u8 ret = 0;
+    for (u8 i = 0; i < CNT_WEBPCKGS_TEL; i++) {
+        if (!webPckgsTel[i].isFull) ret++;
+    }
+    return ret;
+}
+#endif
 
 void makeAuthorizePckg(WebPckg* pPckg, u8 server) {
     static u32 numSession = 0;
@@ -152,9 +188,7 @@ ErrorStatus sendWebPckgData(u8 CMD_DATA, u8* data, u8 sz, u8 szReq, u8* idMCU) {
     u8          req[64];
     ErrorStatus ret = SUCCESS;
 
-    while (bsg.isTCPOpen == SERVER_NIAC) {
-        osDelay(500);
-    }
+    osMutexWait(mutexSessionHandle, osWaitForever);
 
     req[0] = CMD_DATA;
     req[1] = szReq;
@@ -168,16 +202,20 @@ ErrorStatus sendWebPckgData(u8 CMD_DATA, u8* data, u8 sz, u8 szReq, u8* idMCU) {
         // showWebPckg(curPckg);
 
         osMutexWait(mutexWebHandle, osWaitForever);
+        closeTcp();
         if (sendTcp(SERVER_MOTZ, curPckg->buf, curPckg->shift) != TCP_OK) {
             LOG_WEB(LEVEL_ERROR, "send data failed\r\n");
             ret = ERROR;
         }
-        osMutexRelease(mutexWebHandle);
         clearWebPckg(curPckg);
+        closeTcp();
+        osMutexRelease(mutexWebHandle);
     } else {
         ret = ERROR;
         LOG_WEB(LEVEL_ERROR, "NO FREE PCKG\r\n");
     }
+    osMutexRelease(mutexSessionHandle);
+
     return ret;
 }
 
@@ -187,9 +225,8 @@ ErrorStatus generateWebPckgReq(u8 CMD_REQ, u8* data, u8 sz, u8 szReq, u8* answ, 
     u8          req[10];
     WebPckg*    curPckg;
 
-    while (bsg.isTCPOpen == SERVER_NIAC) {
-        osDelay(500);
-    }
+    osMutexWait(mutexSessionHandle, osWaitForever);
+    LOG_WEB(LEVEL_INFO, "{--- Start sending REQ\r\n");
 
     req[0] = CMD_REQ;
     req[1] = 1;
@@ -227,6 +264,8 @@ ErrorStatus generateWebPckgReq(u8 CMD_REQ, u8* data, u8 sz, u8 szReq, u8* answ, 
         ret = ERROR;
         LOG_WEB(LEVEL_ERROR, "NO FREE PCKG\r\n");
     }
+    LOG_WEB(LEVEL_INFO, "---} Finish sending REQ\r\n");
+    osMutexRelease(mutexSessionHandle);
 
     return ret;
 }

@@ -17,6 +17,7 @@ extern osThreadId getTrainDataHandle;
 
 extern osMutexId mutexGPSBufHandle;
 extern osMutexId mutexWebHandle;
+extern osMutexId mutexSessionHandle;
 extern osMutexId mutexRTCHandle;
 extern osMutexId mutexSpiFlashHandle;
 
@@ -221,6 +222,7 @@ void lockAllTasks() {
     osMutexWait(mutexRTCHandle, osWaitForever);
     osMutexWait(mutexSpiFlashHandle, osWaitForever);
     osMutexWait(mutexWebHandle, osWaitForever);
+    osMutexWait(mutexSessionHandle, osWaitForever);
 
     vTaskSuspend(webExchangeHandle);
     vTaskSuspend(getGPSHandle);
@@ -232,6 +234,7 @@ void lockAllTasks() {
     osMutexRelease(mutexRTCHandle);
     osMutexRelease(mutexSpiFlashHandle);
     osMutexRelease(mutexWebHandle);
+    osMutexRelease(mutexSessionHandle);
 }
 
 u32 getSzFirmware() {

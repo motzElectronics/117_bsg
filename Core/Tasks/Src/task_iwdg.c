@@ -31,7 +31,7 @@ void taskManageIWDG(void const* argument) {
             NVIC_SystemReset();
         }
 
-        if (!(timeout % 15)) {
+        if (!(timeout % 30)) {
             osSemaphoreRelease(semCreateWebPckgHandle);
         }
 

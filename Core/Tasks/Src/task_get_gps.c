@@ -17,6 +17,7 @@ extern osThreadId keepAliveHandle;
 extern osThreadId createWebPckgHandle;
 extern osThreadId getNewBinHandle;
 extern osThreadId getTrainDataHandle;
+extern osThreadId sendTelemetryHandle;
 
 extern osSemaphoreId semCreateWebPckgHandle;
 
@@ -125,10 +126,10 @@ void unLockTasks() {
     vTaskResume(createWebPckgHandle);
     vTaskResume(keepAliveHandle);
     vTaskResume(getTrainDataHandle);
+    // vTaskResume(sendTelemetryHandle);
 }
 
 u8 checkStopTrain(PckgGnss *pckg) {
-    static u8 cntr = 0;
     if (pckg->coords.speed < (5 * 10)) {
         bsg.cur_gps.stopTime++;
     } else {
