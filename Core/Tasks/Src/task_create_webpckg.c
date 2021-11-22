@@ -44,15 +44,18 @@ void taskCreateWebPckg(void const *argument) {
         iwdgTaskReg |= IWDG_TASK_REG_WEB_PCKG;
         flush = 0;
         delayPages = getDelayPages();
-        if (osSemaphoreWait(semCreateWebPckgHandle, 1) == osOK) {
+        if (osSemaphoreWait(semCreateWebPckgHandle, 2000) == osOK) {
+            // generateTestPackage();
+            // delayPages = getDelayPages();
             flush = 1;
+            LOG_WEB(LEVEL_INFO, "FLUSH, pages: %d\r\n", delayPages);
             // if (circBufAllPckgs.readAvailable > 0) {
             //     flush = 1;
             //     // updSpiFlash(&circBufAllPckgs);
             //     LOG_WEB(LEVEL_INFO, "FLUSH STARTED\r\n");
             // }
         }
-        while (flush == 1 || delayPages >= 2) {
+        while (flush == 1 || delayPages > 3) {
             if (delayPages == 0) {
                 flush = 0;
                 break;
@@ -83,7 +86,7 @@ void taskCreateWebPckg(void const *argument) {
             szAllPages = getSzAllPages();
             if (szAllPages) {
                 LOG_WEB(LEVEL_INFO, "Create package\r\n");
-                initWebPckg(curPckg, szAllPages, 0, &bsg.idMCU);
+                initWebPckg(curPckg, szAllPages, 0, &bsg.idMCU, bsg.server);
                 addPagesToWebPckg(curPckg);
                 if (osMessagePut(queueWebPckgHandle, (u32)curPckg, 180000) != osOK) {
                     bsg.stat.queueErrCount++;
@@ -107,7 +110,7 @@ void taskCreateWebPckg(void const *argument) {
             LOG_WEB(LEVEL_DEBUG, "no pckg in spiflash\r\n");
             bsg.isSentData = 1;
         }
-        osDelay(500);
+        // osDelay(1000);
     }
 }
 
@@ -185,6 +188,6 @@ void addPagesToWebPckg(WebPckg *pckg) {
             addInfoToWebPckg(pckg, allPages[i]->buf, allPages[i]->iter, allPages[i]->iter / allPages[i]->szType, allPages[i]->type);
         }
     }
-    closeWebPckg(pckg);
+    closeWebPckg(pckg, bsg.server);
     // showWebPckg(pckg);
 }

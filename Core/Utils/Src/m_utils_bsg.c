@@ -28,6 +28,9 @@ void bsgInit() {
     bsg.idDev = BSG_ID_DEV_BSG;
     bsg.idFirmware = BSG_ID_FIRMWARE;
     bsg.idBoot = BSG_ID_BOOT;
+    bsg.server = SERVER_NIAC;
+    u8 id[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0};
+    memcpy(bsg.niacIdent, id, 40);
     memset(&bsg.stat, 0, sizeof(statistics_t));
     memset(&bsg.cur_gps, 0, sizeof(gps_state_t));
     memset(&bsg.timers, 0, sizeof(time_stat_t));

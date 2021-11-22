@@ -110,6 +110,8 @@ typedef struct {
 } time_stat_t;
 
 typedef struct {
+    u64 imei;
+    u8  niacIdent[40];
     u32 idMCU[3];
     u16 idTrain;
     u8  idTrainCar;
@@ -125,6 +127,7 @@ typedef struct {
     u8  tcpErrCnt;
     u8  csq;
     u8  isSpiFlashReady;
+    u8  server;
 
     FIRMWARE_INFO info;
     time_stat_t   timers;

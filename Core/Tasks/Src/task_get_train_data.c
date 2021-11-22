@@ -34,6 +34,8 @@ void taskGetTrainData(void const* argument) {
 
     for (;;) {
         iwdgTaskReg |= IWDG_TASK_REG_TABLO;
+        // osDelay(1000);
+        // continue;
 
         switch (bsg.tablo.initStep) {
             case IU_INIT_NONE:

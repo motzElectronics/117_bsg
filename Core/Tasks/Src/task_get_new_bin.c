@@ -33,6 +33,7 @@ static u32             crcNewFW;
 void big_update_func();
 
 void taskGetNewBin(void const* argument) {
+    u8 updateFailCnt = 0;
     FLASH_Erase_Sector(FLASH_SECTOR_2, VOLTAGE_RANGE_3);
 
     vTaskSuspend(getNewBinHandle);
@@ -45,6 +46,10 @@ void taskGetNewBin(void const* argument) {
         iwdgTaskReg |= IWDG_TASK_REG_NEW_BIN;
         big_update_func();
         osDelay(5000);
+        updateFailCnt++;
+        if (updateFailCnt == 5) {
+            NVIC_SystemReset();
+        }
     }
 
     /* USER CODE END taskGetNewBin */
@@ -106,7 +111,7 @@ void big_update_func() {
 
             osMutexWait(mutexWebHandle, osWaitForever);
             if (!bsg.isTCPOpen) {
-                while (openTcp(SERVER_TELEMETRY) != TCP_OK) {}
+                while (openTcp(SERVER_MOTZ) != TCP_OK) {}
                 cntFailTCPReq = 0;
             }
             osMutexRelease(mutexWebHandle);
@@ -138,13 +143,14 @@ void big_update_func() {
                 cntFailTCPReq++;
                 if (cntFailTCPReq > 10) {
                     cntFailTCPReq = 0;
-                    simReset();
+                    // simReset();
+                    return;
                 }
             }
         } else {
             osMutexWait(mutexWebHandle, osWaitForever);
             if (!bsg.isTCPOpen) {
-                while (openTcp(SERVER_TELEMETRY) != TCP_OK) {}
+                while (openTcp(SERVER_MOTZ) != TCP_OK) {}
             }
             osMutexRelease(mutexWebHandle);
             if (bsg.updTarget == UPD_TARGET_TABLO) {
@@ -264,7 +270,7 @@ ErrorStatus getPartFirmware(u8* reqData, u8* answBuf, u16 szAnsw, u8 szReq) {
 
     curPckg = createWebPckgReq(CMD_REQUEST_PART_FIRMWARE, reqData, szReq, SZ_REQUEST_GET_PART_FIRMWARE, idMCU);
     osMutexWait(mutexWebHandle, osWaitForever);
-    if (sendTcp(SERVER_TELEMETRY, curPckg->buf, curPckg->shift) != TCP_OK) {
+    if (sendTcp(SERVER_MOTZ, curPckg->buf, curPckg->shift) != TCP_OK) {
         LOG(LEVEL_ERROR, "part Firmware\r\n");
         ret = ERROR;
     } else {

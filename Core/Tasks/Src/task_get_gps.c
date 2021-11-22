@@ -42,8 +42,10 @@ void taskGetGPS(void const *argument) {
     spiFlashInit(circBufAllPckgs.buf);
     cBufReset(&circBufAllPckgs);
 
-    simInit();
-    simGetIMEI();
+    while (bsg.imei < 10000000000) {
+        simInit();
+        bsg.imei = simGetIMEI();
+    }
 
     // TODO: time should be syncronized by GPS
     getServerTime();
@@ -277,5 +279,4 @@ void generateTestPackage() {
     saveData((u8 *)&pckgDoors, SZ_CMD_DOORS, CMD_DATA_DOORS, &circBufAllPckgs);
 
     updSpiFlash(&circBufAllPckgs);
-    xSemaphoreGive(semCreateWebPckgHandle);
 }

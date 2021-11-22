@@ -67,7 +67,7 @@ void simInit() {
 }
 
 char* simGetStatusAnsw(u32 timeout) {
-    waitIdle("", &(uInfoSim.irqFlags), 200, timeout);
+    waitIdle("", &(uInfoSim.irqFlags), 50, timeout);
     if (uInfoSim.irqFlags.isIrqIdle) {
         uInfoSim.irqFlags.isIrqIdle = 0;
         return (char*)uInfoSim.pRxBuf;
@@ -225,9 +225,9 @@ u8 simTCPOpen(u8 server) {
     char*       retMsg;
     char*       token;
     memset(params, '\0', 40);
-    if (server == SERVER_TELEMETRY) {
+    if (server == SERVER_MOTZ) {
         sprintf(params, "\"%s\",\"%s\",%d", (char*)"TCP", urls.ourTcpAddr, urls.ourTcpPort);
-    } else if (server == SERVER_DATA) {
+    } else if (server == SERVER_NIAC) {
         sprintf(params, "\"%s\",\"%s\",%d", (char*)"TCP", urls.niacTcpAddr, urls.niacTcpPort);
     } else {
         return SIM_FAIL;
@@ -236,16 +236,18 @@ u8 simTCPOpen(u8 server) {
         return SIM_FAIL;
     }
     retMsg = simGetStatusAnsw(7000);  // waiting for "CONNECT OK"
+    // osDelay(2000);
+    // LOG_SIM(LEVEL_INFO, "Open Ret: %s\r\n", (char*)retMsg + 6);
     token = strtok((char*)retMsg + 6, SIM_SEPARATOR_TEXT);
     if (token == NULL || token[0] == '\0') token = SIM_NO_RESPONSE_TEXT;
     if (strcmp((const char*)token, (const char*)"CONNECT OK") != 0) {
-        LOG_SIM(LEVEL_INFO, "TCP OPEN FAILED: %s\r\n", retMsg);
+        LOG_SIM(LEVEL_ERROR, "TCP OPEN FAILED: %s\r\n", retMsg);
         return SIM_FAIL;
     }
     if (simTCPCheckStatus(SIM_CIPSTAT_CON_OK, 7000, 200) != SIM_SUCCESS) {
         return SIM_FAIL;
     }
-    LOG_SIM(LEVEL_INFO, "TCP CONNECTED\r\n");
+    LOG_SIM(LEVEL_INFO, "TCP OPENED: %s\r\n", params);
     return SIM_SUCCESS;
 }
 
@@ -267,6 +269,10 @@ u8 simTCPSend(u8* data, u16 sz) {
         return SIM_FAIL;
     }
     retMsg = simDownloadData(data, sz);
+    // if (bsg.server == SERVER_NIAC) {
+    //     waitIdle("", &(uInfoSim.irqFlags), 50, 1000);
+    // }
+    // LOG_SIM(LEVEL_INFO, "Send Ret: %s\r\n", retMsg);
     token = strtok(retMsg, SIM_SEPARATOR_TEXT);
     if (token == NULL || token[0] == '\0') token = SIM_NO_RESPONSE_TEXT;
 
@@ -283,7 +289,6 @@ u8 simTCPSend(u8* data, u16 sz) {
         LOG_SIM(LEVEL_ERROR, "simDownloadData() %s time %d\r\n", token, ttt);
         return SIM_TIMEOUT;
     }
-    return SIM_SUCCESS;
 }
 
 long long simGetPhoneNum() {
@@ -296,14 +301,14 @@ long long simGetPhoneNum() {
     return 0;
 }
 
-void simGetIMEI() {
+u64 simGetIMEI() {
     char* retMsg;
     retMsg = simTxATCmd(SIM_CMD_SIMEI, SIM_SZ_CMD_SIMEI, 2000);
-    if (retMsg[0] != '\0') {
-        printf("IMEI is %s\r\n", retMsg);
-        // return atoll(retMsg + 15);
+    if (retMsg[2] != '\0') {
+        printf("IMEI is %s\r\n", &retMsg[2]);
+        return atoll(retMsg + 2);
     }
-    return;
+    return 0;
 }
 
 u8 procReturnStatus(u8 ret) {
@@ -314,23 +319,16 @@ u8 procReturnStatus(u8 ret) {
         notSend = 0;
     }
 
-    if (ret == TCP_SEND_ER) {
-        LOG_SIM(LEVEL_ERROR, "TCP_SEND_ER %d!\r\n\r\n", notSend);
-        // if (notSend == 5) {
-        // LOG_SIM(LEVEL_ERROR, "UNABLE TO SEND 5!\r\n");
-        simReset();
-        ret = TCP_SEND_ER_LOST_PCKG;
-        notSend = 0;
-        //}
-    } else if (ret == TCP_CONNECT_ER) {
-        LOG_SIM(LEVEL_ERROR, "CONNECT ERROR - TOTAL RESET!\r\n");
-        osDelay(1000);
-        simReset();
-        ret = TCP_SEND_ER_LOST_PCKG;
-        notSend = 0;
-        // NVIC_SystemReset();
-    } else if (ret != TCP_OK) {
-        LOG_SIM(LEVEL_ERROR, "UNABLE TO SEND!\r\n");
+    // if (ret == TCP_CONNECT_ER) {
+    //     LOG_SIM(LEVEL_ERROR, "CONNECT ERROR - TOTAL RESET!\r\n");
+    //     simReset();
+    //     ret = TCP_SEND_ER_LOST_PCKG;
+    //     notSend = 0;
+    //     // NVIC_SystemReset();
+    // } else
+    if (ret != TCP_OK) {
+        LOG_SIM(LEVEL_ERROR, "TCP ERROR %d!\r\n", ret);
+        closeTcp();
         simReset();
         ret = TCP_SEND_ER_LOST_PCKG;
         notSend = 0;
@@ -341,16 +339,17 @@ u8 procReturnStatus(u8 ret) {
 
 u8 openTcp(u8 server) {
     u8 ret = TCP_OK;
-    if (!waitGoodCsq(5400)) {
-        LOG_SIM(LEVEL_ERROR, "waitGoodCsq\r\n");
-        ret = TCP_CSQ_ER;
-        bsg.stat.simBadCsqCnt++;
-    }
     if (bsg.isTCPOpen) {
         closeTcp();
     }
 
     u32 ttt = HAL_GetTick();
+    if (!waitGoodCsq(5400)) {
+        LOG_SIM(LEVEL_ERROR, "waitGoodCsq\r\n");
+        ret = TCP_CSQ_ER;
+        bsg.stat.simBadCsqCnt++;
+    }
+    osDelay(100);
     if (ret == TCP_OK && simTCPinit() != SIM_SUCCESS) {
         LOG_SIM(LEVEL_ERROR, "simTCPinit\r\n");
         ret = TCP_INIT_ER;
@@ -362,6 +361,7 @@ u8 openTcp(u8 server) {
     if (ret == TCP_OK) {
         bsg.isTCPOpen = server;
         bsg.stat.simOpenCnt++;
+        LOG_SIM(LEVEL_INFO, "TCP CONNECTED\r\n");
     }
 
     ttt = HAL_GetTick() - ttt;
@@ -375,16 +375,18 @@ u8 closeTcp() {
 
     u32 ttt = HAL_GetTick();
     if (ret == TCP_OK && simTCPclose() != SIM_SUCCESS) {
-        LOG_SIM(LEVEL_ERROR, "simTCPinit\r\n");
+        LOG_SIM(LEVEL_ERROR, "simTCPclose\r\n");
         ret = TCP_CLOSE_ER;
     }
-    bsg.isTCPOpen = 0;
-    LOG_SIM(LEVEL_INFO, "TCP CLOSED\r\n");
+    if (ret == TCP_OK) {
+        bsg.isTCPOpen = 0;
+        LOG_SIM(LEVEL_INFO, "TCP CLOSED\r\n");
+    }
 
     ttt = HAL_GetTick() - ttt;
     bsg.timers.tcp_close_time += ttt;
 
-    return procReturnStatus(ret);
+    return ret;
 }
 
 u8 sendTcp(u8 server, u8* data, u16 sz) {
@@ -398,10 +400,10 @@ u8 sendTcp(u8 server, u8* data, u16 sz) {
         cnt++;
         ret = openTcp(server);
     }
-    if (ret == TCP_OK && !waitGoodCsq(90)) {
-        LOG_SIM(LEVEL_ERROR, "waitGoodCsq\r\n");
-        ret = TCP_CSQ_ER;
-    }
+    // if (ret == TCP_OK && !waitGoodCsq(90)) {
+    //     LOG_SIM(LEVEL_ERROR, "waitGoodCsq\r\n");
+    //     ret = TCP_CSQ_ER;
+    // }
     if (ret == TCP_OK && simTCPSend(data, sz) != SIM_SUCCESS) {
         LOG_SIM(LEVEL_ERROR, "simTCPSend\r\n");
         ret = TCP_SEND_ER;

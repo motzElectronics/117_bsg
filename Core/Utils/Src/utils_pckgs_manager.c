@@ -3,8 +3,10 @@
 #include "../Utils/Inc/utils_bsg.h"
 
 WebPckg             webPckgs[CNT_WEBPCKGS + 1];
-static u16          webPream = BSG_PREAMBLE;
+static u16          motzPream = BSG_PREAMBLE;
+static u8           niacPream[] = {0xa1, 0xa2, 0xa3};
 static u8           endBytes[] = {0x0D, 0x0A};  // reverse order
+static u8           endSessionByte = 0xE2;
 extern osMessageQId queueWebPckgHandle;
 extern osMutexId    mutexWebHandle;
 
@@ -25,16 +27,25 @@ void clearAllWebPckgs() {
     }
 }
 
-void initWebPckg(WebPckg* pPckg, u16 len, u8 isReq, u8* idMCU) {
-    static u32 num = 0;
-    num++;
+void initWebPckg(WebPckg* pPckg, u16 len, u8 isReq, u8* idMCU, u8 server) {
+    static u32 numMotz = 0;
+    static u32 numNiac = 0;
+
     memset(pPckg->buf, '\0', SZ_WEB_PCKG);
     pPckg->shift = 0;
-    pPckg->isRequest = isReq;
-    addInfo(pPckg, (u8*)&webPream, 2);
-    addInfo(pPckg, (u8*)&num, 4);
-    addInfo(pPckg, (u8*)idMCU, 12);
-    addInfo(pPckg, (u8*)&len, 2);
+    if (server == SERVER_MOTZ) {
+        numMotz++;
+        pPckg->isRequest = isReq;
+        addInfo(pPckg, (u8*)&motzPream, 2);
+        addInfo(pPckg, (u8*)&numMotz, 4);
+        addInfo(pPckg, (u8*)idMCU, 12);
+        addInfo(pPckg, (u8*)&len, 2);
+    } else if (server == SERVER_NIAC) {
+        numNiac++;
+        addInfo(pPckg, (u8*)&niacPream[1], 1);
+        addInfo(pPckg, (u8*)&numNiac, 4);
+        addInfo(pPckg, (u8*)&len, 2);
+    }
 }
 
 void addInfoToWebPckg(WebPckg* pPckg, u8* src, u16 sz, u8 cnt, u8 cmdData) {
@@ -50,8 +61,13 @@ void showWebPckg(WebPckg* pPckg) {
     printf("\r\n");
 }
 
-void closeWebPckg(WebPckg* pPckg) {
-    addInfo(pPckg, (u8*)endBytes, 2);
+void closeWebPckg(WebPckg* pPckg, u8 server) {
+    if (server == SERVER_MOTZ) {
+        addInfo(pPckg, (u8*)endBytes, 2);
+    } else if (server == SERVER_NIAC) {
+        addInfo(pPckg, (u8*)&endBytes[0], 1);
+    }
+
     pPckg->isFull = 1;
 }
 
@@ -88,18 +104,30 @@ u8 getCntFreePckg() {
     return ret;
 }
 
-void waitAnswServer(u8 req) {
-    switch (req) {
-        case CMD_REQUEST_SERVER_TIME:
-        case CMD_REQUEST_NUM_FIRMWARE:
-            osDelay(2000);
-            break;
-        case CMD_REQUEST_SZ_FIRMWARE:
-            osDelay(2000);
-            break;
-        case CMD_REQUEST_PART_FIRMWARE:
-            osDelay(2000);
-            break;
+void makeAuthorizePckg(WebPckg* pPckg, u8 server) {
+    static u32 numSession = 0;
+
+    memset(pPckg->buf, '\0', SZ_WEB_PCKG);
+    pPckg->shift = 0;
+    if (server == SERVER_NIAC) {
+        numSession++;
+        addInfo(pPckg, (u8*)&niacPream[0], 1);
+        addInfo(pPckg, (u8*)&numSession, 2);
+        addInfo(pPckg, (u8*)&bsg.imei, 8);
+        addInfo(pPckg, (u8*)bsg.niacIdent, 40);
+
+        closeWebPckg(pPckg, server);
+    }
+}
+
+void makeEndSessionPckg(WebPckg* pPckg, u8 server) {
+    memset(pPckg->buf, '\0', SZ_WEB_PCKG);
+    pPckg->shift = 0;
+    if (server == SERVER_NIAC) {
+        addInfo(pPckg, (u8*)&niacPream[2], 1);
+        addInfo(pPckg, (u8*)&endSessionByte, 1);
+
+        closeWebPckg(pPckg, server);
     }
 }
 
@@ -109,12 +137,12 @@ WebPckg* createWebPckgReq(u8 CMD_REQ, u8* data, u8 sz, u8 szReq, u8* idMCU) {
     req[0] = CMD_REQ;
     req[1] = 1;
     curPckg = getFreePckg();
-    initWebPckg(curPckg, szReq, 1, idMCU);
+    initWebPckg(curPckg, szReq, 1, idMCU, SERVER_MOTZ);
     if (sz) {
         memcpy(req + 2, data, sz);
     }
     addInfo(curPckg, req, szReq);
-    closeWebPckg(curPckg);
+    closeWebPckg(curPckg, SERVER_MOTZ);
     // showWebPckg(curPckg);
     return curPckg;
 }
@@ -124,28 +152,32 @@ ErrorStatus sendWebPckgData(u8 CMD_DATA, u8* data, u8 sz, u8 szReq, u8* idMCU) {
     u8          req[64];
     ErrorStatus ret = SUCCESS;
 
+    while (bsg.isTCPOpen == SERVER_NIAC) {
+        osDelay(500);
+    }
+
     req[0] = CMD_DATA;
     req[1] = szReq;
-    curPckg = getFreePckg();
-    initWebPckg(curPckg, sz + 2, 0, &bsg.idMCU);
-    if (sz) {
-        memcpy(req + 2, data, sz);
-    }
-    addInfo(curPckg, req, sz + 2);
-    closeWebPckg(curPckg);
-    // showWebPckg(curPckg);
+    if ((curPckg = getFreePckgReq()) != NULL) {
+        initWebPckg(curPckg, sz + 2, 0, &bsg.idMCU, SERVER_MOTZ);
+        if (sz) {
+            memcpy(req + 2, data, sz);
+        }
+        addInfo(curPckg, req, sz + 2);
+        closeWebPckg(curPckg, SERVER_MOTZ);
+        // showWebPckg(curPckg);
 
-    // while (bsg.isTCPOpen == SERVER_DATA) {
-    //     osDelay(500);
-    // }
-
-    osMutexWait(mutexWebHandle, osWaitForever);
-    if (sendTcp(SERVER_TELEMETRY, curPckg->buf, curPckg->shift) != TCP_OK) {
-        LOG_WEB(LEVEL_ERROR, "send data failed\r\n");
+        osMutexWait(mutexWebHandle, osWaitForever);
+        if (sendTcp(SERVER_MOTZ, curPckg->buf, curPckg->shift) != TCP_OK) {
+            LOG_WEB(LEVEL_ERROR, "send data failed\r\n");
+            ret = ERROR;
+        }
+        osMutexRelease(mutexWebHandle);
+        clearWebPckg(curPckg);
+    } else {
         ret = ERROR;
+        LOG_WEB(LEVEL_ERROR, "NO FREE PCKG\r\n");
     }
-    osMutexRelease(mutexWebHandle);
-    clearWebPckg(curPckg);
     return ret;
 }
 
@@ -155,24 +187,24 @@ ErrorStatus generateWebPckgReq(u8 CMD_REQ, u8* data, u8 sz, u8 szReq, u8* answ, 
     u8          req[10];
     WebPckg*    curPckg;
 
+    while (bsg.isTCPOpen == SERVER_NIAC) {
+        osDelay(500);
+    }
+
     req[0] = CMD_REQ;
     req[1] = 1;
     if ((curPckg = getFreePckgReq()) != NULL) {
-        initWebPckg(curPckg, szReq, 1, idMCU);
+        initWebPckg(curPckg, szReq, 1, idMCU, SERVER_MOTZ);
         if (sz) {
             memcpy(req + 2, data, sz);
         }
         addInfo(curPckg, req, szReq);
-        closeWebPckg(curPckg);
+        closeWebPckg(curPckg, SERVER_MOTZ);
         // showWebPckg(curPckg);
-
-        // while (bsg.isTCPOpen == SERVER_DATA) {
-        //     osDelay(500);
-        // }
 
         osMutexWait(mutexWebHandle, osWaitForever);
         closeTcp();
-        statSend = sendTcp(SERVER_TELEMETRY, curPckg->buf, curPckg->shift);
+        statSend = sendTcp(SERVER_MOTZ, curPckg->buf, curPckg->shift);
         if (statSend != TCP_OK)
             ret = ERROR;
         else if (uInfoSim.pRxBuf[11] == '\0' && uInfoSim.pRxBuf[12] == '\0' &&

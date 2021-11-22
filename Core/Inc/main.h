@@ -91,12 +91,12 @@ void Error_Handler(void);
 #define WAIT_TIMEOUT 15000
 #define DUMMY_BYTE   0xFF
 
-#define SERVER_TELEMETRY  1
-#define SERVER_DATA       2
+#define SERVER_MOTZ       1
+#define SERVER_NIAC       2
 #define URL_TCP_ADDR      (char*)"188.242.176.25"
 #define URL_TCP_PORT      8086
-#define URL_NIAC_TCP_ADDR (char*)"188.242.176.25"
-#define URL_NIAC_TCP_PORT 8086
+#define URL_NIAC_TCP_ADDR (char*)"gis.ru.net"
+#define URL_NIAC_TCP_PORT 9878
 
 #define BSG_SZ_UART_MSG 132
 #define BSG_SZ_TEMP_MSG 4
