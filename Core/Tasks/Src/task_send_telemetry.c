@@ -11,15 +11,18 @@ extern osMutexId     mutexSessionHandle;
 extern osMessageQId  queueTelPckgHandle;
 extern osSemaphoreId semSendTelPckgHandle;
 
+#if SEND_TEL_TO_MOTZ
 static WebPckg* curPckg = NULL;
+#endif
 
 void taskSendTelemetry(void const* argument) {
+#if SEND_TEL_TO_MOTZ
     u8  statSend = TCP_OK;
     u8  sessionStep = SESSION_OPENING;
     u32 order_num = 0;
 
     osSemaphoreWait(semSendTelPckgHandle, 1);
-
+#endif
     vTaskSuspend(sendTelemetryHandle);
 
     for (;;) {

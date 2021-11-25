@@ -26,7 +26,7 @@
 
 #define BSG_MSG_NO_GPS (char*)"0000.000000,N,00000.000000,E,+0000,000,000"
 
-#define BSG_ID_FIRMWARE         8
+#define BSG_ID_FIRMWARE         9
 #define BSG_ID_BOOT             2
 #define BSG_ID_TRAINCAR         0
 #define BSG_ID_TRAIN            1706
@@ -204,7 +204,9 @@ typedef enum {
     TEL_GR_PROJECT_127,
     TEL_GR_PROJECT_127_STAT,
     TEL_GR_PROJECT_127_MEM,
-    TEL_GR_SIMCOM
+    TEL_GR_SIMCOM,
+    TEL_GR_PROJECT_127_RADIO_STAT,
+    TEL_GR_127_COMMON = 0x10
 } TELEMETRY_GROUP;
 
 typedef enum {
@@ -286,6 +288,19 @@ typedef enum {
     TEL_CD_SIM_TIME_SEND,
     TEL_CD_SIM_TIME_ALL
 } TELEMETRY_CODE_SIMCOM;
+
+typedef enum {
+    TEL_CD_BSG_FW = 1,
+    TEL_CD_IU_HEAD_FW,
+    TEL_CD_IU_TAIL_FW,
+    TEL_CD_PPRU_FW,
+    TEL_CD_BKTE_FW,
+    TEL_CD_CSQ,
+    TEL_CD_START_STOP,
+    TEL_CD_POWER,
+    TEL_CD_KEEP_ALIVE,
+    TEL_CD_SERVICE
+} TELEMETRY_CODE_COMMON;
 
 typedef enum {
     CMD_REQUEST_SERVER_TIME = 0x11,

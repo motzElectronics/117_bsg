@@ -131,11 +131,11 @@ void parseData(u8 *tmpBufPage, u8 len) {
     while (i < len) {
         switch (tmpBufPage[i]) {
             case CMD_DATA_ENERGY_127:
-                addToPage(&pgEnergy, &tmpBufPage[i + 1], SZ_CMD_ENERGY_127);
+                // addToPage(&pgEnergy, &tmpBufPage[i + 1], SZ_CMD_ENERGY_127);
                 i += (SZ_CMD_ENERGY_127 + 1);
                 break;
             case CMD_DATA_VOLTAMPER_127:
-                addToPage(&pgVoltAmper, &tmpBufPage[i + 1], SZ_CMD_VOLTAMPER_127);
+                // addToPage(&pgVoltAmper, &tmpBufPage[i + 1], SZ_CMD_VOLTAMPER_127);
                 i += (SZ_CMD_VOLTAMPER_127 + 1);
                 break;
             case CMD_DATA_TEMP:

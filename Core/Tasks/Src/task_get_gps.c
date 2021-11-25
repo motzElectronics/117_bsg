@@ -228,12 +228,12 @@ void generateTestPackage() {
 
     pckgTel.group = 0x10;
     pckgTel.code = 0x04;
-    pckgTel.data = (3 << 16) | 7;
+    pckgTel.data = (3 << 24) | 7;
     saveTelemetry(&pckgTel, &circBufAllPckgs);
 
     pckgTel.group = 0x10;
     pckgTel.code = 0x05;
-    pckgTel.data = (3 << 16) | 8;
+    pckgTel.data = (3 << 24) | 8;
     saveTelemetry(&pckgTel, &circBufAllPckgs);
 
     pckgTemp.unixTimeStamp = getUnixTimeStamp();
