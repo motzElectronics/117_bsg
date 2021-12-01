@@ -42,10 +42,10 @@ void taskKeepAlive(void const* argument) {
         //     LOG(LEVEL_MAIN, "\r\ngenerateMsgKeepAlive\r\n\r\n");
         //     generateMsgKeepAlive();
         // }
-        if (!(timeout % 5400) && !isRxNewFirmware) {
-            LOG(LEVEL_MAIN, "updRTC\r\n\r\n");
-            updRTC();
-        }
+        // if (!(timeout % 5400) && !isRxNewFirmware) {
+        //     LOG(LEVEL_MAIN, "updRTC\r\n\r\n");
+        //     updRTC();
+        // }
 
         timeout++;
         iwdgTaskReg |= IWDG_TASK_REG_ALIVE;
@@ -123,14 +123,6 @@ ErrorStatus sendMsgTabloFW() {
     pckgTel.group = TEL_GR_PROJECT_127;
     pckgTel.code = TEL_CD_127_TABLO_FW;
     pckgTel.data = bsg.tablo.info.idFirmware;
-    copyTelemetry(&bufTxData[SZ_CMD_TELEMETRY * ptr++], &pckgTel);
-
-    pckgTel.code = TEL_CD_127_TABLO_BOOT_FW;
-    pckgTel.data = bsg.tablo.info.idBoot;
-    copyTelemetry(&bufTxData[SZ_CMD_TELEMETRY * ptr++], &pckgTel);
-
-    pckgTel.code = TEL_CD_127_TABLO_BOOT_ERR;
-    pckgTel.data = bsg.tablo.info.bootErr;
     copyTelemetry(&bufTxData[SZ_CMD_TELEMETRY * ptr++], &pckgTel);
 
     ret = sendWebPckgData(CMD_DATA_TELEMETRY, bufTxData, SZ_CMD_TELEMETRY * ptr, ptr, idMCU);

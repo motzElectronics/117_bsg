@@ -52,7 +52,7 @@ void taskGetGPS(void const *argument) {
     getServerTime();
     generateInitTelemetry();
     unLockTasks();
-    gps_step = GPS_STEP_WORK;
+    gps_step = GPS_STEP_TIMESYNC;
 
     for (;;) {
         iwdgTaskReg |= IWDG_TASK_REG_GPS;
@@ -71,9 +71,9 @@ void taskGetGPS(void const *argument) {
                         if (!setGPSUnixTime(&pckgGnss.dateTime)) {
                             break;
                         }
-                        // generateTestPackage();
-                        generateInitTelemetry();
-                        unLockTasks();
+                        // // generateTestPackage();
+                        // generateInitTelemetry();
+                        // unLockTasks();
 
                         gps_step = GPS_STEP_WORK;
                     }
