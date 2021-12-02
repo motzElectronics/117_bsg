@@ -215,15 +215,6 @@ ErrorStatus sendMsgStatistics() {
     PckgTelemetry pckgTel;
 
     memset(bufTxData, 0, 256);
-    pckgTel.group = TEL_GR_GENINF;
-    pckgTel.code = TEL_CD_GENINF_GPS_INV_CNT;
-    pckgTel.data = bsg.stat.gpsInvaligCount;
-    pckgTel.unixTimeStamp = getUnixTimeStamp();
-    saveTelemetry(&pckgTel, &circBufAllPckgs);
-
-    pckgTel.code = TEL_CD_GENINF_GPS_PARSE_ER_CNT;
-    pckgTel.data = bsg.stat.gpsParseFailCount;
-    saveTelemetry(&pckgTel, &circBufAllPckgs);
 
     pckgTel.group = TEL_GR_PROJECT_127_STAT;
     pckgTel.code = TEL_CD_127_IU_ERR;
@@ -299,6 +290,14 @@ ErrorStatus sendMsgStatistics() {
     bsg.timers.tcp_all_time = HAL_GetTick() - bsg.timers.tcp_all_time;
     pckgTel.data = bsg.timers.tcp_all_time / 1000;
     bsg.timers.tcp_all_time = HAL_GetTick();
+    saveTelemetry(&pckgTel, &circBufAllPckgs);
+
+    pckgTel.code = TEL_CD_SIM_GPS_INV_CNT;
+    pckgTel.data = bsg.stat.gpsInvaligCount;
+    saveTelemetry(&pckgTel, &circBufAllPckgs);
+
+    pckgTel.code = TEL_CD_SIM_GPS_PARSE_ER_CNT;
+    pckgTel.data = bsg.stat.gpsParseFailCount;
     saveTelemetry(&pckgTel, &circBufAllPckgs);
 
     return ret;

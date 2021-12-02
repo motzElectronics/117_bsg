@@ -16,6 +16,5 @@
 void unLockTasks();
 u8   checkStopTrain(PckgGnss* pckg);
 void generateInitTelemetry();
-void generateTestPackage();
 
 #endif

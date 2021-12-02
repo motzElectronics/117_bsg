@@ -39,6 +39,10 @@ void taskGetTrainData(void const* argument) {
 
         switch (bsg.tablo.initStep) {
             case IU_INIT_NONE:
+                if (bsg.cur_gps.valid == 0) {
+                    osDelay(1000);
+                    continue;
+                }
                 LOG(LEVEL_MAIN, "IU_INIT_NONE\r\n");
                 gps_body.valid = bsg.cur_gps.valid;
                 gps_body.speed = bsg.cur_gps.coords.speed;

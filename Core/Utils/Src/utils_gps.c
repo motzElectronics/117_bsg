@@ -1,7 +1,5 @@
 #include "../Utils/Inc/utils_gps.h"
 
-// Gprmc gprmc;
-
 void setTime(DateTime* dt, char* gpsUbloxTime) {
     u32 time = atoi(gpsUbloxTime);
     dt->sec = time % 100;
@@ -21,82 +19,83 @@ void setDate(DateTime* dt, char* gpsUbloxDate) {
 u8 fillGprmc(char* pData, PckgGnss* pckg) {
     u8    ret = GPS_OK;
     char* token;
+    char* p_gngga;
+    char* p_gnrmc;
 
-    token = strsep(&pData, ",");  // $GPGGA
-    if (*token != '$') {
-        return GPS_GPRMC_ERR_PARS;
+    // Check GNGGA, GNRMC prefixes
+    p_gngga = strsep(&pData, "\n");
+    p_gnrmc = strsep(&pData, "\n");
+
+    token = strsep(&p_gngga, ",");  // $GNGGA
+    if (strcmp(token, "$GNGGA") != 0) {
+        return GPS_GPGGA_ERR_PARS;
     }
-    token = strsep(&pData, ",");  // time
-    token = strsep(&pData, ",");  // latitude
-    token = strsep(&pData, ",");  // N/S
-    token = strsep(&pData, ",");  // longtitude
-    token = strsep(&pData, ",");  // W/E
-    token = strsep(&pData, ",");  // pos fix indicator
-
-    token = strsep(&pData, ",");  // sattelites
-    if (*token != '\0') {
-        pckg->coords.sattelites = atoi(token);
-    } else {
-        return GPS_GPGGA_ERR_PARS_SAT;
-    }
-
-    token = strsep(&pData, ",");  // hdop
-    if (*token != '\0') {
-        pckg->coords.hdop = (int)(atof(token) * 100);
-    } else {
-        return GPS_GPGGA_ERR_PARS_HDOP;
-    }
-
-    token = strsep(&pData, ",");  // altitude
-    if (*token != '\0') {
-        pckg->coords.altitude = (int)(atof(token) * 100);
-    } else {
-        return GPS_GPGGA_ERR_PARS_ALT;
-    }
-
-    token = strsep(&pData, "\n");
-
-    token = strsep(&pData, ",");
-    if (*token != '$') {
+    token = strsep(&p_gnrmc, ",");  // $GNRMC
+    if (strcmp(token, "$GNRMC") != 0) {
         return GPS_GPRMC_ERR_PARS;
     }
 
-    token = strsep(&pData, ",");  // hhmmss.ss
+    // Parse GNRMC string
+    token = strsep(&p_gnrmc, ",");  // hhmmss.ss
     if (*token != '\0') {
         setTime(&pckg->dateTime, token);
     } else {
         return GPS_GPRMC_ERR_PARS_TIME;
     }
-    token = strsep(&pData, ",");  // validity - A-ok, V-invalid
+    token = strsep(&p_gnrmc, ",");  // validity - A-ok, V-invalid
     if (*token == 'A') {
-        if ((ret = setCoords(&pData, &pckg->coords.latitude)) != GPS_OK) return ret;
-        if ((ret = setCoords(&pData, &pckg->coords.longitude)) != GPS_OK) return ret;
+        if ((ret = setCoords(&p_gnrmc, &pckg->coords.latitude)) != GPS_OK) return ret;
+        if ((ret = setCoords(&p_gnrmc, &pckg->coords.longitude)) != GPS_OK) return ret;
 
-        token = strsep(&pData, ",");  // speed
+        token = strsep(&p_gnrmc, ",");  // speed
         if (*token != '\0') {
             pckg->coords.speed = (int)(atof(token) * 1.8 * 10);
         } else {
             return GPS_GPRMC_ERR_PARS_SPEED;
         }
-
-        token = strsep(&pData, ",");  // course
+        token = strsep(&p_gnrmc, ",");  // course
         if (*token != '\0') {
             pckg->coords.course = (int)(atof(token) * 10);
         } else {
             return GPS_GPRMC_ERR_PARS_COURSE;
         }
-
-        token = strsep(&pData, ",");
+        token = strsep(&p_gnrmc, ",");
         if (*token != '\0') {
             setDate(&pckg->dateTime, token);
         } else {
             return GPS_GPRMC_ERR_PARS_DATE;
         }
 
+        // Parse GNGGA string
+        token = strsep(&p_gngga, ",");  // time
+        token = strsep(&p_gngga, ",");  // latitude
+        token = strsep(&p_gngga, ",");  // N/S
+        token = strsep(&p_gngga, ",");  // longtitude
+        token = strsep(&p_gngga, ",");  // W/E
+        token = strsep(&p_gngga, ",");  // pos fix indicator
+
+        token = strsep(&p_gngga, ",");  // sattelites
+        if (*token != '\0') {
+            pckg->coords.sattelites = atoi(token);
+        } else {
+            return GPS_GPGGA_ERR_PARS_SAT;
+        }
+        token = strsep(&p_gngga, ",");  // hdop
+        if (*token != '\0') {
+            pckg->coords.hdop = (int)(atof(token) * 100);
+        } else {
+            return GPS_GPGGA_ERR_PARS_HDOP;
+        }
+        token = strsep(&p_gngga, ",");  // altitude
+        if (*token != '\0') {
+            pckg->coords.altitude = (int)(atof(token) * 100);
+        } else {
+            return GPS_GPGGA_ERR_PARS_ALT;
+        }
     } else if (*token == 'V') {
         return GPS_GPRMC_ERR_INVALID_DATA_STATUS;
     } else {
-        return GPS_GPRMC_ERR_PARS;
+        return GPS_GPRMC_ERR_PARS_FLAG;
     }
     return ret;
 }

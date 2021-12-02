@@ -11,6 +11,7 @@ extern u16 iwdgTaskReg;
 
 extern osMutexId mutexGPSBufHandle;
 extern osMutexId mutexRTCHandle;
+extern osMutexId mutexSessionHandle;
 
 extern osThreadId webExchangeHandle;
 extern osThreadId keepAliveHandle;
@@ -36,8 +37,13 @@ u8 setGPSUnixTime(DateTime *dt);
 
 void taskGetGPS(void const *argument) {
     u8  ret;
+    u8  gpsParceErrCnt = 0;
+    u16 gpsParseErr = 0;
     u32 numIteration = 0;
     u8  gps_step = GPS_STEP_NONE;
+
+    PckgTelemetry pckgTel;
+
     cBufInit(&circBufGnss, uInfoGnss.pRxBuf, uInfoGnss.szRxBuf, CIRC_TYPE_GNSS);
 
     spiFlashInit(circBufAllPckgs.buf);
@@ -60,7 +66,7 @@ void taskGetGPS(void const *argument) {
         if (uInfoGnss.irqFlags.isIrqIdle) {
             uInfoGnss.irqFlags.isIrqIdle = 0;
             memcpy(bufGnss, uInfoGnss.pRxBuf, 300);
-            // LOG_GPS(LEVEL_INFO, "%s", bufGnss);
+            // LOG_GPS(LEVEL_INFO, "\r\n%s", bufGnss);
             ret = fillGprmc(bufGnss, &pckgGnss);
             switch (gps_step) {
                 case GPS_STEP_NONE:
@@ -71,7 +77,6 @@ void taskGetGPS(void const *argument) {
                         if (!setGPSUnixTime(&pckgGnss.dateTime)) {
                             break;
                         }
-                        // // generateTestPackage();
                         // generateInitTelemetry();
                         // unLockTasks();
 
@@ -96,12 +101,31 @@ void taskGetGPS(void const *argument) {
                             setGPSUnixTime(&pckgGnss.dateTime);
                         }
                         numIteration++;
+                        gpsParceErrCnt = 0;
+                        gpsParseErr = 0;
                     } else if (ret == GPS_GPRMC_ERR_INVALID_DATA_STATUS) {
                         bsg.cur_gps.valid = 0;
+                        gpsParceErrCnt = 0;
+                        gpsParseErr = 0;
                         bsg.stat.gpsInvaligCount++;
                     } else {
                         bsg.cur_gps.valid = 0;
                         bsg.stat.gpsParseFailCount++;
+                        gpsParceErrCnt++;
+                        gpsParseErr |= (1 << ret);
+                        if (gpsParceErrCnt == 15) {
+                            pckgTel.group = TEL_GR_SIMCOM;
+                            pckgTel.code = TEL_CD_SIM_GPS_PARSE_ERROR;
+                            pckgTel.data = gpsParseErr;
+                            saveTelemetry(&pckgTel, &circBufAllPckgs);
+                            gpsParceErrCnt = 0;
+                            gpsParseErr = 0;
+                            bsg.cur_gps.valid = 0;
+
+                            osMutexWait(mutexSessionHandle, osWaitForever);
+                            simReset();
+                            osMutexRelease(mutexSessionHandle);
+                        }
                     }
                     break;
                 default:
@@ -155,7 +179,7 @@ u8 setGPSUnixTime(DateTime *dt) {
 
         osMutexWait(mutexRTCHandle, osWaitForever);
         if (stmDate.Year < 36 &&
-            stmDate.Year > 19) {  // sometimes timestamp is wrong and has
+            stmDate.Year > 10) {  // sometimes timestamp is wrong and has
                                   // value like 2066 year
             HAL_RTC_SetTime(&hrtc, &stmTime, RTC_FORMAT_BIN);
             HAL_RTC_SetDate(&hrtc, &stmDate, RTC_FORMAT_BIN);
@@ -201,83 +225,4 @@ void generateInitTelemetry() {
 
     updSpiFlash(&circBufAllPckgs);
     xSemaphoreGive(semCreateWebPckgHandle);
-}
-
-void generateTestPackage() {
-    PckgTelemetry pckgTel;
-    PckgTemp      pckgTemp;
-    PckgGnss      pckgGnss;
-    PckgDoors     pckgDoors;
-
-    LOG_WEB(LEVEL_MAIN, "Generate TEST package\r\n");
-
-    pckgTel.group = 0x10;
-    pckgTel.code = 0x01;
-    pckgTel.data = 4;
-    saveTelemetry(&pckgTel, &circBufAllPckgs);
-
-    pckgTel.group = 0x10;
-    pckgTel.code = 0x02;
-    pckgTel.data = 3;
-    saveTelemetry(&pckgTel, &circBufAllPckgs);
-
-    pckgTel.group = 0x10;
-    pckgTel.code = 0x03;
-    pckgTel.data = 3;
-    saveTelemetry(&pckgTel, &circBufAllPckgs);
-
-    pckgTel.group = 0x10;
-    pckgTel.code = 0x04;
-    pckgTel.data = (3 << 24) | 7;
-    saveTelemetry(&pckgTel, &circBufAllPckgs);
-
-    pckgTel.group = 0x10;
-    pckgTel.code = 0x05;
-    pckgTel.data = (3 << 24) | 8;
-    saveTelemetry(&pckgTel, &circBufAllPckgs);
-
-    pckgTemp.unixTimeStamp = getUnixTimeStamp();
-    pckgTemp.temp[0] = 102;
-    pckgTemp.temp[1] = 0;
-    pckgTemp.temp[2] = 3;
-    pckgTemp.temp[3] = 16;
-    saveData((u8 *)&pckgTemp, SZ_CMD_TEMP, CMD_DATA_TEMP, &circBufAllPckgs);
-    pckgTemp.temp[2] = 4;
-    pckgTemp.temp[3] = 17;
-    saveData((u8 *)&pckgTemp, SZ_CMD_TEMP, CMD_DATA_TEMP, &circBufAllPckgs);
-    pckgTemp.temp[2] = 5;
-    pckgTemp.temp[3] = 16;
-    saveData((u8 *)&pckgTemp, SZ_CMD_TEMP, CMD_DATA_TEMP, &circBufAllPckgs);
-    pckgTemp.temp[2] = 6;
-    pckgTemp.temp[3] = 15;
-    saveData((u8 *)&pckgTemp, SZ_CMD_TEMP, CMD_DATA_TEMP, &circBufAllPckgs);
-
-    pckgGnss.unixTimeStamp = getUnixTimeStamp();
-    pckgGnss.coords.latitude.fst = 6002;
-    pckgGnss.coords.latitude.sec = 797666;
-    pckgGnss.coords.longitude.fst = 3020;
-    pckgGnss.coords.longitude.sec = 346243;
-    pckgGnss.coords.altitude = 4454;
-    pckgGnss.coords.course = 2968;
-    pckgGnss.coords.speed = 9;
-    pckgGnss.coords.sattelites = 12;
-    pckgGnss.coords.hdop = 88;
-    serializePckgGnss(bufPckgGnss, &pckgGnss);
-    saveData((u8 *)&bufPckgGnss, SZ_CMD_GEO_PLUS, CMD_DATA_GEO_PLUS, &circBufAllPckgs);
-
-    pckgDoors.unixTimeStamp = getUnixTimeStamp();
-    pckgDoors.number = 1;
-    pckgDoors.state = 7;
-    saveData((u8 *)&pckgDoors, SZ_CMD_DOORS, CMD_DATA_DOORS, &circBufAllPckgs);
-    pckgDoors.number = 1;
-    pckgDoors.state = 6;
-    saveData((u8 *)&pckgDoors, SZ_CMD_DOORS, CMD_DATA_DOORS, &circBufAllPckgs);
-    pckgDoors.number = 1;
-    pckgDoors.state = 4;
-    saveData((u8 *)&pckgDoors, SZ_CMD_DOORS, CMD_DATA_DOORS, &circBufAllPckgs);
-    pckgDoors.number = 1;
-    pckgDoors.state = 0;
-    saveData((u8 *)&pckgDoors, SZ_CMD_DOORS, CMD_DATA_DOORS, &circBufAllPckgs);
-
-    updSpiFlash(&circBufAllPckgs);
 }

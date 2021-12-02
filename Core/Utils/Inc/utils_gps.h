@@ -13,12 +13,12 @@
 #define GPS_GPRMC_ERR_PARS_COURSE         4
 #define GPS_GPRMC_ERR_PARS_TIME           5
 #define GPS_GPRMC_ERR_PARS_DATE           6
-#define GPS_GPRMC_ERR_7                   7
-#define GPS_GPRMC_ERR_8                   8
-#define GPS_GPRMC_ERR_PARS                9
-#define GPS_GPGGA_ERR_PARS_SAT            10
-#define GPS_GPGGA_ERR_PARS_HDOP           11
-#define GPS_GPGGA_ERR_PARS_ALT            12
+#define GPS_GPRMC_ERR_PARS_FLAG           7
+#define GPS_GPRMC_ERR_PARS                8
+#define GPS_GPGGA_ERR_PARS                16
+#define GPS_GPGGA_ERR_PARS_SAT            17
+#define GPS_GPGGA_ERR_PARS_HDOP           18
+#define GPS_GPGGA_ERR_PARS_ALT            19
 
 u8    fillGprmc(char* pData, PckgGnss* pckg);
 void  clearGprmc();
