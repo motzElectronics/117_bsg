@@ -74,9 +74,13 @@ void taskGetGPS(void const *argument) {
                     break;
                 case GPS_STEP_TIMESYNC:
                     if (ret == GPS_OK) {
+                        pckgTel.group = TEL_GR_SIMCOM;
+                        pckgTel.code = TEL_CD_SIM_GPS_TIMESYNC;
+                        pckgTel.data = getUnixTimeStamp();
                         if (!setGPSUnixTime(&pckgGnss.dateTime)) {
                             break;
                         }
+                        saveTelemetry(&pckgTel, &circBufAllPckgs);
                         // generateInitTelemetry();
                         // unLockTasks();
 
@@ -98,7 +102,13 @@ void taskGetGPS(void const *argument) {
                             }
                         }
                         if (!(numIteration % 1800)) {
+                            pckgTel.group = TEL_GR_SIMCOM;
+                            pckgTel.code = TEL_CD_SIM_GPS_TIMESYNC;
+                            pckgTel.data = getUnixTimeStamp();
+
                             setGPSUnixTime(&pckgGnss.dateTime);
+
+                            saveTelemetry(&pckgTel, &circBufAllPckgs);
                         }
                         numIteration++;
                         gpsParceErrCnt = 0;
