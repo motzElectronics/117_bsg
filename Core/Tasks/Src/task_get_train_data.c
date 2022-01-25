@@ -39,20 +39,6 @@ void taskGetTrainData(void const* argument) {
 
         switch (bsg.tablo.initStep) {
             case IU_INIT_NONE:
-                if (bsg.cur_gps.valid == 0) {
-                    osDelay(1000);
-                    continue;
-                }
-                LOG(LEVEL_MAIN, "IU_INIT_NONE\r\n");
-                gps_body.valid = bsg.cur_gps.valid;
-                gps_body.speed = bsg.cur_gps.coords.speed;
-                gps_body.stopTime = bsg.cur_gps.stopTime;
-
-                if (tablo_send_request(CMD_GNSS_SHORT, (u8*)&gps_body, sizeof(gps_body_t))) {
-                    bsg.tablo.initStep = IU_INIT_TIMESYNC;
-                } else {
-                    osDelay(1000);
-                }
                 bsg.tablo.initStep = IU_INIT_TIMESYNC;
                 break;
             case IU_INIT_TIMESYNC:
@@ -69,10 +55,27 @@ void taskGetTrainData(void const* argument) {
                 bsg.tablo.info.idFirmware = 0;
                 res = tablo_send_request(CMD_GET_INFO, NULL, 0);
                 if (res && bsg.tablo.info.idFirmware != 0 && bsg.tablo.info.idMCU[0] != 0) {
-                    bsg.tablo.initStep = IU_INIT_COMPLETE;
+                    bsg.tablo.initStep = IU_INIT_GEODATA;
                 }
 
                 generateMsgTabloFW();
+                break;
+            case IU_INIT_GEODATA:
+                if (bsg.cur_gps.valid == 0) {
+                    osDelay(1000);
+                    continue;
+                }
+                LOG(LEVEL_MAIN, "IU_INIT_NONE\r\n");
+                gps_body.valid = bsg.cur_gps.valid;
+                gps_body.speed = bsg.cur_gps.coords.speed;
+                gps_body.stopTime = bsg.cur_gps.stopTime;
+
+                if (tablo_send_request(CMD_GNSS_SHORT, (u8*)&gps_body, sizeof(gps_body_t))) {
+                    bsg.tablo.initStep = IU_INIT_COMPLETE;
+                } else {
+                    osDelay(1000);
+                }
+                bsg.tablo.initStep = IU_INIT_COMPLETE;
                 break;
             case IU_INIT_COMPLETE:
                 if (iter % 10000 == 7000) {

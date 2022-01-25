@@ -12,6 +12,7 @@ typedef enum {
     IU_INIT_NONE = 0,
     IU_INIT_TIMESYNC = 1,
     IU_INIT_GET_INFO,
+    IU_INIT_GEODATA,
     IU_INIT_COMPLETE
 } InitStep;
 

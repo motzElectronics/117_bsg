@@ -92,7 +92,7 @@ void taskCreateWebPckg(void const *argument) {
             szAllPages = getSzAllPages();
             if (szAllPages) {
                 // LOG_WEB(LEVEL_INFO, "Create package\r\n");
-                initWebPckg(curPckg, szAllPages, 0, &bsg.idMCU, bsg.server);
+                initWebPckg(curPckg, szAllPages, 0, (u8 *)&bsg.idMCU, bsg.server);
                 addPagesToWebPckg(curPckg);
                 if (osMessagePut(queueWebPckgHandle, (u32)curPckg, 180000) != osOK) {
                     bsg.stat.queueErrCount++;
