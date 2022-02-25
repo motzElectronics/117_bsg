@@ -228,10 +228,11 @@ void saveData(u8* data, u8 sz, u8 cmdData, CircularBuffer* cbuf) {
         cBufWriteToBuf(cbuf, (u8*)bufEnd, 4);
         spiFlashWriteNextPg(cbuf->buf, cbuf->readAvailable, 0);
         cBufReset(cbuf);
-    } else {
-        cBufWriteToBuf(cbuf, &cmdData, 1);
-        cBufWriteToBuf(cbuf, data, sz);
     }
+
+    cBufWriteToBuf(cbuf, &cmdData, 1);
+    cBufWriteToBuf(cbuf, data, sz);
+
     osMutexRelease(mutexGPSBufHandle);
 }
 
