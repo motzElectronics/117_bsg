@@ -35,8 +35,6 @@ void bsgInit() {
     memset(&bsg.cur_gps, 0, sizeof(gps_state_t));
     memset(&bsg.timers, 0, sizeof(time_stat_t));
     bsg.cur_gps.stopTime = 100;
-
-    setUnixTimeStamp(946684800);
 }
 
 void updateCurCoords(PckgGnss* pckgGnss) {

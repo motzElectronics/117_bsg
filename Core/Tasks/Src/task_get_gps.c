@@ -44,8 +44,9 @@ void taskGetGPS(void const *argument) {
 
     PckgTelemetry pckgTel;
 
-    cBufInit(&circBufGnss, uInfoGnss.pRxBuf, uInfoGnss.szRxBuf, CIRC_TYPE_GNSS);
+    setUnixTimeStamp(946684800);
 
+    cBufInit(&circBufGnss, uInfoGnss.pRxBuf, uInfoGnss.szRxBuf, CIRC_TYPE_GNSS);
     spiFlashInit(circBufAllPckgs.buf);
     cBufReset(&circBufAllPckgs);
 
