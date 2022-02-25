@@ -35,6 +35,8 @@ void bsgInit() {
     memset(&bsg.cur_gps, 0, sizeof(gps_state_t));
     memset(&bsg.timers, 0, sizeof(time_stat_t));
     bsg.cur_gps.stopTime = 100;
+
+    setUnixTimeStamp(946684800);
 }
 
 void updateCurCoords(PckgGnss* pckgGnss) {
@@ -61,6 +63,47 @@ u32 getUnixTimeStamp() {
 
     t = mktime(&curTime);
     return (u32)t;
+}
+
+void setUnixTimeStamp(u32 timeStamp) {
+    if (timeStamp < 946684800) {
+        LOG(LEVEL_ERROR, "BAD TIMESTAMP\r\n");
+        return;
+    }
+
+    RTC_TimeTypeDef sTime;
+    RTC_DateTypeDef sDate;
+
+    osMutexWait(mutexRTCHandle, osWaitForever);
+
+    struct tm time_tm;
+    time_t    now = (time_t)timeStamp;
+    time_tm = *(localtime(&now));
+
+    sTime.Hours = (uint8_t)time_tm.tm_hour;
+    sTime.Minutes = (uint8_t)time_tm.tm_min;
+    sTime.Seconds = (uint8_t)time_tm.tm_sec;
+    sTime.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
+    sTime.StoreOperation = RTC_STOREOPERATION_RESET;
+    if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK) {
+        LOG(LEVEL_ERROR, "Failed to set time\r\n");
+    }
+
+    if (time_tm.tm_wday == 0) { time_tm.tm_wday = 7; }  // the chip goes mon tue wed thu fri sat sun
+    sDate.WeekDay = (uint8_t)time_tm.tm_wday;
+    sDate.Month = (uint8_t)time_tm.tm_mon + 1;  // momth 1- This is why date math is frustrating.
+    sDate.Date = (uint8_t)time_tm.tm_mday;
+    sDate.Year = (uint16_t)(time_tm.tm_year + 1900 - 2000);  // time.h is years since 1900, chip is years since 2000
+
+    /*
+     * update the RTC
+     */
+    if (HAL_RTC_SetDate(&hrtc, &sDate, RTC_FORMAT_BIN) != HAL_OK) {
+        LOG(LEVEL_ERROR, "Failed to set date\r\n");
+    }
+
+    HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR0, 0x32F2);  // lock it in with the backup registers
+    osMutexRelease(mutexRTCHandle);
 }
 
 void getServerTime() {

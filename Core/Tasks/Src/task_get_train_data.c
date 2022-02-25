@@ -78,10 +78,10 @@ void taskGetTrainData(void const* argument) {
                 bsg.tablo.initStep = IU_INIT_COMPLETE;
                 break;
             case IU_INIT_COMPLETE:
-                if (iter % 10000 == 7000) {
+                if (iter % 2000 == 700) {
                     timeStamp = getUnixTimeStamp();
                     tablo_send_request(CMD_SYNC, (u8*)&timeStamp, sizeof(timeStamp));
-                } else if (iter % 50 == 40) {
+                } else if (iter % 20 == 10) {
                     gps_body.valid = bsg.cur_gps.valid;
                     gps_body.speed = bsg.cur_gps.coords.speed;
                     gps_body.stopTime = bsg.cur_gps.stopTime;

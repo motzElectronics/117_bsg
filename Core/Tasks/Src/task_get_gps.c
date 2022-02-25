@@ -85,6 +85,15 @@ void taskGetGPS(void const *argument) {
                         // unLockTasks();
 
                         gps_step = GPS_STEP_WORK;
+                        numIteration = 0;
+                    } else {
+                        if (!(numIteration % 5)) {
+                            pckgTel.group = TEL_GR_HARDWARE_STATUS;
+                            pckgTel.code = TEL_CD_HW_BSG_ALIVE;
+                            pckgTel.data = 200;
+                            saveTelemetry(&pckgTel, &circBufAllPckgs);
+                        }
+                        numIteration++;
                     }
                     break;
                 case GPS_STEP_WORK:
@@ -170,7 +179,7 @@ u8 checkStopTrain(PckgGnss *pckg) {
         bsg.cur_gps.stopTime = 0;
     }
 
-    if (bsg.cur_gps.stopTime > 10) {
+    if (bsg.cur_gps.stopTime > 60) {
         return TRAIN_STOP;
     }
     return TRAIN_MOVE;

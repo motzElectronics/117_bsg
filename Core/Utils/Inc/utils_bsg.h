@@ -26,7 +26,7 @@
 
 #define BSG_MSG_NO_GPS (char*)"0000.000000,N,00000.000000,E,+0000,000,000"
 
-#define BSG_ID_FIRMWARE         2
+#define BSG_ID_FIRMWARE         3
 #define BSG_ID_BOOT             2
 #define BSG_ID_TRAINCAR         0
 #define BSG_ID_TRAIN            1706
@@ -321,6 +321,7 @@ void bsgInit();
 void updateCurCoords(PckgGnss* pckgGnss);
 
 u32  getUnixTimeStamp();
+void setUnixTimeStamp(u32 timeStamp);
 void getServerTime();
 void getBsgNumFw();
 void getTabloNumFw();
