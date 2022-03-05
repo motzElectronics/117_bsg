@@ -2,6 +2,7 @@
 
 #include "../Tasks/Inc/task_iwdg.h"
 #include "../Utils/Inc/utils_bsg.h"
+#include "../Utils/Inc/utils_flash.h"
 #include "../Utils/Inc/utils_pckgs_manager.h"
 
 extern u16 iwdgTaskReg;
@@ -96,6 +97,45 @@ void generateMsgTabloFW() {
     pckgTel.code = TEL_CD_127_TABLO_BOOT_ERR;
     pckgTel.data = bsg.tablo.info.bootErr;
     saveTelemetry(&pckgTel, &circBufAllPckgs);
+}
+
+ErrorStatus sendMsgDevOn() {
+    ErrorStatus   ret = SUCCESS;
+    PckgTelemetry pckgTel;
+    u8            ptr = 0;
+    u8*           idMCU;
+    u32           tmp;
+
+    // idMCU = (u8*)&bsg.tablo.info.idMCU;
+    idMCU = (u8*)&bsg.idMCU;
+
+    LOG(LEVEL_MAIN, "sendMsgDevOn\r\n");
+
+    memset(bufTxData, 0, 128);
+    pckgTel.group = TEL_GR_GENINF;
+    pckgTel.code = TEL_CD_GENINF_NUM_FIRMWARE;
+    pckgTel.data = BSG_ID_FIRMWARE;
+    pckgTel.unixTimeStamp = getUnixTimeStamp();
+    copyTelemetry(&bufTxData[SZ_CMD_TELEMETRY * ptr++], &pckgTel);
+
+    pckgTel.code = TEL_CD_GENINF_NUM_BOOT;
+    pckgTel.data = bsg.info.idBoot;
+    copyTelemetry(&bufTxData[SZ_CMD_TELEMETRY * ptr++], &pckgTel);
+
+    pckgTel.group = TEL_GR_HARDWARE_STATUS;
+    pckgTel.code = TEL_CD_HW_BSG;
+    pckgTel.data = 1;
+    copyTelemetry(&bufTxData[SZ_CMD_TELEMETRY * ptr++], &pckgTel);
+
+    pckgTel.code = TEL_CD_HW_UPDATE_ERR;
+    tmp = getFlashData(FLASH_ADDR_ERR_NEW_FIRMWARE);
+    if (tmp > 10) tmp = 0;
+    pckgTel.data = tmp;
+    copyTelemetry(&bufTxData[SZ_CMD_TELEMETRY * ptr++], &pckgTel);
+
+    ret = sendWebPckgData(CMD_DATA_TELEMETRY, bufTxData, SZ_CMD_TELEMETRY * ptr, ptr, idMCU);
+
+    return ret;
 }
 
 ErrorStatus sendMsgTabloFW() {

@@ -61,11 +61,11 @@ void taskGetTrainData(void const* argument) {
                 generateMsgTabloFW();
                 break;
             case IU_INIT_GEODATA:
-                if (bsg.cur_gps.valid == 0) {
-                    osDelay(1000);
-                    continue;
-                }
-                LOG(LEVEL_MAIN, "IU_INIT_NONE\r\n");
+                // if (bsg.cur_gps.valid == 0) {
+                //     osDelay(1000);
+                //     continue;
+                // }
+                LOG(LEVEL_MAIN, "IU_INIT_GEODATA\r\n");
                 gps_body.valid = bsg.cur_gps.valid;
                 gps_body.speed = bsg.cur_gps.coords.speed;
                 gps_body.stopTime = bsg.cur_gps.stopTime;

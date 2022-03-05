@@ -16,6 +16,7 @@ void generateMsgTabloFW();
 ErrorStatus sendMsgTabloFW();
 ErrorStatus sendMsgFWUpdated();
 ErrorStatus sendMsgFWUpdateBegin();
+ErrorStatus sendMsgDevOn();
 ErrorStatus sendMsgDevOff();
 ErrorStatus sendMsgStatistics();
 

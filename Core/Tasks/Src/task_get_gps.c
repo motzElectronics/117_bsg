@@ -40,6 +40,7 @@ void taskGetGPS(void const *argument) {
     u8  gpsParceErrCnt = 0;
     u16 gpsParseErr = 0;
     u32 numIteration = 0;
+    u32 comnErrCnt = 0;
     u8  gps_step = GPS_STEP_NONE;
 
     PckgTelemetry pckgTel;
@@ -56,8 +57,11 @@ void taskGetGPS(void const *argument) {
     }
 
     // TODO: time should be syncronized by GPS
-    getServerTime();
+    // getServerTime();
     generateInitTelemetry();
+    if (bsg.server == SERVER_NIAC) {
+        sendMsgDevOn();
+    }
     unLockTasks();
     gps_step = GPS_STEP_TIMESYNC;
 
@@ -88,7 +92,7 @@ void taskGetGPS(void const *argument) {
                         gps_step = GPS_STEP_WORK;
                         numIteration = 0;
                     } else {
-                        if (!(numIteration % 5)) {
+                        if (!(numIteration % 10)) {
                             pckgTel.group = TEL_GR_HARDWARE_STATUS;
                             pckgTel.code = TEL_CD_HW_BSG_ALIVE;
                             pckgTel.data = 200;
@@ -151,6 +155,21 @@ void taskGetGPS(void const *argument) {
                 default:
                     gps_step = GPS_STEP_NONE;
                     break;
+            }
+            if (ret != GPS_OK) {
+                comnErrCnt++;
+                if (!(comnErrCnt % 1200)) {
+                    pckgTel.group = TEL_GR_SIMCOM;
+                    pckgTel.code = TEL_CD_SIM_GPS_RESET;
+                    pckgTel.data = comnErrCnt;
+                    saveTelemetry(&pckgTel, &circBufAllPckgs);
+
+                    osMutexWait(mutexSessionHandle, osWaitForever);
+                    simReset();
+                    osMutexRelease(mutexSessionHandle);
+                }
+            } else {
+                comnErrCnt = 0;
             }
             memset(bufGnss, '\0', sizeof(bufGnss));
             uartClearInfo(&uInfoGnss);
